@@ -1,0 +1,26 @@
+{
+    email {$EMAIL_FOR_SSL}
+}
+
+{$DOMAIN_NAME} {
+    # ─── Frontend (Nginx/Static) ───
+    reverse_proxy frontend:80
+
+    # ─── Backend API ───
+    handle_path /api/* {
+        reverse_proxy backend:3000
+    }
+
+    # ─── Tracking WebSockets ───
+    handle_path /ws/* {
+        reverse_proxy backend:3000
+    }
+
+    # ─── Media Storage (if served via backend) ───
+    handle_path /uploads/* {
+        reverse_proxy backend:3000
+    }
+
+    # Optional: Gzip compression
+    encode gzip
+}

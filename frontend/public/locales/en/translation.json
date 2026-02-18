@@ -1,0 +1,672 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "drivers": "Drivers",
+    "vehicles": "Vehicles",
+    "trips": "Trips",
+    "shifts": "Shifts",
+    "inspections": "Inspections",
+    "expenses": "Expenses",
+    "damage_reports": "Damage Reports",
+    "tracking": "Live Tracking",
+    "reports": "Reports",
+    "audit_logs": "Audit Logs",
+    "verification": "Verification",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "nav_driver": {
+    "home": "Home",
+    "shift": "Shift",
+    "trips": "Trips",
+    "inspection": "Inspection",
+    "expenses": "Expenses",
+    "damage": "Damage"
+  },
+  "auth": {
+    "login": "Login",
+    "email": "Email Address",
+    "password": "Password",
+    "forgot_password": "Forgot Password?",
+    "session_expired": "Session expired. Please login again.",
+    "signing_in": "Signing in...",
+    "sign_in": "Sign In",
+    "enter_email": "Enter your email",
+    "enter_password": "Enter your password",
+    "fleet_platform": "Fleet Management Platform",
+    "login_failed": "Login failed. Please check your credentials.",
+    "forgot_password_title": "Reset Password",
+    "forgot_password_desc": "Enter your email to receive a password reset link.",
+    "send_reset_link": "Send Reset Link",
+    "back_to_login": "Back to Login",
+    "reset_password_title": "Create New Password",
+    "reset_password_desc": "Enter your new password below.",
+    "new_password": "New Password",
+    "confirm_password": "Confirm Password",
+    "passwords_dont_match": "Passwords do not match",
+    "reset_success": "Password reset successfully! Redirecting to login...",
+    "invalid_token": "Invalid or expired reset link.",
+    "reset_btn": "Reset Password",
+    "reset_link_sent": "If an account exists with that email, we have sent a password reset link.",
+    "email_sent_check": "Please check your email for a password reset link."
+  },
+  "trip": {
+    "start_trip": "Start Trip",
+    "complete_trip": "Complete Trip",
+    "cancel_trip": "Cancel Trip",
+    "status": "Trip Status",
+    "pickup": "Pickup Location",
+    "dropoff": "Drop-off Location",
+    "my_trips": "My Trips",
+    "no_trips": "No trips assigned yet",
+    "price_unit": "EGP",
+    "passenger": "Passenger",
+    "bags": "Bags",
+    "no_phone": "No Phone",
+    "scheduled": "Scheduled",
+    "status_in_progress": "Active"
+  },
+  "shift": {
+    "management": "Shift Management",
+    "no_active": "No Active Shift",
+    "start_desc": "Start a shift to begin accepting trips and recording your activity.",
+    "start_btn": "Start Driver Shift",
+    "active": "Shift Active",
+    "pending": "Pending Verification",
+    "biometric_title": "Biometric Verification",
+    "biometric_desc": "Please capture a clear selfie to verify your identity and start your shift.",
+    "activate_btn": "Activate Shift",
+    "end_btn": "End Shift",
+    "vehicle": "Vehicle",
+    "started_at": "Started",
+    "not_assigned": "Not assigned",
+    "manual_review_alert": "Verification requires manual review. Please wait for admin approval.",
+    "failed_alert": "Verification failed. Please try again or contact support.",
+    "close_confirm": "Are you sure you want to close your shift?"
+  },
+  "driver_home": {
+    "identity_pending": "Identity verification pending",
+    "identity_required": "Action Required: Verify Identity",
+    "admin_review_desc": "Admin is reviewing your documents. Tap refresh once approved.",
+    "upload_needed_desc": "Please upload your photo and National ID to start driving.",
+    "refresh_status": "Refresh Status",
+    "upload_docs": "Upload Documents",
+    "edit_photo": "Edit Photo",
+    "current_vehicle": "Current Vehicle",
+    "scan_qr_desc": "Scan vehicle QR code to start driving.",
+    "enter_qr": "Enter QR Code (e.g. VH-QR-001)",
+    "assign_btn": "Assign",
+    "daily_earnings": "Daily Earnings",
+    "selfie_label": "Selfie Photo",
+    "id_front": "ID Front",
+    "id_back": "ID Back",
+    "selected": "Selected",
+    "tap_select": "Tap to select",
+    "upload_success": "Documents uploaded. Pending admin review.",
+    "status_refreshed": "Status refreshed",
+    "photo_updated": "Profile photo updated"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "approve": "Approve",
+    "reject": "Reject",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "hi": "Hi",
+    "brand": "Sezar Drive",
+    "confirm": "Confirm",
+    "prompt": "Prompt",
+    "submit": "Submit",
+    "view": "View",
+    "yes": "Yes",
+    "no": "No",
+    "currency": "EGP",
+    "inspection_type": {
+      "start_shift": "Start Shift",
+      "end_shift": "End Shift",
+      "pre_trip": "Pre-Trip",
+      "post_trip": "Post-Trip"
+    },
+    "status": {
+      "assigned": "Assigned",
+      "started": "Started",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "available": "Available",
+      "in_use": "In Use",
+      "maintenance": "Maintenance",
+      "damaged": "Damaged",
+      "active": "Active",
+      "inactive": "Inactive",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "pendingverification": "Pending Verification",
+      "closed": "Closed",
+      "verified": "Verified",
+      "manual_review": "Manual Review",
+      "in_progress": "Active",
+      "all": "All"
+    }
+  },
+  "entities": {
+    "driver": "Driver",
+    "vehicle": "Vehicle",
+    "trip": "Trip",
+    "shift": "Shift",
+    "expense": "Expense",
+    "user": "User"
+  },
+  "roles": {
+    "admin": "Admin",
+    "driver": "Driver",
+    "system": "System"
+  },
+  "errors": {
+    "NO_ACTIVE_SHIFT": "Driver {{name}} does not have an active shift. They must start and activate their shift first.",
+    "ACTIVE_TRIP_EXISTS": "Driver {{name}} already has an active or assigned trip.",
+    "NO_VEHICLE_ASSIGNED": "Driver has no assigned vehicle.",
+    "INSPECTION_REQUIRED": "Vehicle inspection not completed.",
+    "IDENTITY_NOT_VERIFIED": "Driver identity not verified."
+  },
+  "actions": {
+    "created": "Created",
+    "updated": "Updated",
+    "deleted": "Deleted",
+    "assigned": "Assigned",
+    "started": "Started",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "activated": "Activated",
+    "closed": "Closed",
+    "verified": "Verified",
+    "preferences_updated": "Preferences Updated",
+    "resolved": "Resolved",
+    "acknowledged": "Acknowledged",
+    "maintenance": "Sent to Maintenance",
+    "login": "Login",
+    "logout": "Logout",
+    "locked": "Locked",
+    "unlocked": "Unlocked"
+  },
+  "auth_types": {
+    "login": "Login",
+    "logout": "Logout",
+    "face_verification": "Face Verification"
+  },
+  "damage": {
+    "report_title": "Report Vehicle Damage",
+    "describe_label": "Describe the damage *",
+    "placeholder": "Describe the location, severity, and cause of damage...",
+    "add_photo": "Add Photo",
+    "photos": "Photos",
+    "no_photos": "No photos added yet",
+    "submit": "Submit Damage Report",
+    "success_title": "Damage Report Submitted",
+    "success_desc": "Admin will review your report shortly.",
+    "submit_another": "Submit Another Report",
+    "error_shift": "Active shift required to report damage.",
+    "error_vehicle": "No active vehicle assignment found. Please scan a vehicle QR code first."
+  },
+  "expenses": {
+    "title": "My Expenses",
+    "new": "New",
+    "no_expenses": "No expenses submitted",
+    "submit_title": "Submit Expense",
+    "error_shift": "You must have an active shift to submit an expense.",
+    "category_label": "Category *",
+    "select_category": "Select category",
+    "amount_label": "Amount *",
+    "description_label": "Description",
+    "receipt_label": "Receipt (optional)",
+    "placeholder_desc": "What was this expense for?",
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    }
+  },
+  "inspection": {
+    "title": "Vehicle Inspection",
+    "no_shift_title": "No Active Shift",
+    "no_shift_desc": "You need an active shift to perform a vehicle inspection.",
+    "go_shifts": "Go to Shifts",
+    "done_title": "Inspection Complete!",
+    "done_desc": "Your vehicle inspection has been recorded successfully.",
+    "checklist_desc": "Check each item that passes inspection:",
+    "notes_label": "Notes (optional)",
+    "notes_placeholder": "Any additional observations...",
+    "continue_photos": "Continue to Photos",
+    "photos_desc": "Take photos of each side of the vehicle:",
+    "captured": "✓ Captured",
+    "tap_capture": "Tap to capture",
+    "review_complete": "Review & Complete",
+    "summary_title": "Checklist Summary",
+    "pass": "Pass",
+    "fail": "Fail",
+    "uploaded": "Uploaded",
+    "missing": "Missing",
+    "flag_alert": "Some items failed inspection. This will be flagged for admin review.",
+    "submit": "Submit Inspection",
+    "directions": {
+      "front": "Front",
+      "back": "Back",
+      "left": "Left",
+      "right": "Right",
+      "inside": "Inside",
+      "dashboard": "Dashboard"
+    },
+    "mileage": "Mileage",
+    "checklist": {
+      "tires": "Tires condition",
+      "lights": "Headlights & taillights",
+      "brakes": "Brake function",
+      "mirrors": "Mirrors intact",
+      "fluids": "Fluid levels",
+      "seatbelts": "Seatbelts working",
+      "horn": "Horn working",
+      "wipers": "Windshield wipers"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Fleet operations overview",
+    "loading": "Loading dashboard...",
+    "stats": {
+      "drivers": "Total Drivers",
+      "vehicles": "Total Vehicles",
+      "trips": "Total Trips",
+      "shifts": "Shifts",
+      "expenses": "Expenses",
+      "today_revenue": "Today's Revenue",
+      "today_expenses": "Today's Expenses",
+      "today_damages": "Today's Damages",
+      "today_pending_expenses": "Today's Pending Expenses"
+    },
+    "activity": {
+      "title": "Recent Activity",
+      "empty": "No recent activity.",
+      "system": "System"
+    }
+  },
+  "vehicles": {
+    "title": "Vehicles",
+    "subtitle": "Manage fleet vehicles",
+    "add_btn": "Add Vehicle",
+    "search_placeholder": "Search by plate, model, or QR...",
+    "available_only": "Available Only",
+    "table": {
+      "plate": "Plate Number",
+      "model": "Model",
+      "year": "Year",
+      "capacity": "Capacity",
+      "qr": "QR Code",
+      "status": "Status",
+      "actions": "Actions",
+      "empty": "No vehicles found",
+      "seats": "{{count}} seats"
+    },
+    "pagination": {
+      "prev": "Prev",
+      "next": "Next",
+      "info": "Page {{current}} of {{total}}"
+    },
+    "modal": {
+      "add_title": "Add New Vehicle",
+      "edit_title": "Edit Vehicle",
+      "plate_label": "Plate Number *",
+      "model_label": "Model *",
+      "year_label": "Year *",
+      "capacity_label": "Capacity *",
+      "qr_label": "QR Code *",
+      "update_btn": "Update Vehicle",
+      "create_btn": "Create Vehicle",
+      "plate_placeholder": "ABC-1234",
+      "model_placeholder": "e.g. Toyota Camry",
+      "qr_placeholder": "VH-QR-XXX"
+    },
+    "messages": {
+      "delete_confirm": "Are you sure you want to deactivate this vehicle?",
+      "validation_failed": "Validation failed. Please check the fields below.",
+      "check_fields": "Please fix the errors in the form before submitting.",
+      "op_failed": "Operation failed"
+    }
+  },
+  "drivers": {
+    "title": "Drivers",
+    "subtitle": "Manage fleet drivers",
+    "add_btn": "Add Driver",
+    "search_placeholder": "Search by name, email, or phone...",
+    "table": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "license": "License",
+      "status": "Status",
+      "identity": "Identity",
+      "actions": "Actions",
+      "empty": "No drivers found",
+      "active": "Active",
+      "inactive": "Inactive",
+      "verified": "Verified",
+      "pending": "Pending"
+    },
+    "modal": {
+      "add_title": "Add New Driver",
+      "edit_title": "Edit Driver",
+      "avatar": "Personal Photo",
+      "id_front": "National ID (Front)",
+      "id_back": "National ID (Back)",
+      "tap_upload": "Tap to upload",
+      "name_label": "Full Name *",
+      "email_label": "Email *",
+      "phone_label": "Phone *",
+      "license_label": "License Number",
+      "password_label": "Temporary Password",
+      "password_hint": "Minimum 8 characters",
+      "password_keep": "(Leave blank to keep)",
+      "first_login_alert": "This password must be changed on first login.",
+      "update_btn": "Update Driver",
+      "phone_required": "Phone number is required",
+      "phone_invalid": "Invalid phone format (10-15 digits)",
+      "email_required": "Email is required",
+      "email_invalid": "Invalid email address",
+      "license_required": "License number is required",
+      "license_invalid": "Alphanumeric characters only",
+      "name_required": "Name is required",
+      "password_invalid": "Password must be at least 8 characters",
+      "create_btn": "Create Driver",
+      "phone_placeholder": "+966500000000",
+      "license_placeholder": "DL-XXXX-XXX"
+    },
+    "messages": {
+      "approve_confirm": "Approve identity for {{name}}?",
+      "delete_confirm": "Are you sure you want to deactivate this driver?",
+      "op_failed": "Operation failed",
+      "delete_failed": "Delete failed"
+    }
+  },
+  "trips": {
+    "title": "Trips",
+    "subtitle": "View and manage all trips",
+    "assign_btn": "Assign Trip",
+    "filter_all": "All",
+    "table": {
+      "driver": "Driver",
+      "pickup": "Pickup",
+      "dropoff": "Dropoff",
+      "passengers": "Passengers",
+      "price": "Price",
+      "status": "Status",
+      "created": "Created",
+      "actions": "Actions",
+      "empty": "No trips found"
+    },
+    "modal": {
+      "assign_title": "Assign New Trip",
+      "details_title": "Trip Details",
+      "driver_label": "Driver *",
+      "select_driver": "Select Driver",
+      "pickup_label": "Pickup Location *",
+      "dropoff_label": "Dropoff Location *",
+      "price_label": "Price ({{unit}}) *",
+      "time_label": "Scheduled Time",
+      "passengers_label": "Passengers",
+      "no_passengers": "No passengers added yet",
+      "add_passenger": "+ Add Passenger",
+      "passenger_num": "Passenger #{{count}}",
+      "name_ph": "Name",
+      "phone_ph": "Phone (optional)",
+      "pickup_ph": "Specific Pickup (optional)",
+      "bags_ph": "Bags",
+      "reason_placeholder": "Reason for cancellation",
+      "pickup_placeholder": "Enter pickup location",
+      "dropoff_placeholder": "Enter dropoff location"
+    },
+    "details": {
+      "status": "Status",
+      "vehicle": "Vehicle",
+      "pickup": "Pickup",
+      "dropoff": "Dropoff",
+      "price": "Price",
+      "scheduled": "Scheduled",
+      "started": "Started",
+      "ended": "Ended",
+      "cancel_reason": "Cancel Reason"
+    },
+    "messages": {
+      "cancel_prompt": "Cancel reason:"
+    }
+  },
+  "audit": {
+    "title": "Audit Logs",
+    "subtitle": "Immutable record of all platform actions",
+    "filter": {
+      "entity_type": "Entity Type",
+      "action_type": "Action Type",
+      "all_entities": "All Entities",
+      "action_ph": "e.g. shift.activated",
+      "from": "From",
+      "to": "To",
+      "actor_search": "Actor Search",
+      "actor_ph": "Name or Email...",
+      "entity_id_ph": "Search by Entity ID...",
+      "clear_btn": "Clear Filters"
+    },
+    "table": {
+      "timestamp": "Timestamp",
+      "actor": "Actor",
+      "role": "Role",
+      "action": "Action",
+      "entity": "Entity",
+      "entity_id": "Entity ID",
+      "details": "Details",
+      "empty": "No audit logs found matching filters"
+    },
+    "modal": {
+      "title": "Log Details",
+      "action": "Action",
+      "entity": "Entity",
+      "timestamp": "Timestamp",
+      "ip": "IP Address",
+      "prev_state": "Previous State",
+      "new_state": "New State",
+      "metadata": "Metadata"
+    },
+    "entity": {
+      "damage_report": "Damage Report",
+      "inspection": "Inspection",
+      "identity_verification": "Identity Verification",
+      "user": "User",
+      "driver": "Driver",
+      "vehicle": "Vehicle",
+      "shift": "Shift",
+      "trip": "Trip",
+      "expense": "Expense"
+    },
+    "fields": {
+      "status": "Status",
+      "driverId": "Driver ID",
+      "price": "Price",
+      "reason": "Reason",
+      "override": "Override",
+      "amount": "Amount",
+      "category": "Category",
+      "description": "Description",
+      "plateNumber": "Plate Number"
+    }
+  },
+  "admin_damage": {
+    "title": "Damage Reports",
+    "subtitle": "Review vehicle damage reports from drivers",
+    "table": {
+      "vehicle": "Vehicle",
+      "driver": "Driver",
+      "description": "Description",
+      "status": "Status",
+      "reported": "Reported",
+      "actions": "Actions",
+      "empty": "No damage reports"
+    },
+    "status": {
+      "reported": "Reported",
+      "acknowledged": "Acknowledged",
+      "maintenance": "In Maintenance",
+      "resolved": "Resolved"
+    },
+    "actions": {
+      "acknowledge": "Acknowledge",
+      "maintenance": "Send to Maintenance",
+      "resolve": "Resolve"
+    },
+    "modal": {
+      "title": "Damage Report",
+      "photos": "Photos"
+    }
+  },
+  "verification": {
+    "title": "Identity Verification Queue",
+    "subtitle": "Review and manage driver identities",
+    "sort": {
+      "label": "Sort By",
+      "date": "Date Submitted",
+      "oldest": "Oldest First",
+      "newest": "Newest First"
+    },
+    "card": {
+      "unknown": "Unknown Driver",
+      "submitted": "Submitted: {{date}}",
+      "selfie": "Selfie",
+      "id_front": "ID Front",
+      "id_back": "ID Back",
+      "no_photo": "No {{label}}",
+      "approve": "Approve",
+      "reject": "Reject",
+      "empty": "No pending verifications"
+    },
+    "messages": {
+      "reject_prompt": "Enter rejection reason:",
+      "confirm_approve": "Are you sure you want to approve this verification?",
+      "confirm_reject": "Are you sure you want to reject this verification?",
+      "success_approve": "Verification approved",
+      "success_reject": "Verification rejected",
+      "no_pending_desc": "All caught up! No verifications match your filter."
+    }
+  },
+  "admin_expenses": {
+    "title": "Expenses",
+    "subtitle": "Review and approve driver expenses",
+    "filter": {
+      "all": "All",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "table": {
+      "driver": "Driver",
+      "category": "Category",
+      "amount": "Amount",
+      "description": "Description",
+      "status": "Status",
+      "date": "Date",
+      "actions": "Actions",
+      "empty": "No expenses found"
+    },
+    "modal": {
+      "title": "Expense Details",
+      "receipt": "Receipt",
+      "approve": "Approve",
+      "reject": "Reject",
+      "reject_prompt": "Rejection reason:",
+      "reason_placeholder": "Reason for rejection"
+    }
+  },
+  "shifts": {
+    "title": "Shifts",
+    "subtitle": "Monitor driver shifts",
+    "filter": {
+      "all": "All",
+      "pending": "Pending Verification",
+      "active": "Active",
+      "closed": "Closed"
+    },
+    "table": {
+      "driver": "Driver",
+      "vehicle": "Vehicle",
+      "status": "Status",
+      "started": "Started",
+      "closed": "Closed",
+      "reason": "Close Reason",
+      "actions": "Actions",
+      "empty": "No shifts found"
+    },
+    "actions": {
+      "inspections": "Inspections",
+      "close": "Close"
+    },
+    "modal": {
+      "title": "Shift Inspections",
+      "empty": "No inspections found for this shift.",
+      "type_title": "{{type}} Inspection",
+      "checklist": "Checklist",
+      "photos": "Photos",
+      "close_prompt": "Close reason:",
+      "reason_placeholder": "Reason for closing shift"
+    }
+  },
+  "tracking": {
+    "title": "Live Tracking",
+    "subtitle": "Real-time driver locations",
+    "status": {
+      "live": "Live",
+      "disconnected": "Disconnected"
+    },
+    "popup": {
+      "last_seen": "Last seen: {{time}}"
+    },
+    "card": {
+      "title": "Active Drivers",
+      "empty": "No active drivers currently"
+    }
+  },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "Generate revenue and fleet performance reports",
+    "filter": {
+      "start": "Start Date",
+      "end": "End Date",
+      "generate": "Generate"
+    },
+    "stats": {
+      "revenue": "Total Revenue",
+      "trips": "Total Trips",
+      "expenses": "Total Expenses",
+      "net": "Net Revenue"
+    },
+    "table": {
+      "driver": "Driver",
+      "trips": "Trips",
+      "revenue": "Revenue",
+      "expenses": "Expenses",
+      "net": "Net"
+    },
+    "card": {
+      "title": "Revenue by Driver"
+    }
+  },
+  "days": {
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat",
+    "sun": "Sun"
+  }
+}

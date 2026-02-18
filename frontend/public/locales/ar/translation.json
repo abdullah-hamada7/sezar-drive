@@ -1,0 +1,664 @@
+{
+  "nav": {
+    "dashboard": "لوحة القيادة",
+    "drivers": "السائقين",
+    "vehicles": "المركبات",
+    "trips": "الرحلات",
+    "shifts": "المناوبات",
+    "inspections": "الفحوصات",
+    "expenses": "المصاريف",
+    "damage_reports": "تقارير الأضرار",
+    "tracking": "تتبع مباشر",
+    "reports": "التقارير",
+    "audit_logs": "سجلات التدقيق",
+    "verification": "التحقق",
+    "settings": "الإعدادات",
+    "logout": "تسجيل الخروج"
+  },
+  "nav_driver": {
+    "home": "الرئيسية",
+    "shift": "المناوبة",
+    "trips": "الرحلات",
+    "inspection": "الفحص",
+    "expenses": "المصاريف",
+    "damage": "الأضرار"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "forgot_password": "نسيت كلمة المرور؟",
+    "change_password": "تغيير كلمة المرور",
+    "session_expired": "انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى.",
+    "signing_in": "جاري الدخول...",
+    "sign_in": "الدخول",
+    "enter_email": "أدخل بريدك الإلكتروني",
+    "enter_password": "أدخل كلمة المرور",
+    "fleet_platform": "منصة إدارة الأسطول",
+    "login_failed": "فشل تسجيل الدخول. يرجى التحقق من بياناتك.",
+    "forgot_password_title": "إعادة تعيين كلمة المرور",
+    "forgot_password_desc": "أدخل بريدك الإلكتروني لتلقي رابط إعادة تعيين كلمة المرور.",
+    "send_reset_link": "إرسال رابط البدء",
+    "back_to_login": "العودة لتسجيل الدخول",
+    "reset_password_title": "إنشاء كلمة مرور جديدة",
+    "reset_password_desc": "أدخل كلمة المرور الجديدة أدناه.",
+    "new_password": "كلمة المرور الجديدة",
+    "confirm_password": "تأكيد كلمة المرور",
+    "passwords_dont_match": "كلمات المرور غير متطابقة",
+    "reset_success": "تم إعادة تعيين كلمة المرور بنجاح! جاري تحويلك لتسجيل الدخول...",
+    "invalid_token": "رابط إعادة التعيين غير صالح أو منتهي الصلاحية.",
+    "reset_btn": "إعادة تعيين",
+    "reset_link_sent": "في حال وجود حساب مرتبط بهذا البريد، تم إرسال رابط إعادة تعيين كلمة المرور.",
+    "email_sent_check": "يرجى التحقق من بريدك الإلكتروني للحصول على رابط إعادة تعيين كلمة المرور."
+  },
+  "trip": {
+    "start_trip": "بدء الرحلة",
+    "complete_trip": "إكمال الرحلة",
+    "cancel_trip": "إلغاء الرحلة",
+    "status": "حالة الرحلة",
+    "pickup": "مكان الاستلام",
+    "dropoff": "مكان الوصول",
+    "my_trips": "رحلاتي",
+    "no_trips": "لا توجد رحلات كلف بها بعد",
+    "price_unit": "ج.م",
+    "passenger": "الراكب",
+    "bags": "الحقائب",
+    "no_phone": "لا يوجد هاتف",
+    "scheduled": "مجدولة",
+    "status_in_progress": "نشطة"
+  },
+  "shift": {
+    "management": "إدارة المناوبات",
+    "no_active": "لا توجد مناوبة نشطة",
+    "start_desc": "ابدأ مناوبة لبدء قبول الرحلات وتسجيل نشاطك.",
+    "start_btn": "بدء مناوبة سائق",
+    "active": "المناوبة نشطة",
+    "pending": "في انتظار التحقق",
+    "biometric_title": "التحقق الحيوي",
+    "biometric_desc": "يرجى التقاط صورة سيلفي واضحة للتحقق من هويتك وبدء مناوبتك.",
+    "activate_btn": "تفعيل المناوبة",
+    "end_btn": "إنهاء المناوبة",
+    "vehicle": "المركبة",
+    "started_at": "وقت البدء",
+    "not_assigned": "غير محدد",
+    "manual_review_alert": "التحقق يتطلب مراجعة يدوية. يرجى انتظار موافقة المسؤول.",
+    "failed_alert": "فشل التحقق. يرجى المحاولة مرة أخرى أو الاتصال بالدعم.",
+    "close_confirm": "هل أنت متأكد من رغبتك في إغلاق المناوبة؟"
+  },
+  "driver_home": {
+    "identity_pending": "التحقق من الهوية قيد المراجعة",
+    "identity_required": "مطلوب إجراء: التحقق من الهوية",
+    "admin_review_desc": "يقوم المسؤول بمراجعة مستنداتك. اضغط على تحديث بمجرد الموافقة.",
+    "upload_needed_desc": "يرجى تحميل صورتك والهوية الوطنية لبدء القيادة.",
+    "refresh_status": "تحديث الحالة",
+    "upload_docs": "تحميل المستندات",
+    "edit_photo": "تعديل الصورة",
+    "current_vehicle": "المركبة الحالية",
+    "scan_qr_desc": "امسح رمز QR للمركبة لبدء القيادة.",
+    "enter_qr": "أدخل رمز QR (مثال: VH-QR-001)",
+    "assign_btn": "تعيين",
+    "daily_earnings": "الأرباح اليومية",
+    "selfie_label": "الصورة الشخصية",
+    "id_front": "الهوية الوطنية (الوجه)",
+    "id_back": "الهوية الوطنية (الظهر)",
+    "selected": "تم الاختيار",
+    "tap_select": "اضغط للاختيار",
+    "upload_success": "تم تحميل المستندات. بانتظار مراجعة المسؤول.",
+    "status_refreshed": "تم تحديث الحالة",
+    "photo_updated": "تم تحديث صورة الملف الشخصي"
+  },
+  "common": {
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "approve": "موافقة",
+    "reject": "رفض",
+    "loading": "جاري التحميل...",
+    "error": "حدث خطأ ما",
+    "success": "تم بنجاح",
+    "hi": "أهلاً",
+    "brand": "سيزار درايف",
+    "confirm": "تأكيد",
+    "prompt": "إدخال",
+    "submit": "إرسال",
+    "view": "عرض",
+    "currency": "ج.م",
+    "status": {
+      "assigned": "تم التعيين",
+      "started": "بدأت",
+      "completed": "مكتملة",
+      "cancelled": "ملغاة",
+      "available": "متاح",
+      "in_use": "قيد الاستخدام",
+      "maintenance": "في الصيانة",
+      "damaged": "متضرر",
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "pending": "قيد الانتظار",
+      "approved": "مقبول",
+      "rejected": "مرفوض",
+      "pendingverification": "بانتظار التحقق",
+      "closed": "مغلق",
+      "verified": "تم التحقق",
+      "manual_review": "مراجعة يدوية",
+      "in_progress": "نشطة",
+      "all": "الكل"
+    }
+  },
+  "entities": {
+    "driver": "سائق",
+    "vehicle": "مركبة",
+    "trip": "رحلة",
+    "shift": "مناوبة",
+    "expense": "مصروف",
+    "user": "مستخدم"
+  },
+  "roles": {
+    "admin": "مدير",
+    "driver": "سائق",
+    "system": "النظام"
+  },
+  "errors": {
+    "NO_ACTIVE_SHIFT": "السائق {{name}} ليس لديه وردية نشطة. يجب أن يبدأ ويفعل ورديته أولاً.",
+    "ACTIVE_TRIP_EXISTS": "السائق {{name}} لديه بالفعل رحلة نشطة أو معينة.",
+    "NO_VEHICLE_ASSIGNED": "السائق ليس لديه مركبة معينة.",
+    "INSPECTION_REQUIRED": "فحص المركبة لم يكتمل.",
+    "IDENTITY_NOT_VERIFIED": "هوية السائق لم توثق."
+  },
+  "actions": {
+    "created": "إنشاء",
+    "updated": "تحديث",
+    "deleted": "حذف",
+    "assigned": "تعيين",
+    "started": "بدء",
+    "completed": "إكمال",
+    "cancelled": "إلغاء",
+    "approved": "موافقة",
+    "rejected": "رفض",
+    "activated": "تفعيل",
+    "closed": "إغلاق",
+    "verified": "توثيق",
+    "preferences_updated": "تحديث التفضيلات",
+    "resolved": "تم الإصلاح",
+    "acknowledged": "تم الاستلام",
+    "maintenance": "إرسال للصيانة",
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "locked": "مؤمن",
+    "unlocked": "مفتوح"
+  },
+  "auth_types": {
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "face_verification": "التحقق من الوجه"
+  },
+  "damage": {
+    "report_title": "الإبلاغ عن أضرار المركبة",
+    "describe_label": "صف الضرر *",
+    "placeholder": "صف الموقع، الشدة، وسبب الضرر...",
+    "add_photo": "إضافة صورة",
+    "photos": "الصور",
+    "no_photos": "لم يتم إضافة صور بعد",
+    "submit": "تقديم بلاغ الضرر",
+    "success_title": "تم تقديم بلاغ الضرر",
+    "success_desc": "سيقوم المسؤول بمراجعة بلاغك قريباً.",
+    "submit_another": "تقديم بلاغ آخر",
+    "error_shift": "المناوبة النشطة مطلوبة للإبلاغ عن الأضرار.",
+    "error_vehicle": "لم يتم العثور على مركبة معينة. يرجى مسح رمز QR للمركبة أولاً."
+  },
+  "expenses": {
+    "title": "مصاريفي",
+    "new": "جديد",
+    "no_expenses": "لا توجد مصاريف مقدمة",
+    "submit_title": "تقديم مصروف",
+    "error_shift": "يجب أن يكون لديك مناوبة نشطة لتقديم مصروف.",
+    "category_label": "الفئة *",
+    "select_category": "اختر الفئة",
+    "amount_label": "المبلغ *",
+    "description_label": "الوصف",
+    "receipt_label": "الإيصال (اختياري)",
+    "placeholder_desc": "ما هو سبب هذا المصروف؟",
+    "status": {
+      "pending": "قيد الانتظار",
+      "approved": "تمت الموافقة",
+      "rejected": "مرفوض"
+    }
+  },
+  "inspection": {
+    "title": "فحص المركبة",
+    "no_shift_title": "لا توجد مناوبة نشطة",
+    "no_shift_desc": "تحتاج إلى مناوبة نشطة لإجراء فحص للمركبة.",
+    "go_shifts": "اذهب للمناوبات",
+    "done_title": "اكتمل الفحص!",
+    "done_desc": "تم تسجيل فحص مركبتك بنجاح.",
+    "checklist_desc": "حدد كل عنصر يجتاز الفحص:",
+    "notes_label": "ملاحظات (اختياري)",
+    "notes_placeholder": "أي ملاحظات إضافية...",
+    "continue_photos": "المتابعة للصور",
+    "photos_desc": "التقط صوراً لكل جانب من جوانب المركبة:",
+    "captured": "✓ تم الالتقاط",
+    "tap_capture": "اضغط للالتقاط",
+    "review_complete": "مراجعة وإكمال",
+    "summary_title": "ملخص الفحص",
+    "pass": "ناجح",
+    "fail": "راسب",
+    "uploaded": "تم الرفع",
+    "missing": "مفقود",
+    "flag_alert": "فشلت بعض العناصر في الفحص. سيتم وضع علامة عليها لمراجعة المسؤول.",
+    "submit": "تقديم الفحص",
+    "photos_missing_error": "يرجى التقاط صور لجميع الجوانب الأربعة قبل الإكمال.",
+    "directions": {
+      "front": "الأمام",
+      "back": "الخلف",
+      "left": "اليسار",
+      "right": "اليمين"
+    },
+    "checklist": {
+      "tires": "حالة الإطارات",
+      "lights": "المصابيح الأمامية والخلفية",
+      "brakes": "وظيفة الفرامل",
+      "mirrors": "المرايا سليمة",
+      "fluids": "مستويات السوائل",
+      "seatbelts": "أحزمة الأمان تعمل",
+      "horn": "المنبه (الزمور) يعمل",
+      "wipers": "مساحات الزجاج"
+    }
+  },
+  "dashboard": {
+    "title": "لوحة القيادة",
+    "subtitle": "نظرة عامة على عمليات الأسطول",
+    "loading": "جاري تحميل لوحة القيادة...",
+    "stats": {
+      "drivers": "إجمالي السائقين",
+      "vehicles": "إجمالي المركبات",
+      "trips": "إجمالي الرحلات",
+      "shifts": "المناوبات",
+      "expenses": "المصاريف",
+      "today_revenue": "إيرادات اليوم",
+      "today_expenses": "مصاريف اليوم",
+      "today_damages": "أضرار اليوم",
+      "today_pending_expenses": "مصاريف اليوم المعلقة"
+    },
+    "activity": {
+      "title": "النشاط الأخير",
+      "empty": "لا يوجد نشاط أخير.",
+      "system": "النظام"
+    }
+  },
+  "vehicles": {
+    "title": "المركبات",
+    "subtitle": "إدارة مركبات الأسطول",
+    "add_btn": "إضافة مركبة",
+    "search_placeholder": "بحث باللوحة، الموديل، أو QR...",
+    "available_only": "المتاح فقط",
+    "table": {
+      "plate": "رقم اللوحة",
+      "model": "الموديل",
+      "year": "السنة",
+      "capacity": "السعة",
+      "qr": "رمز QR",
+      "status": "الحالة",
+      "actions": "الإجراءات",
+      "empty": "لم يتم العثور على مركبات",
+      "seats": "{{count}} مقاعد"
+    },
+    "pagination": {
+      "prev": "السابق",
+      "next": "التالي",
+      "info": "صفحة {{current}} من {{total}}"
+    },
+    "modal": {
+      "add_title": "إضافة مركبة جديدة",
+      "edit_title": "تعديل المركبة",
+      "plate_label": "رقم اللوحة *",
+      "model_label": "الموديل *",
+      "year_label": "السنة *",
+      "capacity_label": "السعة *",
+      "qr_label": "رمز QR *",
+      "update_btn": "تحديث المركبة",
+      "create_btn": "إنشاء مركبة",
+      "plate_placeholder": "أ ب ج 1234",
+      "model_placeholder": "مثال: تويوتا كامري",
+      "qr_placeholder": "VH-QR-XXX"
+    },
+    "messages": {
+      "delete_confirm": "هل أنت متأكد من رغبتك في إلغاء تفعيل هذه المركبة؟",
+      "op_failed": "فشلت العملية"
+    }
+  },
+  "drivers": {
+    "title": "السائقين",
+    "subtitle": "إدارة سائقي الأسطول",
+    "add_btn": "إضافة سائق",
+    "search_placeholder": "بحث بالاسم، البريد، أو الهاتف...",
+    "table": {
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "license": "الرخصة",
+      "status": "الحالة",
+      "identity": "الهوية",
+      "actions": "الإجراءات",
+      "empty": "لم يتم العثور على سائقين",
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "verified": "موثق",
+      "pending": "معلق"
+    },
+    "modal": {
+      "add_title": "إضافة سائق جديد",
+      "edit_title": "تعديل السائق",
+      "avatar": "الصورة الشخصية",
+      "id_front": "الهوية الوطنية (الوجه)",
+      "id_back": "الهوية الوطنية (الظهر)",
+      "tap_upload": "اضغط للرفع",
+      "name_label": "الاسم الكامل *",
+      "email_label": "البريد الإلكتروني *",
+      "phone_label": "الهاتف *",
+      "license_label": "رقم الرخصة",
+      "password_label": "كلمة مرور مؤقتة",
+      "password_hint": "8 أحرف على الأقل",
+      "password_keep": "(اتركه فارغاً للإبقاء عليها)",
+      "first_login_alert": "يجب تغيير كلمة المرور هذه عند أول تسجيل دخول.",
+      "update_btn": "تحديث السائق",
+      "phone_required": "رقم الهاتف مطلوب",
+      "phone_invalid": "تنسيق الهاتف غير صالح (10-15 رقمًا)",
+      "email_required": "البريد الإلكتروني مطلوب",
+      "email_invalid": "عنوان بريد إلكتروني غير صالح",
+      "license_required": "رقم الرخصة مطلوب",
+      "license_invalid": "أحرف وأرقام فقط",
+      "name_required": "الاسم مطلوب",
+      "password_invalid": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
+      "create_btn": "إنشاء سائق",
+      "phone_placeholder": "+966500000000",
+      "license_placeholder": "رقم الرخصة"
+    },
+    "messages": {
+      "approve_confirm": "الموافقة على هوية {{name}}؟",
+      "delete_confirm": "هل أنت متأكد من رغبتك في إلغاء تفعيل هذا السائق؟",
+      "op_failed": "فشلت العملية",
+      "validation_failed": "فشل التحقق. يرجى التحقق من الحقول أدناه.",
+      "check_fields": "يرجى تصحيح الأخطاء في النموذج قبل الإرسال.",
+      "delete_failed": "فشل الحذف"
+    }
+  },
+  "trips": {
+    "title": "الرحلات",
+    "subtitle": "عرض وإدارة جميع الرحلات",
+    "assign_btn": "تعيين رحلة",
+    "filter_all": "الكل",
+    "table": {
+      "driver": "السائق",
+      "pickup": "الاستلام",
+      "dropoff": "التوصيل",
+      "passengers": "الركاب",
+      "price": "السعر",
+      "status": "الحالة",
+      "created": "أنشئت في",
+      "actions": "الإجراءات",
+      "empty": "لم يتم العثور على رحلات"
+    },
+    "modal": {
+      "assign_title": "تعيين رحلة جديدة",
+      "details_title": "تفاصيل الرحلة",
+      "driver_label": "السائق *",
+      "select_driver": "اختر السائق",
+      "pickup_label": "مكان الاستلام *",
+      "dropoff_label": "مكان التوصيل *",
+      "price_label": "السعر ({{unit}}) *",
+      "time_label": "الوقت المجدول",
+      "passengers_label": "الركاب",
+      "no_passengers": "لم يتم إضافة ركاب بعد",
+      "add_passenger": "+ إضافة راكب",
+      "passenger_num": "الراكب #{{count}}",
+      "name_ph": "الاسم",
+      "phone_ph": "الهاتف (اختياري)",
+      "pickup_ph": "مكان استلام محدد (اختياري)",
+      "bags_ph": "حقائب",
+      "reason_placeholder": "سبب الإلغاء",
+      "pickup_placeholder": "أدخل مكان الاستلام",
+      "dropoff_placeholder": "أدخل مكان التوصيل"
+    },
+    "details": {
+      "status": "الحالة",
+      "vehicle": "المركبة",
+      "pickup": "الاستلام",
+      "dropoff": "التوصيل",
+      "price": "السعر",
+      "scheduled": "المجدول",
+      "started": "البدء",
+      "ended": "الانتهاء",
+      "cancel_reason": "سبب الإلغاء"
+    },
+    "messages": {
+      "cancel_prompt": "سبب الإلغاء:"
+    }
+  },
+  "audit": {
+    "title": "سجلات التدقيق",
+    "subtitle": "سجل غير قابل للتغيير لجميع إجراءات المنصة",
+    "filter": {
+      "entity_type": "نوع الكيان",
+      "action_type": "نوع الإجراء",
+      "all_entities": "جميع الكيانات",
+      "action_ph": "مثال: shift.activated",
+      "from": "من",
+      "to": "إلى",
+      "actor_search": "بحث عن الفاعل",
+      "actor_ph": "الاسم أو البريد...",
+      "entity_id_ph": "بحث بمعرف الكيان...",
+      "clear_btn": "مسح الفلاتر"
+    },
+    "table": {
+      "timestamp": "الطابع الزمني",
+      "actor": "الفاعل",
+      "role": "الدور",
+      "action": "الإجراء",
+      "entity": "الكيان",
+      "entity_id": "معرف الكيان",
+      "details": "التفاصيل",
+      "empty": "لم يتم العثور على سجلات تطابق الفلاتر"
+    },
+    "modal": {
+      "title": "تفاصيل السجل",
+      "action": "الإجراء",
+      "entity": "الكيان",
+      "timestamp": "الطابع الزمني",
+      "ip": "عنوان IP",
+      "prev_state": "الحالة السابقة",
+      "new_state": "الحالة الجديدة",
+      "metadata": "بيانات وصفية"
+    },
+    "entity": {
+      "damage_report": "تقرير ضرر",
+      "inspection": "فحص",
+      "identity_verification": "توثيق الهوية",
+      "user": "مستخدم",
+      "driver": "سائق",
+      "vehicle": "مركبة",
+      "shift": "مناوبة",
+      "trip": "رحلة",
+      "expense": "مصروف"
+    },
+    "fields": {
+      "status": "الحالة",
+      "driverId": "معرف السائق",
+      "price": "السعر",
+      "reason": "السبب",
+      "override": "تجاوز",
+      "amount": "المبلغ",
+      "category": "الفئة",
+      "description": "الوصف",
+      "plateNumber": "رقم اللوحة"
+    }
+  },
+  "admin_damage": {
+    "title": "تقارير الأضرار",
+    "subtitle": "مراجعة تقارير أضرار المركبات من السائقين",
+    "table": {
+      "vehicle": "المركبة",
+      "driver": "السائق",
+      "description": "الوصف",
+      "status": "الحالة",
+      "reported": "تاريخ التقرير",
+      "actions": "الإجراءات",
+      "empty": "لا توجد تقارير أضرار"
+    },
+    "status": {
+      "reported": "تم الإبلاغ",
+      "acknowledged": "تم الاستلام",
+      "maintenance": "في الصيانة",
+      "resolved": "تم الإصلاح"
+    },
+    "actions": {
+      "acknowledge": "تأكيد الاستلام",
+      "maintenance": "إرسال للصيانة",
+      "resolve": "حل المشكلة"
+    },
+    "modal": {
+      "title": "تقرير الضرر",
+      "photos": "الصور"
+    }
+  },
+  "verification": {
+    "title": "رتل توثيق الهوية",
+    "subtitle": "مراجعة وإدارة هويات السائقين",
+    "sort": {
+      "label": "فرز حسب",
+      "date": "تاريخ التقديم",
+      "oldest": "الأقدم أولاً",
+      "newest": "الأحدث أولاً"
+    },
+    "card": {
+      "unknown": "سائق غير معروف",
+      "submitted": "تم التقديم: {{date}}",
+      "selfie": "صورة شخصية",
+      "id_front": "وجه الهوية",
+      "id_back": "ظهر الهوية",
+      "no_photo": "لا توجد {{label}}",
+      "approve": "موافقة",
+      "reject": "رفض",
+      "empty": "لا توجد طلبات توثيق معلقة"
+    },
+    "messages": {
+      "reject_prompt": "أدخل سبب الرفض:",
+      "confirm_approve": "هل أنت متأكد من رغبتك في قبول هذا التوثيق؟",
+      "confirm_reject": "هل أنت متأكد من رغبتك في رفض هذا التوثيق؟",
+      "success_approve": "تم قبول التوثيق",
+      "success_reject": "تم رفض التوثيق",
+      "no_pending_desc": "تم الانتهاء! لا توجد طلبات تحقق تطابق الفلتر الخاص بك."
+    }
+  },
+  "admin_expenses": {
+    "title": "المصاريف",
+    "subtitle": "مراجعة واعتماد مصاريف السائقين",
+    "filter": {
+      "all": "الكل",
+      "pending": "قيد الانتظار",
+      "approved": "مقبول",
+      "rejected": "مرفوض"
+    },
+    "table": {
+      "driver": "السائق",
+      "category": "الفئة",
+      "amount": "المبلغ",
+      "description": "الوصف",
+      "status": "الحالة",
+      "date": "التاريخ",
+      "actions": "الإجراءات",
+      "empty": "لم يتم العثور على مصاريف"
+    },
+    "modal": {
+      "title": "تفاصيل المصروف",
+      "receipt": "الإيصال",
+      "approve": "موافقة",
+      "reject": "رفض",
+      "reject_prompt": "سبب الرفض:",
+      "reason_placeholder": "سبب الرفض"
+    }
+  },
+  "shifts": {
+    "title": "الورديات",
+    "subtitle": "مراقبة ورديات السائقين",
+    "filter": {
+      "all": "الكل",
+      "pending": "في انتظار التوثيق",
+      "active": "نشطة",
+      "closed": "مغلقة"
+    },
+    "table": {
+      "driver": "السائق",
+      "vehicle": "المركبة",
+      "status": "الحالة",
+      "started": "بدأت في",
+      "closed": "أغلقت في",
+      "reason": "سبب الإغلاق",
+      "actions": "الإجراءات",
+      "empty": "لم يتم العثور على ورديات"
+    },
+    "actions": {
+      "inspections": "الفحوصات",
+      "close": "إغلاق"
+    },
+    "modal": {
+      "title": "فحوصات الوردية",
+      "empty": "لم يتم العثور على فحوصات لهذه الوردية.",
+      "type_title": "فحص {{type}}",
+      "checklist": "قائمة التحقق",
+      "photos": "الصور",
+      "close_prompt": "سبب الإغلاق:",
+      "reason_placeholder": "سبب إغلاق المناوبة"
+    }
+  },
+  "tracking": {
+    "title": "التتبع المباشر",
+    "subtitle": "مواقع السائقين في الوقت الفعلي",
+    "status": {
+      "live": "مباشر",
+      "disconnected": "منقطع"
+    },
+    "popup": {
+      "last_seen": "آخر ظهور: {{time}}"
+    },
+    "card": {
+      "title": "السائقين النشطين",
+      "empty": "لا يوجد سائقين نشطين حالياً"
+    }
+  },
+  "reports": {
+    "title": "التقارير",
+    "subtitle": "إنشاء تقارير الإيرادات وأداء الأسطول",
+    "filter": {
+      "start": "تاريخ البدء",
+      "end": "تاريخ الانتهاء",
+      "generate": "إنشاء"
+    },
+    "stats": {
+      "revenue": "إجمالي الإيرادات",
+      "trips": "إجمالي الرحلات",
+      "expenses": "إجمالي المصاريف",
+      "net": "صافي الإيرادات"
+    },
+    "table": {
+      "driver": "السائق",
+      "trips": "الرحلات",
+      "revenue": "الإيرادات",
+      "expenses": "المصاريف",
+      "net": "الصافي"
+    },
+    "card": {
+      "title": "الإيرادات حسب السائق"
+    }
+  },
+  "days": {
+    "mon": "إثنين",
+    "tue": "ثلاثاء",
+    "wed": "أربعاء",
+    "thu": "خميس",
+    "fri": "جمعة",
+    "sat": "سبت",
+    "sun": "أحد"
+  }
+}
+

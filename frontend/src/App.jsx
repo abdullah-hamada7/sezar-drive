@@ -1,0 +1,164 @@
+import { lazy, Suspense, useEffect } from "react";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { AuthProvider } from "./contexts/AuthContext.jsx";
+import { useAuth } from "./hooks/useAuth";
+import { ToastProvider } from "./contexts/ToastContext.jsx";
+import { ShiftProvider } from "./contexts/ShiftContext.jsx";
+
+// Loading Component
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-screen bg-slate-950">
+    <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+  </div>
+);
+
+// Lazy loaded pages
+const LoginPage = lazy(() => import("./pages/Login"));
+const ChangePasswordPage = lazy(() => import("./pages/ChangePassword"));
+const ResetPasswordPage = lazy(() => import("./pages/ResetPassword"));
+const DeviceVerificationPage = lazy(() => import("./pages/DeviceVerification"));
+
+// Admin Pages
+const AdminLayout = lazy(() => import("./layouts/AdminLayout/AdminLayout"));
+const DashboardPage = lazy(() => import("./pages/admin/Dashboard"));
+const DriversPage = lazy(() => import("./pages/admin/Drivers"));
+const VehiclesPage = lazy(() => import("./pages/admin/Vehicles"));
+const TripsPage = lazy(() => import("./pages/admin/Trips"));
+const ShiftsPage = lazy(() => import("./pages/admin/Shifts"));
+const ExpensesPage = lazy(() => import("./pages/admin/Expenses"));
+const DamageReportsPage = lazy(() => import("./pages/admin/DamageReports"));
+const TrackingPage = lazy(() => import("./pages/admin/Tracking"));
+const ReportsPage = lazy(() => import("./pages/admin/Reports"));
+const AuditLogsPage = lazy(() => import("./pages/admin/AuditLogs"));
+const VerificationQueue = lazy(() => import("./pages/admin/VerificationQueue"));
+
+// Driver Pages
+const DriverLayout = lazy(() => import("./layouts/DriverLayout/DriverLayout"));
+const DriverHome = lazy(() => import("./pages/driver/DriverHome"));
+const DriverShift = lazy(() => import("./pages/driver/DriverShift"));
+const DriverTrips = lazy(() => import("./pages/driver/DriverTrips"));
+const DriverInspection = lazy(() => import("./pages/driver/DriverInspection"));
+const DriverExpenses = lazy(() => import("./pages/driver/DriverExpenses"));
+const DriverDamage = lazy(() => import("./pages/driver/DriverDamage"));
+
+function ProtectedRoute({ children, requireAdmin, requireDriver }) {
+  const { isAuthenticated, isAdmin, isDriver, user } = useAuth();
+
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (user?.mustChangePassword)
+    return <Navigate to="/change-password" replace />;
+
+  if (requireAdmin && !isAdmin) {
+    return isDriver ? (
+      <Navigate to="/driver" replace />
+    ) : (
+      <Navigate to="/login" replace />
+    );
+  }
+
+  if (requireDriver && !isDriver) {
+    return isAdmin ? (
+      <Navigate to="/admin" replace />
+    ) : (
+      <Navigate to="/login" replace />
+    );
+  }
+
+  return children;
+}
+
+function AppRoutes() {
+  const { isAuthenticated, isAdmin, user } = useAuth();
+  const { i18n } = useTranslation();
+
+  // Sync i18n with user preference on load
+  useEffect(() => {
+    if (user?.languagePreference && user.languagePreference !== i18n.language) {
+      i18n.changeLanguage(user.languagePreference);
+    }
+  }, [user, i18n]);
+
+  // Sync document direction with current language
+  useEffect(() => {
+    const dir = i18n.dir();
+    document.documentElement.dir = dir;
+    document.documentElement.lang = i18n.language;
+  }, [i18n]);
+
+  return (
+    <Routes>
+      <Route
+        path="/login"
+        element={
+          isAuthenticated ? (
+            <Navigate to={isAdmin ? "/admin" : "/driver"} />
+          ) : (
+            <LoginPage />
+          )
+        }
+      />
+      <Route path="/change-password" element={<ChangePasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
+      <Route path="/verify-device" element={<DeviceVerificationPage />} />
+
+      {/* Admin Routes */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute requireAdmin>
+            <AdminLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<DashboardPage />} />
+        <Route path="drivers" element={<DriversPage />} />
+        <Route path="vehicles" element={<VehiclesPage />} />
+        <Route path="trips" element={<TripsPage />} />
+        <Route path="shifts" element={<ShiftsPage />} />
+        <Route path="expenses" element={<ExpensesPage />} />
+        <Route path="damage" element={<DamageReportsPage />} />
+        <Route path="tracking" element={<TrackingPage />} />
+        <Route path="reports" element={<ReportsPage />} />
+        <Route path="audit" element={<AuditLogsPage />} />
+        <Route path="verification" element={<VerificationQueue />} />
+      </Route>
+
+      {/* Driver Routes */}
+      <Route
+        path="/driver"
+        element={
+          <ProtectedRoute requireDriver>
+            <DriverLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<DriverHome />} />
+        <Route path="shift" element={<DriverShift />} />
+        <Route path="trips" element={<DriverTrips />} />
+        <Route path="inspection" element={<DriverInspection />} />
+        <Route path="expenses" element={<DriverExpenses />} />
+        <Route path="damage" element={<DriverDamage />} />
+      </Route>
+
+      {/* Catch-all */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
+  );
+}
+
+export default function App() {
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <HashRouter>
+        <AuthProvider>
+          <ShiftProvider>
+            <ToastProvider>
+              <AppRoutes />
+            </ToastProvider>
+          </ShiftProvider>
+        </AuthProvider>
+      </HashRouter>
+    </Suspense>
+  );
+}

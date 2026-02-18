@@ -1,0 +1,33 @@
+node_modules/
+dist/
+.env
+.DS_Store
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.idea/
+.vscode/
+*.swp
+*.bak
+uploads/
+coverage/
+.next/
+out/
+build/
+.turbo/
+.vercel/
+.gemini/
+! .gemini/antigravity/brain/
+.agent/
+
+# Infrastructure (Terraform)
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfplan
+plan
+terraform.tfvars
+
+# Deployment Artifacts
+trip.zip

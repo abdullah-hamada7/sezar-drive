@@ -1,0 +1,16 @@
+# AWS Region (e.g., us-east-1)
+aws_region = "us-east-1"
+
+# Your Project Name
+project_name = "sezar-drive"
+
+# Allowed CIDR blocks for SSH access
+# REPLACE THIS WITH YOUR OWN IP (e.g., ["1.2.3.4/32"])
+# Do NOT use ["0.0.0.0/0"] for security
+ssh_cidr_blocks = ["REPLACE_WITH_YOUR_IP/32"]
+
+# Optional: Instance type (default is t3.micro)
+# instance_type = "t3.small"
+
+# Optional: AMI ID (must match your region)
+# ami_id = "ami-0c7217cdde317cfec"
