@@ -1,8 +1,9 @@
 {
     email {$EMAIL_FOR_SSL}
+    auto_https off
 }
 
-http://{$DOMAIN_NAME} {
+:80 {
     # ─── Frontend (Nginx/Static) ───
     reverse_proxy frontend:80
 
