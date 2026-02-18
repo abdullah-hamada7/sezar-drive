@@ -14,7 +14,18 @@ export function AuthProvider({ children }) {
   const getDeviceFingerprint = () => {
     let fingerprint = localStorage.getItem('device_fingerprint');
     if (!fingerprint) {
-      fingerprint = crypto.randomUUID();
+      // crypto.randomUUID() requires a secure context (HTTPS)
+      // Provide a fallback for HTTP/IP-based access
+      if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        fingerprint = crypto.randomUUID();
+      } else {
+        // Simple fallback UUID generator
+        fingerprint = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+          const r = (Math.random() * 16) | 0;
+          const v = c === 'x' ? r : (r & 0x3) | 0x8;
+          return v.toString(16);
+        });
+      }
       localStorage.setItem('device_fingerprint', fingerprint);
     }
     return fingerprint;
