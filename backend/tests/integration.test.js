@@ -41,7 +41,7 @@ describe('API Integration Tests (E2E)', () => {
   beforeAll(async () => {
     const res = await request(app)
       .post('/api/v1/auth/login')
-      .send({ email: 'admin@fleet.com', password: 'Admin@2024' });
+      .send({ email: 'hossam@sezar.com', password: 'Hossam@2026' });
     
     expect(res.status).toBe(200);
     adminToken = res.body.accessToken;

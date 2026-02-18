@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Fleet Management E2E', () => {
-  const adminEmail = 'admin@fleet.com';
-  const adminPassword = 'Admin@2024';
+  const adminEmail = 'hossam@sezar.com';
+  const adminPassword = 'Hossam@2026';
   const driverEmail = `e2e.driver.${Date.now()}@fleet.com`;
   const driverPassword = 'Password123!';
   const newDriverPassword = 'NewPass123!@';

@@ -11,8 +11,8 @@ const options = {
 };
 
 const adminCreds = JSON.stringify({
-  email: 'admin@fleet.com',
-  password: 'Admin@2024'
+  email: 'hossam@sezar.com',
+  password: 'Hossam@2026'
 });
 
 function login(creds) {

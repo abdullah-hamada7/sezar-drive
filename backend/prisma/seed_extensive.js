@@ -28,12 +28,12 @@ async function main() {
     await prisma.expenseCategory.deleteMany();
 
     // 2. Admin User
-    const adminPassword = await bcrypt.hash('Admin@2024', 12);
+    const adminPassword = await bcrypt.hash('Hossam@2026', 12);
     const admin = await prisma.user.upsert({
-      where: { email: 'admin@fleet.com' },
+      where: { email: 'hossam@sezar.com' },
       update: {},
       create: {
-        email: 'admin@fleet.com',
+        email: 'hossam@sezar.com',
         phone: '+966500000001',
         name: 'System Admin',
         passwordHash: adminPassword,
@@ -237,7 +237,7 @@ async function main() {
 
     console.log('\n🎉 Extensive Seeding Completed Successfully!');
     console.log('\n📋 Quick Test Logins:');
-    console.log('  Admin:  admin@fleet.com / Admin@2024');
+    console.log('  Admin:  hossam@sezar.com / Hossam@2026');
     console.log('  Driver (active): driver5@fleet.com / Driver123!');
 
   } catch (error) {

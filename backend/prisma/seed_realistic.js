@@ -29,10 +29,10 @@ async function main() {
     await prisma.expenseCategory.deleteMany();
 
     // 2. Admin User
-    const adminPassword = await bcrypt.hash('Admin@2024', 12);
+    const adminPassword = await bcrypt.hash('Hossam@2026', 12);
     const admin = await prisma.user.create({
       data: {
-        email: 'admin@fleet.com',
+        email: 'hossam@sezar.com',
         phone: '+966500000001',
         name: 'System Admin',
         passwordHash: adminPassword,
@@ -297,7 +297,7 @@ async function main() {
 
     console.log('\n🎉 Realistic Seeding Completed Successfully!');
     console.log('\n📋 Quick Test Logins:');
-    console.log('  Admin:  admin@fleet.com / Admin@2024');
+    console.log('  Admin:  hossam@sezar.com / Hossam@2026');
     console.log('  Driver: driver1@fleet.com / Driver123!');
     console.log('  (Active trip is on driver1 account)');
 

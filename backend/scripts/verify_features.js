@@ -6,8 +6,8 @@ const API_PORT = 3001;
 const API_BASE = '/api/v1';
 
 // Seed Data
-const ADMIN_EMAIL = 'admin@fleet.com';
-const ADMIN_PASSWORD = 'Admin@2024';
+const ADMIN_EMAIL = 'hossam@sezar.com';
+const ADMIN_PASSWORD = 'Hossam@2026';
 const DRIVER_EMAIL = 'driver1@fleet.com';
 const DRIVER_PASSWORD = 'Driver123!';
 const NEW_DRIVER_PASSWORD = 'NewDriverPassword123!';

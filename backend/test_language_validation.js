@@ -8,8 +8,8 @@ async function testValidation() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email: 'admin@fleet.com',
-        password: 'Admin@2024'
+        email: 'hossam@sezar.com',
+        password: 'Hossam@2026'
       })
     });
     

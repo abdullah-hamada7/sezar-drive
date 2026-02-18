@@ -295,7 +295,7 @@ ON trips (driver_id) WHERE status IN ('Assigned', 'Started');
 ```sql
 -- Admin user (password: Admin@123)
 INSERT INTO users (id, email, phone, password_hash, name, role, must_change_password, identity_verified)
-VALUES ('...', 'admin@fleet.com', '+1000000000', '$bcrypt_hash', 'System Admin', 'admin', false, true);
+VALUES ('...', 'hossam@sezar.com', '+1000000000', '$bcrypt_hash', 'System Admin', 'admin', false, true);
 
 -- Expense categories
 INSERT INTO expense_categories (name, requires_approval) VALUES

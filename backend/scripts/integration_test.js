@@ -16,7 +16,7 @@ async function runTests() {
   let adminToken;
   try {
     const res = await agent.post('/auth/login')
-      .send({ email: 'admin@fleet.com', password: 'Admin@2024' }); // Correct from seed.js
+      .send({ email: 'hossam@sezar.com', password: 'Hossam@2026' }); // Correct from seed.js
       
     if (res.status !== 200) {
         // Try 'password123' if admin123 fails, checks seed.js content
