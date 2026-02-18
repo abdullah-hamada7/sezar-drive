@@ -9,7 +9,7 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
-      - "443:443"
+      # - "443:443" # Disabled while using IP address to prevent SSL errors
     environment:
       DOMAIN_NAME: ${DOMAIN_NAME}
       EMAIL_FOR_SSL: ${EMAIL_FOR_SSL}
