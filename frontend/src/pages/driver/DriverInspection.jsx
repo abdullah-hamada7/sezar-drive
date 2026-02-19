@@ -17,8 +17,8 @@ export default function DriverInspection() {
   const [notes, setNotes] = useState('');
   const [photos, setPhotos] = useState({});
   const [inspectionId, setInspectionId] = useState(null);
+
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const fileRef = useRef(null);
   const [currentDirection, setCurrentDirection] = useState(null);
 
@@ -28,11 +28,10 @@ export default function DriverInspection() {
 
   async function submitChecklist() {
     if (!shift) {
-      setError(t('inspection.no_shift_title'));
+      addToast(t('inspection.no_shift_title'), 'error');
       return;
     }
     setLoading(true);
-    setError('');
     try {
       const type = 'full';
       const res = await api.createInspection({
@@ -43,7 +42,7 @@ export default function DriverInspection() {
       });
       setInspectionId(res.data.id);
       setStep('photos');
-    } catch (err) { setError(err.message || t('common.error')); }
+    } catch (err) { addToast(err.message || t('common.error'), 'error'); }
     finally { setLoading(false); }
   }
 
@@ -70,14 +69,14 @@ export default function DriverInspection() {
 
   async function completeInspection() {
     if (Object.keys(photos).length < 4) {
-      setError(t('inspection.photos_missing_error') || 'Please take photos of all 4 sides before completing.');
+      addToast(t('inspection.photos_missing_error') || 'Please take photos of all 4 sides before completing.', 'error');
       return;
     }
     setLoading(true);
     try {
       await api.completeInspection(inspectionId, { checklistData: { checks, notes } });
       setStep('done');
-    } catch (err) { setError(err.message || t('common.error')); }
+    } catch (err) { addToast(err.message || t('common.error'), 'error'); }
     finally { setLoading(false); }
   }
 

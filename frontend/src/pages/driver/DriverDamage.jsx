@@ -12,7 +12,7 @@ export default function DriverDamage() {
   const { activeShift } = useShift();
   const [activeTrip, setActiveTrip] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+
   const fileRef = useRef(null);
 
   useEffect(() => {
@@ -40,14 +40,14 @@ export default function DriverDamage() {
   async function handleSubmit(e) {
     e.preventDefault();
     if (!activeShift) {
-      setError(t('damage.error_shift'));
+      addToast(t('damage.error_shift'), 'error');
       return;
     }
-    setError('');
+    
     const vehicleId = activeShift.vehicleId || activeShift.assignments?.[0]?.vehicleId;
 
     if (!vehicleId) {
-      setError(t('damage.error_vehicle'));
+      addToast(t('damage.error_vehicle'), 'error');
       return;
     }
 
@@ -69,7 +69,7 @@ export default function DriverDamage() {
       }
 
       setStep('success');
-    } catch (err) { setError(err.message || t('common.error')); }
+    } catch (err) { addToast(err.message || t('common.error'), 'error'); }
     finally { setLoading(false); }
   }
 
@@ -101,8 +101,6 @@ export default function DriverDamage() {
     <div>
       <h2 className="page-title" style={{ marginBottom: 'var(--space-lg)' }}>{t('damage.report_title')}</h2>
       <input type="file" ref={fileRef} accept="image/*" capture="environment" onChange={addPhoto} style={{ display: 'none' }} />
-
-      {error && <div className="alert alert-error">{error}</div>}
 
       <form onSubmit={handleSubmit}>
         <div className="card" style={{ marginBottom: 'var(--space-md)' }}>

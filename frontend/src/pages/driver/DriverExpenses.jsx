@@ -1,20 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 import { Receipt, Plus, X, Upload, CheckCircle } from 'lucide-react';
 import { useShift } from '../../contexts/ShiftContext';
+import { ToastContext } from '../../contexts/toastContext';
 
 const STATUS_BADGES = { pending: 'badge-warning', approved: 'badge-success', rejected: 'badge-danger' };
 
 export default function DriverExpenses() {
   const { t } = useTranslation();
+  const { addToast } = useContext(ToastContext);
   const [expenses, setExpenses] = useState([]);
   const [categories, setCategories] = useState([]);
   const { activeShift } = useShift();
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ categoryId: '', amount: '', description: '', receipt: null });
-  const [error, setError] = useState('');
 
   useEffect(() => { load(); loadCategories(); }, []);
 
@@ -48,10 +49,9 @@ export default function DriverExpenses() {
   async function handleSubmit(e) {
     e.preventDefault();
     if (!activeShift) {
-      setError(t('expenses.error_shift'));
+      addToast(t('expenses.error_shift'), 'error');
       return;
     }
-    setError('');
     try {
       const formData = new FormData();
       formData.append('shiftId', activeShift.id);
@@ -63,8 +63,9 @@ export default function DriverExpenses() {
       await api.createExpense(formData);
       setShowForm(false);
       setForm({ categoryId: '', amount: '', description: '', receipt: null });
+      addToast(t('expenses.success_create'), 'success');
       load();
-    } catch (err) { setError(err.message || t('common.error')); }
+    } catch (err) { addToast(err.message || t('common.error'), 'error'); }
   }
 
   if (loading) return <div className="loading-page"><div className="spinner"></div></div>;
@@ -107,7 +108,6 @@ export default function DriverExpenses() {
               <h2 className="modal-title">{t('expenses.submit_title')}</h2>
               <button className="btn-icon" onClick={() => setShowForm(false)}><X size={18} /></button>
             </div>
-            {error && <div className="alert alert-error mb-md">{error}</div>}
             <form onSubmit={handleSubmit}>
               <div className="form-group mb-md">
                 <label className="form-label">{t('expenses.category_label')}</label>
