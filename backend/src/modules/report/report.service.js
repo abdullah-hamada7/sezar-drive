@@ -10,6 +10,26 @@ const { ValidationError } = require('../../errors');
 const FONT_REGULAR = path.join(__dirname, '../../assets/fonts/Cairo-Regular.ttf');
 const FONT_BOLD = path.join(__dirname, '../../assets/fonts/Cairo-Bold.ttf');
 
+function isValidFontFile(filePath) {
+  try {
+    if (!fs.existsSync(filePath)) return false;
+    const fd = fs.openSync(filePath, 'r');
+    const buffer = Buffer.alloc(4);
+    fs.readSync(fd, buffer, 0, 4, 0);
+    fs.closeSync(fd);
+
+    const signature = buffer.toString('ascii');
+    const isTtf = buffer.equals(Buffer.from([0x00, 0x01, 0x00, 0x00]));
+    const isTrueType = signature === 'true';
+    const isOpenType = signature === 'OTTO';
+    const isTtc = signature === 'ttcf';
+
+    return isTtf || isTrueType || isOpenType || isTtc;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Helper to prepare RTL text for PDFKit
  */
@@ -138,13 +158,15 @@ async function generatePDF(reportData, res) {
 
   // Register Fonts (fallback to built-in fonts if custom fonts fail)
   try {
-    if (fs.existsSync(FONT_REGULAR)) {
-      doc.registerFont('Cairo', FONT_REGULAR);
+    const hasRegular = isValidFontFile(FONT_REGULAR);
+    const hasBold = isValidFontFile(FONT_BOLD);
+    if (hasRegular) doc.registerFont('Cairo', FONT_REGULAR);
+    if (hasBold) doc.registerFont('Cairo-Bold', FONT_BOLD);
+    if (hasRegular) {
+      doc.font('Cairo');
+    } else {
+      doc.font('Helvetica');
     }
-    if (fs.existsSync(FONT_BOLD)) {
-      doc.registerFont('Cairo-Bold', FONT_BOLD);
-    }
-    doc.font('Cairo');
   } catch (err) {
     console.warn('[REPORT_WARN] Failed to load custom fonts, using default.', err.message);
     doc.font('Helvetica');
