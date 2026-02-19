@@ -1,6 +1,7 @@
 const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
 const path = require('path');
+const fs = require('fs');
 const reshaper = require('arabic-persian-reshaper').ArabicReshaper;
 const bidi = require('bidi-js')();
 const prisma = require('../../config/database');
@@ -135,10 +136,19 @@ async function generatePDF(reportData, res) {
   res.setHeader('Content-Disposition', 'attachment; filename=revenue_report.pdf');
   doc.pipe(res);
 
-  // Register Fonts
-  doc.registerFont('Cairo', FONT_REGULAR);
-  doc.registerFont('Cairo-Bold', FONT_BOLD);
-  doc.font('Cairo');
+  // Register Fonts (fallback to built-in fonts if custom fonts fail)
+  try {
+    if (fs.existsSync(FONT_REGULAR)) {
+      doc.registerFont('Cairo', FONT_REGULAR);
+    }
+    if (fs.existsSync(FONT_BOLD)) {
+      doc.registerFont('Cairo-Bold', FONT_BOLD);
+    }
+    doc.font('Cairo');
+  } catch (err) {
+    console.warn('[REPORT_WARN] Failed to load custom fonts, using default.', err.message);
+    doc.font('Helvetica');
+  }
 
   // Header
   doc.fontSize(20).font('Cairo-Bold').text(prepareRTL('Fleet Management — Revenue Report / تقرير الإيرادات'), { align: 'center' });

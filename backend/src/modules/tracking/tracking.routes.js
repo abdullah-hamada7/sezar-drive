@@ -10,7 +10,7 @@ router.post(
   authenticate, enforcePasswordChanged, authorize('driver'),
   async (req, res, next) => {
     try {
-      await trackingService.updateLocation(req.user.id, req.body);
+      await trackingService.updateLocation(req.user.id, req.body, req.body.shiftId, req.body.tripId);
       res.json({ message: 'Location updated' });
     } catch (err) { next(err); }
   }

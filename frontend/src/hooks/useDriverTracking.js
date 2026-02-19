@@ -44,7 +44,9 @@ export function useDriverTracking() {
     if (watchIdRef.current !== null) return; // Already watching
 
     if (!navigator.geolocation) {
-      console.error('Geolocation not supported');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('app:toast', { detail: { message: 'Geolocation is not supported on this device.', type: 'warning' } }));
+      }
       return;
     }
 
@@ -73,7 +75,14 @@ export function useDriverTracking() {
           }));
         }
       },
-      (error) => console.error('GPS Error:', error),
+      (error) => {
+        if (typeof window !== 'undefined') {
+          const message = error?.code === 1
+            ? 'Location permission denied. Enable location services to continue.'
+            : 'Unable to access GPS. Please try again.';
+          window.dispatchEvent(new CustomEvent('app:toast', { detail: { message, type: 'error' } }));
+        }
+      },
       { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
     );
   }, []);

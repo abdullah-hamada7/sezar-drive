@@ -1,10 +1,11 @@
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, useContext } from "react";
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { AuthProvider } from "./contexts/AuthContext.jsx";
 import { useAuth } from "./hooks/useAuth";
 import { ToastProvider } from "./contexts/ToastContext.jsx";
 import { ShiftProvider } from "./contexts/ShiftContext.jsx";
+import { ToastContext } from "./contexts/toastContext";
 
 // Loading Component
 const PageLoader = () => (
@@ -147,6 +148,28 @@ function AppRoutes() {
   );
 }
 
+function GlobalToastListener() {
+  const { addToast } = useContext(ToastContext);
+
+  useEffect(() => {
+    const handler = (event) => {
+      const detail = event?.detail || {};
+      const message = detail.message || 'Something went wrong.';
+      const type = detail.type || 'error';
+      addToast(message, type);
+    };
+
+    window.addEventListener('app:toast', handler);
+    window.addEventListener('app:error', handler);
+    return () => {
+      window.removeEventListener('app:toast', handler);
+      window.removeEventListener('app:error', handler);
+    };
+  }, [addToast]);
+
+  return null;
+}
+
 export default function App() {
   return (
     <Suspense fallback={<PageLoader />}>
@@ -154,6 +177,7 @@ export default function App() {
         <AuthProvider>
           <ShiftProvider>
             <ToastProvider>
+              <GlobalToastListener />
               <AppRoutes />
             </ToastProvider>
           </ShiftProvider>

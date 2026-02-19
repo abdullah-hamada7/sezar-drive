@@ -26,6 +26,12 @@ class HttpService {
     const url = `${API_BASE}${endpoint}`;
     const headers = { ...options.headers };
 
+    const notifyToast = (message, type = 'error') => {
+      if (options.suppressToast) return;
+      if (typeof window === 'undefined') return;
+      window.dispatchEvent(new CustomEvent('app:toast', { detail: { message, type } }));
+    };
+
     if (this.accessToken && !options.skipAuth) {
       headers['Authorization'] = `Bearer ${this.accessToken}`;
     }
@@ -35,14 +41,27 @@ class HttpService {
       options.body = JSON.stringify(options.body);
     }
 
-    let response = await fetch(url, { ...options, headers });
+    let response;
+    try {
+      response = await fetch(url, { ...options, headers });
+    } catch (err) {
+      notifyToast('Network error. Please check your connection and try again.', 'error');
+      err.isNetworkError = true;
+      throw err;
+    }
 
     // Token refresh on 401
     if (response.status === 401 && this.refreshToken && !options._retried) {
       const refreshed = await this.tryRefresh();
       if (refreshed) {
         headers['Authorization'] = `Bearer ${this.accessToken}`;
-        response = await fetch(url, { ...options, headers, _retried: true });
+        try {
+          response = await fetch(url, { ...options, headers, _retried: true });
+        } catch (err) {
+          notifyToast('Network error. Please check your connection and try again.', 'error');
+          err.isNetworkError = true;
+          throw err;
+        }
       }
     }
 
@@ -56,6 +75,7 @@ class HttpService {
         message += ` (${details})`;
       }
 
+      notifyToast(message, response.status >= 500 ? 'error' : 'warning');
       const err = new Error(message);
       err.status = response.status;
       err.code = error.error?.code || error.code;

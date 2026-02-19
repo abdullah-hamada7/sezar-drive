@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MapPin, Radio } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { ToastContext } from '../../contexts/toastContext';
 
 // Fix Leaflet icon issue
 delete L.Icon.Default.prototype._getIconUrl;
@@ -23,10 +24,12 @@ function MapRecenter({ center }) {
 
 export default function TrackingPage() {
   const { t, i18n } = useTranslation();
+  const { addToast } = useContext(ToastContext);
   const [drivers, setDrivers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [wsStatus, setWsStatus] = useState('disconnected');
   const wsRef = useRef(null);
+  const wsHadConnectionRef = useRef(false);
 
   const connectWebSocket = useCallback(() => {
     const token = localStorage.getItem('accessToken');
@@ -36,12 +39,21 @@ export default function TrackingPage() {
     const ws = new WebSocket(`${protocol}://${window.location.host}/ws/tracking?token=${token}`);
     wsRef.current = ws;
 
-    ws.onopen = () => setWsStatus('connected');
+    ws.onopen = () => {
+      wsHadConnectionRef.current = true;
+      setWsStatus('connected');
+    };
     ws.onclose = () => {
       setWsStatus('disconnected');
+      if (wsHadConnectionRef.current) {
+        addToast('Live tracking disconnected. Reconnecting...', 'warning');
+      }
       setTimeout(connectWebSocket, 5000);
     };
-    ws.onerror = () => setWsStatus('error');
+    ws.onerror = () => {
+      setWsStatus('error');
+      addToast('Live tracking connection error.', 'error');
+    };
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
@@ -95,7 +107,9 @@ export default function TrackingPage() {
         lastUpdate: d.lastLocationAt
       }));
       setDrivers(formatted.filter(d => d.lat !== null));
-    } catch (err) { console.error(err); }
+    } catch (err) {
+      addToast(err.message || 'Failed to load active drivers.', 'error');
+    }
     finally { setLoading(false); }
   }
 
