@@ -3,15 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import { useShift } from '../../contexts/ShiftContext';
 import api from '../../services/api';
-import { ClipboardCheck, User, Car } from 'lucide-react';
+import { ClipboardCheck, User } from 'lucide-react';
 import { ToastContext } from '../../contexts/toastContext';
 
 export default function DriverHome() {
   const { t } = useTranslation();
   const { user, updateUser } = useAuth();
   const { addToast } = useContext(ToastContext);
-  const { activeShift, refreshShift, loading: shiftLoading } = useShift();
-  const [assigningVehicle, setAssigningVehicle] = useState(false);
+  const { activeShift, loading: shiftLoading } = useShift();
 
   const refreshStatus = useCallback(async () => {
     try {
@@ -105,58 +104,6 @@ export default function DriverHome() {
              </button>
          </div>
       </div>
-
-      {/* Vehicle Assignment / Active Vehicle */}
-      <div className="card mb-md">
-         <div className="flex items-center justify-between mb-sm">
-             <h3 className="card-title flex items-center gap-sm"><Car size={16}/> {t('driver_home.current_vehicle')}</h3>
-         </div>
-         {(() => {
-             const currentVehicle = activeShift?.vehicle || activeShift?.assignments?.[0]?.vehicle;
-             return currentVehicle ? (
-                 <div className="p-sm bg-success-soft rounded flex items-center gap-md">
-                     <div className="p-xs bg-white rounded-full"><Car size={20} className="text-success" /></div>
-                     <div>
-                         <div className="font-bold">{currentVehicle.plateNumber}</div>
-                         <div className="text-sm">{currentVehicle.model} ({currentVehicle.year})</div>
-                     </div>
-                 </div>
-             ) : (
-                 <div>
-                     <p className="text-sm text-muted mb-sm">{t('driver_home.scan_qr_desc')}</p>
-                     <div className="flex gap-sm">
-                         <input 
-                            type="text" 
-                            className="form-input" 
-                            placeholder={t('driver_home.enter_qr')}
-                            id="qr-input"
-                         />
-                          <button 
-                             className="btn btn-primary"
-                             disabled={assigningVehicle}
-                             onClick={async () => {
-                                 const qr = document.getElementById('qr-input').value;
-                                 if(!qr) return addToast(t('driver_home.enter_qr'), 'error');
-                                 setAssigningVehicle(true);
-                                 try {
-                                     await api.assignSelfVehicle(qr);
-                                     addToast(t('common.success'), 'success');
-                                     refreshShift(); // Refresh to show vehicle
-                                 } catch(err) {
-                                     addToast(err.message, 'error');
-                                 } finally {
-                                     setAssigningVehicle(false);
-                                 }
-                             }}
-                          >
-                            {t('driver_home.assign_btn')}
-                         </button>
-                     </div>
-                 </div>
-             );
-         })()}
-      </div>
-
 
       {/* Shift Status */}
       {activeShift && (

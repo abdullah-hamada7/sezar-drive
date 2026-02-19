@@ -17,6 +17,7 @@ export default function DriverShift() {
   const [actionLoading, setActionLoading] = useState(false);
   const [activeStep, setActiveStep] = useState(null); // 'face' | 'qr'
   const [showConfirm, setShowConfirm] = useState(false);
+  const [manualQr, setManualQr] = useState('');
 
   useEffect(() => { 
     loadUser();
@@ -132,6 +133,25 @@ export default function DriverShift() {
         <h2 className="page-title">{t('shift.scan_vehicle')}</h2>
         <div className="card">
           <QRScanner onScan={handleQRScan} onCancel={() => setActiveStep(null)} />
+          <div className="mt-md" style={{ borderTop: '1px solid var(--color-border)', paddingTop: '1rem' }}>
+            <div className="text-sm text-muted" style={{ marginBottom: '0.5rem' }}>{t('driver_home.enter_qr')}</div>
+            <div className="flex gap-sm">
+              <input
+                type="text"
+                className="form-input"
+                placeholder={t('driver_home.enter_qr')}
+                value={manualQr}
+                onChange={(e) => setManualQr(e.target.value)}
+              />
+              <button
+                className="btn btn-primary"
+                onClick={() => manualQr && handleQRScan(manualQr)}
+                disabled={!manualQr || actionLoading}
+              >
+                {t('driver_home.assign_btn')}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
