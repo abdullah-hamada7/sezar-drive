@@ -52,7 +52,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       PORT: 3000
       NODE_ENV: production
-      CORS_ORIGIN: https://${DOMAIN_NAME}
+      CORS_ORIGIN: http://${DOMAIN_NAME}
       S3_BUCKET: ${S3_BUCKET}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
