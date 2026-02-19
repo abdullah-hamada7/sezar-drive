@@ -194,12 +194,13 @@
     "ACTIVE_TRIP_EXISTS": "السائق {{name}} لديه بالفعل رحلة نشطة أو معينة.",
     "NO_VEHICLE_ASSIGNED": "السائق ليس لديه مركبة معينة.",
     "INSPECTION_REQUIRED": "فحص المركبة لم يكتمل.",
-    "IDENTITY_NOT_VERIFIED": "هوية السائق لم توثق."
+    "IDENTITY_NOT_VERIFIED": "هوية السائق لم توثق.",
+    "NETWORK_ERROR": "خطأ في الشبكة. يرجى التحقق من اتصالك.",
+    "UNAUTHORIZED": "انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى.",
+    "FORBIDDEN": "تم رفض الوصول.",
+    "UNKNOWN_ERROR": "حدث خطأ غير معروف."
   },
   "actions": {
-    "created": "إنشاء",
-    "updated": "تحديث",
-    "deleted": "حذف",
     "assigned": "تعيين",
     "started": "بدء",
     "completed": "إكمال",

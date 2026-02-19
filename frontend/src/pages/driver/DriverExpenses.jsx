@@ -65,7 +65,9 @@ export default function DriverExpenses() {
       setForm({ categoryId: '', amount: '', description: '', receipt: null });
       addToast(t('expenses.success_create'), 'success');
       load();
-    } catch (err) { addToast(err.message || t('common.error'), 'error'); }
+    } catch (err) {
+      // Handled by HttpService
+    }
   }
 
   if (loading) return <div className="loading-page"><div className="spinner"></div></div>;

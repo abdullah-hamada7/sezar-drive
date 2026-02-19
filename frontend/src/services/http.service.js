@@ -26,10 +26,10 @@ class HttpService {
     const url = `${API_BASE}${endpoint}`;
     const headers = { ...options.headers };
 
-    const notifyToast = (message, type = 'error') => {
+    const notifyToast = (message, type = 'error', code = null) => {
       if (options.suppressToast) return;
       if (typeof window === 'undefined') return;
-      window.dispatchEvent(new CustomEvent('app:toast', { detail: { message, type } }));
+      window.dispatchEvent(new CustomEvent('app:toast', { detail: { message, type, code } }));
     };
 
     if (this.accessToken && !options.skipAuth) {
@@ -45,8 +45,9 @@ class HttpService {
     try {
       response = await fetch(url, { ...options, headers });
     } catch (err) {
-      notifyToast('Network error. Please check your connection and try again.', 'error');
+      notifyToast('Network error. Please check your connection and try again.', 'error', 'NETWORK_ERROR');
       err.isNetworkError = true;
+      err.code = 'NETWORK_ERROR';
       throw err;
     }
 
@@ -58,8 +59,9 @@ class HttpService {
         try {
           response = await fetch(url, { ...options, headers, _retried: true });
         } catch (err) {
-          notifyToast('Network error. Please check your connection and try again.', 'error');
+          notifyToast('Network error. Please check your connection and try again.', 'error', 'NETWORK_ERROR');
           err.isNetworkError = true;
+          err.code = 'NETWORK_ERROR';
           throw err;
         }
       }
@@ -67,6 +69,7 @@ class HttpService {
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ message: response.statusText }));
+      const code = error.error?.code || error.code || 'UNKNOWN_ERROR';
       let message = error.error?.message || error.message || 'Request failed';
 
       // If there are validation details, append them
@@ -75,10 +78,10 @@ class HttpService {
         message += ` (${details})`;
       }
 
-      notifyToast(message, response.status >= 500 ? 'error' : 'warning');
+      notifyToast(message, response.status >= 500 ? 'error' : 'warning', code);
       const err = new Error(message);
       err.status = response.status;
-      err.code = error.error?.code || error.code;
+      err.code = code;
       err.details = error.error?.details || error.details;
       throw err;
     }

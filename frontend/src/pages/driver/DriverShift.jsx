@@ -45,7 +45,7 @@ export default function DriverShift() {
             setActiveStep('face');
         }
     } catch (err) {
-        addToast(err.message || t('common.error'), 'error');
+        // Handled by HttpService
     } finally {
         setActionLoading(false);
     }
@@ -72,7 +72,7 @@ export default function DriverShift() {
         addToast(t('shift.failed_alert'), 'error');
       }
     } catch (err) {
-      addToast(err.message || t('common.error'), 'error');
+      // Handled by HttpService
     } finally {
       setActionLoading(false);
     }
@@ -86,7 +86,7 @@ export default function DriverShift() {
       setActiveStep(null);
       await refreshShift();
     } catch (err) {
-      addToast(err.message || t('common.error'), 'error');
+      // Handled by HttpService
     } finally {
       setActionLoading(false);
     }
@@ -98,8 +98,9 @@ export default function DriverShift() {
       await api.activateShift(shift.id);
       addToast(t('common.success'), 'success');
       await refreshShift();
-    } catch (err) { addToast(err.message || t('common.error'), 'error'); }
-    finally { setActionLoading(false); }
+    } catch (err) {
+      // Handled by HttpService
+    } finally { setActionLoading(false); }
   }
 
   async function onConfirmClose() {
@@ -109,8 +110,9 @@ export default function DriverShift() {
       await api.closeShift(shift.id);
       addToast(t('common.success'), 'success');
       await refreshShift();
-    } catch (err) { addToast(err.message || t('common.error'), 'error'); }
-    finally { setActionLoading(false); }
+    } catch (err) {
+      // Handled by HttpService
+    } finally { setActionLoading(false); }
   }
 
   if (loading || shiftLoading) return <div className="loading-page"><div className="spinner"></div></div>;

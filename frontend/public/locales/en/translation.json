@@ -194,12 +194,13 @@
     "ACTIVE_TRIP_EXISTS": "Driver {{name}} already has an active or assigned trip.",
     "NO_VEHICLE_ASSIGNED": "Driver has no assigned vehicle.",
     "INSPECTION_REQUIRED": "Vehicle inspection not completed.",
-    "IDENTITY_NOT_VERIFIED": "Driver identity not verified."
+    "IDENTITY_NOT_VERIFIED": "Driver identity not verified.",
+    "NETWORK_ERROR": "Network error. Please check your connection.",
+    "UNAUTHORIZED": "Session expired. Please login again.",
+    "FORBIDDEN": "Access denied.",
+    "UNKNOWN_ERROR": "An unknown error occurred."
   },
   "actions": {
-    "created": "Created",
-    "updated": "Updated",
-    "deleted": "Deleted",
     "assigned": "Assigned",
     "started": "Started",
     "completed": "Completed",

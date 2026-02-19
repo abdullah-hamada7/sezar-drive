@@ -54,7 +54,7 @@ export default function DriverInspection() {
       setStep('photos');
     } catch (err) {
       setError(err.message || t('common.error'));
-      addToast(err.message || t('common.error'), 'error');
+      // Handled by HttpService
     }
     finally { setLoading(false); }
   }
@@ -78,7 +78,7 @@ export default function DriverInspection() {
       setPhotos(prev => ({ ...prev, [currentDirection]: URL.createObjectURL(file) }));
     } catch (err) {
       setError(err.message || t('common.error'));
-      addToast(err.message || t('common.error'), 'error');
+      // Handled by HttpService
     }
 
     e.target.value = '';
@@ -96,7 +96,7 @@ export default function DriverInspection() {
       setStep('done');
     } catch (err) {
       setError(err.message || t('common.error'));
-      addToast(err.message || t('common.error'), 'error');
+      // Handled by HttpService
     }
     finally { setLoading(false); }
   }

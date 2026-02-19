@@ -1,11 +1,13 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 import { AlertTriangle, Camera, CheckCircle, X } from 'lucide-react';
 import { useShift } from '../../contexts/ShiftContext';
+import { ToastContext } from '../../contexts/toastContext';
 
 export default function DriverDamage() {
   const { t } = useTranslation();
+  const { addToast } = useContext(ToastContext);
   const [step, setStep] = useState('form'); // form | success
   const [description, setDescription] = useState('');
   const [photos, setPhotos] = useState([]);
@@ -69,8 +71,9 @@ export default function DriverDamage() {
       }
 
       setStep('success');
-    } catch (err) { addToast(err.message || t('common.error'), 'error'); }
-    finally { setLoading(false); }
+    } catch (err) {
+      // Handled by HttpService
+    } finally { setLoading(false); }
   }
 
   function addPhoto(e) {

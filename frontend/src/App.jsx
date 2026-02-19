@@ -150,13 +150,25 @@ function AppRoutes() {
 
 function GlobalToastListener() {
   const { addToast } = useContext(ToastContext);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const handler = (event) => {
       const detail = event?.detail || {};
-      const message = detail.message || 'Something went wrong.';
+      const code = detail.code;
+      const defaultMessage = detail.message || (t ? t('common.error') : 'Something went wrong.');
       const type = detail.type || 'error';
-      addToast(message, type);
+
+      // Check for translation using the code first (e.g., errors.NO_ACTIVE_SHIFT)
+      let finalMessage = defaultMessage;
+      if (code && t) {
+        const translated = t(`errors.${code}`);
+        if (translated !== `errors.${code}`) {
+          finalMessage = translated;
+        }
+      }
+
+      addToast(finalMessage, type);
     };
 
     window.addEventListener('app:toast', handler);
@@ -165,7 +177,7 @@ function GlobalToastListener() {
       window.removeEventListener('app:toast', handler);
       window.removeEventListener('app:error', handler);
     };
-  }, [addToast]);
+  }, [addToast, t]);
 
   return null;
 }
