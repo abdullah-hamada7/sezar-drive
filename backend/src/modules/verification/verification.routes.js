@@ -68,9 +68,11 @@ router.post('/shift-selfie', authenticate, upload.single('photo'), async (req, r
       throw new ValidationError('Selfie photo is required');
     }
 
-    // Check if user has a reference photo
+    // Check if user has a reference photo (Profile Photo or Identity Photo)
     const user = await prisma.user.findUnique({ where: { id: driverId } });
-    if (!user.identityPhotoUrl) {
+    const referencePhoto = user.avatarUrl || user.identityPhotoUrl;
+    
+    if (!referencePhoto) {
       throw new ValidationError('No reference photo found. Please set up your profile photo first.');
     }
 
@@ -98,7 +100,7 @@ router.post('/shift-selfie', authenticate, upload.single('photo'), async (req, r
 
     // 3. Run Rekognition CompareFaces
     const { verifyFace } = require('./verification.service');
-    const verification = await verifyFace(user.identityPhotoUrl, file.buffer);
+    const verification = await verifyFace(referencePhoto, file.buffer);
 
     // 4. Update Shift
     shift = await prisma.shift.update({

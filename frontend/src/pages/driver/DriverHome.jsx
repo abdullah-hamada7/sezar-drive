@@ -97,25 +97,6 @@ export default function DriverHome() {
   const [refreshing, setRefreshing] = useState(false);
   const [biometricPending, setBiometricPending] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const refreshStatus = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      const res = await api.getMe();
-      if (res.data?.user) {
-        updateUser(res.data.user);
-        if (res.data.accessToken) {
-          api.setTokens(res.data.accessToken, undefined);
-        }
-        addToast(t('driver_home.status_refreshed'), 'success');
-      }
-    } catch (err) {
-      addToast(err.message || t('common.error'), 'error');
-    } finally {
-      setRefreshing(false);
-    }
-  }, [t, updateUser, addToast]);
  
   useEffect(() => {
     const handleIdentityUpdate = (e) => {
@@ -173,68 +154,29 @@ export default function DriverHome() {
     }
   }
 
+  const refreshStatus = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      const res = await api.getMe();
+      if (res.data?.user) {
+        updateUser(res.data.user);
+        if (res.data.accessToken) {
+          api.setTokens(res.data.accessToken, undefined);
+        }
+        addToast(t('driver_home.status_refreshed'), 'success');
+      }
+    } catch (err) {
+      addToast(err.message || t('common.error'), 'error');
+    } finally {
+      setRefreshing(false);
+    }
+  }, [t, updateUser, addToast]);
+
   if (shiftLoading) return <div className="loading-page"><div className="spinner"></div></div>;
 
   return (
     <div>
-      {/* Identity & Biometric Gate */}
-      {!user?.identityVerified && (
-        <div className={`alert ${user?.identityPhotoUrl ? 'alert-warning' : 'alert-info'} mb-md`}>
-          <div className="flex gap-md items-start">
-            <User size={24} />
-            <div style={{ flex: 1 }}>
-              <strong>
-                {!user?.identityPhotoUrl 
-                  ? t('driver_home.identity_required') 
-                  : needsBiometric 
-                    ? t('shift.biometric_title') 
-                    : t('driver_home.identity_pending')}
-              </strong>
-              
-              <p className="text-sm" style={{ marginTop: '0.25rem', marginBottom: '0.5rem' }}>
-                {!user?.identityPhotoUrl
-                  ? t('driver_home.upload_needed_desc')
-                  : needsBiometric
-                    ? t('shift.biometric_desc')
-                    : t('driver_home.admin_review_desc')}
-              </p>
-
-              {!user?.identityPhotoUrl || needsBiometric ? (
-                <div className="mt-sm">
-                  <IdentityUploadForm onUpload={handleIdentityUpload} user={user} />
-                  
-                  {needsBiometric && user?.identityPhotoUrl && (
-                    <div className="mt-md pt-md" style={{ borderTop: '1px solid var(--color-border)' }}>
-                      <p className="text-sm font-bold mb-sm">{t('shift.biometric_title')}</p>
-                      {biometricPending ? (
-                        <div className="card glass-card p-sm">
-                           <FaceCapture 
-                              onCapture={handleBiometricCapture} 
-                              onCancel={() => setBiometricPending(false)} 
-                           />
-                           {isVerifying && <div className="mt-sm text-center"><div className="spinner"></div> {t('common.loading')}</div>}
-                        </div>
-                      ) : (
-                        <button className="btn btn-primary btn-sm flex items-center gap-xs" onClick={() => setBiometricPending(true)}>
-                           <Camera size={14} /> {t('shift.biometric_title')}
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <button
-                  className="btn btn-sm btn-outline flex items-center gap-xs"
-                  onClick={refreshStatus}
-                  disabled={refreshing}
-                >
-                  <RefreshCw size={14} className={refreshing ? 'spin' : ''} /> {t('driver_home.refresh_status')}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Identity & Biometric Gate Removed - Admin Verification Assumed */}
 
       <div className="page-header mb-md">
         <h1 className="page-title text-gradient">{t('nav.dashboard')}</h1>
