@@ -6,11 +6,14 @@ import api from '../../services/api';
 import { ClipboardCheck, User } from 'lucide-react';
 import { ToastContext } from '../../contexts/toastContext';
 
+import DriverDetailsModal from '../../components/driver/DriverDetailsModal';
+
 export default function DriverHome() {
   const { t } = useTranslation();
   const { user, updateUser } = useAuth();
   const { addToast } = useContext(ToastContext);
   const { activeShift, loading: shiftLoading } = useShift();
+  const [showDetails, setShowDetails] = useState(false);
 
   const refreshStatus = useCallback(async () => {
     try {
@@ -48,13 +51,12 @@ export default function DriverHome() {
 
   if (shiftLoading) return <div className="loading-page"><div className="spinner"></div></div>;
 
+  const isShiftActive = activeShift?.status === 'Active';
+  const isShiftPending = activeShift?.status === 'PendingVerification';
+
   return (
     <div>
       {/* Identity & Biometric Gate Removed - Admin Verification Assumed */}
-
-      <div className="page-header mb-md">
-        <h1 className="page-title text-gradient">{t('nav.dashboard')}</h1>
-      </div>
 
       {/* Profile & Avatar */}
       <div className="card glass-card mb-md flex items-center justify-between">
@@ -75,44 +77,37 @@ export default function DriverHome() {
             </div>
          </div>
          <div style={{ position: 'relative' }}>
-             <input
-                type="file"
-                id="avatar-upload"
-                style={{ display: 'none' }}
-                accept="image/*"
-                onChange={async (e) => {
-                    if (!e.target.files[0]) return;
-                    const formData = new FormData();
-                    formData.append('avatar', e.target.files[0]);
-                    try {
-                        const res = await api.updateProfileAvatar(formData);
-                        if (res?.data) {
-                          updateUser(res.data);
-                        } else if (res) {
-                          updateUser(res);
-                        } else {
-                          refreshStatus();
-                        }
-                        addToast(t('driver_home.photo_updated'), 'success');
-                    } catch (err) {
-                        addToast(err.message || t('common.error'), 'error');
-                    }
-                }}
-             />
-             <button className="btn btn-secondary btn-sm" onClick={() => document.getElementById('avatar-upload').click()}>
-                {t('driver_home.edit_photo')}
+             <button className="btn btn-secondary btn-sm" onClick={() => setShowDetails(true)}>
+                {t('driver.view_details', 'View Details')}
              </button>
          </div>
       </div>
 
+      <DriverDetailsModal 
+        driver={user} 
+        isOpen={showDetails} 
+        onClose={() => setShowDetails(false)} 
+      />
+
       {/* Shift Status */}
-      {activeShift && (
+      {isShiftActive && (
         <div className="card mb-md" style={{ borderColor: 'var(--color-success)', background: 'var(--color-success-bg)' }}>
           <div className="flex items-center gap-md">
             <ClipboardCheck size={24} style={{ color: 'var(--color-success)' }} />
             <div>
               <div style={{ fontWeight: 600, color: 'var(--color-success)' }}>{t('shift.active')}</div>
               <div className="text-sm text-muted">{t('shift.vehicle')}: {activeShift.vehicle?.plateNumber || '—'}</div>
+            </div>
+          </div>
+        </div>
+      )}
+      {isShiftPending && (
+        <div className="card mb-md" style={{ borderColor: 'var(--color-warning)', background: 'var(--color-warning-bg)' }}>
+          <div className="flex items-center gap-md">
+            <ClipboardCheck size={24} style={{ color: 'var(--color-warning)' }} />
+            <div>
+              <div style={{ fontWeight: 600, color: 'var(--color-warning)' }}>{t('shift.pending')}</div>
+              <div className="text-sm text-muted">{t('shift.awaiting_verification')}</div>
             </div>
           </div>
         </div>

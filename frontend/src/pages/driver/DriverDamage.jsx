@@ -32,7 +32,7 @@ export default function DriverDamage() {
 
   async function loadContext() {
     try {
-      const tripRes = await api.getTrips('limit=1&status=Started');
+      const tripRes = await api.getTrips('limit=1&status=IN_PROGRESS');
       setActiveTrip(tripRes.data.trips?.[0]);
     } catch { /* ignore */ }
   }

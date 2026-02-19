@@ -51,6 +51,11 @@ class ShiftValidator {
    * Validate preconditions for closing a shift.
    */
   static async validateClosurePreconditions(shiftId, driverId, startedAt) {
+    // If shift hasn't started, no end inspection is required.
+    if (!startedAt) {
+      return { endInspection: null, activeTrip: null };
+    }
+
     // Check end-of-shift inspection
     const endInspection = await prisma.inspection.findFirst({
       where: { 

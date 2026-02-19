@@ -73,6 +73,7 @@
     "start_btn": "Start Driver Shift",
     "active": "Shift Active",
     "pending": "Pending Verification",
+    "awaiting_verification": "Awaiting verification to activate",
     "biometric_title": "Biometric Verification",
     "biometric_desc": "Please capture a clear selfie to verify your identity and start your shift.",
     "activate_btn": "Activate Shift",

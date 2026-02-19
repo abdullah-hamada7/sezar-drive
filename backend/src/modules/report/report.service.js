@@ -1,64 +1,7 @@
 const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
-const path = require('path');
-const fs = require('fs');
-let reshaper;
-try {
-  const reshaperModule = require('arabic-persian-reshaper');
-  const ArabicReshaper = reshaperModule.ArabicReshaper || reshaperModule;
-  reshaper = typeof ArabicReshaper === 'function' ? new ArabicReshaper() : ArabicReshaper;
-} catch (error) {
-  console.warn('[RTL_WARN] Failed to initialize ArabicReshaper:', error.message);
-  reshaper = { reshape: (text) => text }; // Dummy fallback
-}
-let bidi;
-try {
-  bidi = require('bidi-js')();
-} catch (error) {
-  console.warn('[RTL_WARN] Failed to initialize bidi-js:', error.message);
-  bidi = { getReorderedText: (text) => text }; // Dummy fallback
-}
 const prisma = require('../../config/database');
 const { ValidationError } = require('../../errors');
-
-const FONT_REGULAR = path.join(__dirname, '../../assets/fonts/Cairo-Regular.ttf');
-const FONT_BOLD = path.join(__dirname, '../../assets/fonts/Cairo-Bold.ttf');
-
-function isValidFontFile(filePath) {
-  try {
-    if (!fs.existsSync(filePath)) return false;
-    const fd = fs.openSync(filePath, 'r');
-    const buffer = Buffer.alloc(4);
-    fs.readSync(fd, buffer, 0, 4, 0);
-    fs.closeSync(fd);
-
-    const signature = buffer.toString('ascii');
-    const isTtf = buffer.equals(Buffer.from([0x00, 0x01, 0x00, 0x00]));
-    const isTrueType = signature === 'true';
-    const isOpenType = signature === 'OTTO';
-    const isTtc = signature === 'ttcf';
-
-    return isTtf || isTrueType || isOpenType || isTtc;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Helper to prepare RTL text for PDFKit
- */
-function prepareRTL(text) {
-  if (!text) return '';
-  try {
-    // 1. Reshape Arabic characters (handle connected forms)
-    const reshaped = typeof reshaper?.reshape === 'function' ? reshaper.reshape(text) : text;
-    // 2. Reorder for RTL display
-    return bidi.getReorderedText(reshaped);
-  } catch (err) {
-    console.warn('[RTL_WARN] Failed to reshape text:', text, err.message);
-    return text; // Fallback to original text
-  }
-}
 
 /**
  * Generate revenue report for a date range.
@@ -94,7 +37,7 @@ async function generateRevenueData({ startDate, endDate, driverId }) {
   });
 
   if (trips.length === 0) {
-    throw new ValidationError('REPORT_EMPTY_DATA', 'No completed trips found in this period / لا توجد رحلات مكتملة في هذه الفترة');
+    throw new ValidationError('REPORT_EMPTY_DATA', 'No completed trips found in this period');
   }
 
 
@@ -174,55 +117,28 @@ async function generatePDF(reportData, res) {
   res.setHeader('Content-Disposition', 'attachment; filename=revenue_report.pdf');
   doc.pipe(res);
 
-    // Register Fonts (fallback to built-in fonts if custom fonts fail)
-    let fontRegular = 'Helvetica';
-    let fontBold = 'Helvetica-Bold';
-    try {
-      const hasRegular = isValidFontFile(FONT_REGULAR);
-      const hasBold = isValidFontFile(FONT_BOLD);
-      if (hasRegular && hasBold) {
-        doc.registerFont('Cairo', FONT_REGULAR);
-        doc.registerFont('Cairo-Bold', FONT_BOLD);
-        doc.font('Cairo');
-        doc.font('Cairo-Bold');
-        fontRegular = 'Cairo';
-        fontBold = 'Cairo-Bold';
-      }
-    } catch (err) {
-      console.warn('[REPORT_WARN] Failed to load custom fonts, using default.', err.message);
-    }
-
-    try {
-      doc.font(fontRegular);
-    } catch (err) {
-      console.warn('[REPORT_WARN] Failed to apply font, using default.', err.message);
-      fontRegular = 'Helvetica';
-      fontBold = 'Helvetica-Bold';
-      doc.font(fontRegular);
-    }
-
   // Header
-  doc.fontSize(20).font(fontBold).text(prepareRTL('Fleet Management — Revenue Report / تقرير الإيرادات'), { align: 'center' });
+  doc.fontSize(20).font('Helvetica-Bold').text('Fleet Management — Revenue Report', { align: 'center' });
   doc.moveDown();
-  doc.fontSize(12).font(fontRegular).text(prepareRTL(`Period / الفترة: ${reportData.startDate.slice(0, 10)} to ${reportData.endDate.slice(0, 10)}`));
+  doc.fontSize(12).font('Helvetica').text(`Period: ${reportData.startDate.slice(0, 10)} to ${reportData.endDate.slice(0, 10)}`, { align: 'center' });
   doc.moveDown();
 
   // Summary table
-  doc.fontSize(14).font(fontBold).text(prepareRTL('Summary / الملخص'), { underline: true });
+  doc.fontSize(14).font('Helvetica-Bold').text('Summary', { underline: true });
   doc.moveDown(0.5);
-  doc.fontSize(11).font(fontRegular);
-  doc.text(prepareRTL(`Total Revenue / إجمالي الإيرادات: ${reportData.totalRevenue.toFixed(2)} EGP`));
-  doc.text(prepareRTL(`Total Expenses / إجمالي المصروفات: ${reportData.totalExpenses.toFixed(2)} EGP`));
-  doc.text(prepareRTL(`Net Revenue / صافي الربح: ${reportData.netRevenue.toFixed(2)} EGP`));
-  doc.text(prepareRTL(`Total Trips / عدد الرحلات: ${reportData.tripCount}`));
+  doc.fontSize(11).font('Helvetica');
+  doc.text(`Total Revenue: ${reportData.totalRevenue.toFixed(2)} EGP`);
+  doc.text(`Total Expenses: ${reportData.totalExpenses.toFixed(2)} EGP`);
+  doc.text(`Net Revenue: ${reportData.netRevenue.toFixed(2)} EGP`);
+  doc.text(`Total Trips: ${reportData.tripCount}`);
   doc.moveDown();
 
   // Driver breakdown
-  doc.fontSize(14).font(fontBold).text(prepareRTL('Driver Breakdown / تفاصيل السائقين'), { underline: true });
+  doc.fontSize(14).font('Helvetica-Bold').text('Driver Breakdown', { underline: true });
   doc.moveDown(0.5);
-  doc.fontSize(11).font(fontRegular);
+  doc.fontSize(11).font('Helvetica');
   for (const driver of reportData.driverSummaries) {
-    doc.text(prepareRTL(`${driver.driverName}: Revenue ${driver.totalRevenue.toFixed(2)} EGP | Expenses ${driver.totalExpenses.toFixed(2)} EGP | Net ${driver.netRevenue.toFixed(2)} EGP | Trips: ${driver.tripCount}`));
+    doc.text(`${driver.driverName}: Revenue ${driver.totalRevenue.toFixed(2)} EGP | Expenses ${driver.totalExpenses.toFixed(2)} EGP | Net ${driver.netRevenue.toFixed(2)} EGP | Trips: ${driver.tripCount}`);
   }
 
   doc.end();
@@ -238,24 +154,24 @@ async function generateExcel(reportData, res) {
   // Summary sheet
   const summarySheet = workbook.addWorksheet('Summary');
   summarySheet.columns = [
-    { header: 'Metric / المقياس', key: 'metric', width: 30 },
-    { header: 'Value / القيمة', key: 'value', width: 25 },
+    { header: 'Metric', key: 'metric', width: 30 },
+    { header: 'Value', key: 'value', width: 25 },
   ];
-  summarySheet.addRow({ metric: 'Period Start / بداية الفترة', value: reportData.startDate.slice(0, 10) });
-  summarySheet.addRow({ metric: 'Period End / نهاية الفترة', value: reportData.endDate.slice(0, 10) });
-  summarySheet.addRow({ metric: 'Total Revenue (EGP) / إجمالي الإيرادات', value: reportData.totalRevenue });
-  summarySheet.addRow({ metric: 'Total Expenses (EGP) / إجمالي المصروفات', value: reportData.totalExpenses });
-  summarySheet.addRow({ metric: 'Net Revenue (EGP) / صافي الربح', value: reportData.netRevenue });
-  summarySheet.addRow({ metric: 'Total Trips / عدد الرحلات', value: reportData.tripCount });
+  summarySheet.addRow({ metric: 'Period Start', value: reportData.startDate.slice(0, 10) });
+  summarySheet.addRow({ metric: 'Period End', value: reportData.endDate.slice(0, 10) });
+  summarySheet.addRow({ metric: 'Total Revenue (EGP)', value: reportData.totalRevenue });
+  summarySheet.addRow({ metric: 'Total Expenses (EGP)', value: reportData.totalExpenses });
+  summarySheet.addRow({ metric: 'Net Revenue (EGP)', value: reportData.netRevenue });
+  summarySheet.addRow({ metric: 'Total Trips', value: reportData.tripCount });
 
   // Drivers sheet
   const driverSheet = workbook.addWorksheet('Drivers');
   driverSheet.columns = [
-    { header: 'Driver / السائق', key: 'name', width: 25 },
-    { header: 'Revenue (EGP) / الإيرادات', key: 'revenue', width: 20 },
-    { header: 'Expenses (EGP) / المصروفات', key: 'expenses', width: 20 },
-    { header: 'Net (EGP) / الصافي', key: 'net', width: 20 },
-    { header: 'Trips / الرحلات', key: 'trips', width: 15 },
+    { header: 'Driver', key: 'name', width: 25 },
+    { header: 'Revenue (EGP)', key: 'revenue', width: 20 },
+    { header: 'Expenses (EGP)', key: 'expenses', width: 20 },
+    { header: 'Net (EGP)', key: 'net', width: 20 },
+    { header: 'Trips', key: 'trips', width: 15 },
   ];
   for (const d of reportData.driverSummaries) {
     driverSheet.addRow({
@@ -267,13 +183,13 @@ async function generateExcel(reportData, res) {
   // Trips sheet
   const tripsSheet = workbook.addWorksheet('Trips');
   tripsSheet.columns = [
-    { header: 'Date / التاريخ', key: 'date', width: 25 },
-    { header: 'Driver / السائق', key: 'driver', width: 25 },
-    { header: 'Vehicle / المركبة', key: 'vehicle', width: 20 },
-    { header: 'Pickup / موقع الركوب', key: 'pickup', width: 35 },
-    { header: 'Dropoff / المحطة الأخيرة', key: 'dropoff', width: 35 },
-    { header: 'Price / السعر', key: 'price', width: 15 },
-    { header: 'Status / الحالة', key: 'status', width: 15 },
+    { header: 'Date', key: 'date', width: 25 },
+    { header: 'Driver', key: 'driver', width: 25 },
+    { header: 'Vehicle', key: 'vehicle', width: 20 },
+    { header: 'Pickup', key: 'pickup', width: 35 },
+    { header: 'Dropoff', key: 'dropoff', width: 35 },
+    { header: 'Price', key: 'price', width: 15 },
+    { header: 'Status', key: 'status', width: 15 },
   ];
   for (const t of reportData.trips) {
     tripsSheet.addRow({
