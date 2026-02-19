@@ -161,6 +161,13 @@ async function reviewExpense(expenseId, adminId, action, rejectionReason, ipAddr
     reason: rejectionReason
   });
 
+  notifyAdmins(
+    'expense_reviewed',
+    'Expense Review Updated',
+    `Expense ${expenseId} was ${status}.`,
+    { expenseId, status }
+  );
+
   return FileService.signExpense(updated);
 }
 

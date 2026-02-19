@@ -51,6 +51,20 @@ export default function TripsPage() {
     load();
   }, [page, statusFilter, refresh]);
 
+  useEffect(() => {
+    const handleUpdate = () => setRefresh(r => r + 1);
+    window.addEventListener('ws:trip_assigned', handleUpdate);
+    window.addEventListener('ws:trip_started', handleUpdate);
+    window.addEventListener('ws:trip_completed', handleUpdate);
+    window.addEventListener('ws:trip_cancelled', handleUpdate);
+    return () => {
+      window.removeEventListener('ws:trip_assigned', handleUpdate);
+      window.removeEventListener('ws:trip_started', handleUpdate);
+      window.removeEventListener('ws:trip_completed', handleUpdate);
+      window.removeEventListener('ws:trip_cancelled', handleUpdate);
+    };
+  }, []);
+
   async function openCreate() {
     setError('');
     setShowCreateModal(true);

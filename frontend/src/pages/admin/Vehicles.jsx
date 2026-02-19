@@ -43,6 +43,20 @@ export default function VehiclesPage() {
 
   useEffect(() => { load(); }, [load]);
 
+  useEffect(() => {
+    const handleUpdate = () => load();
+    window.addEventListener('ws:shift_activated', handleUpdate);
+    window.addEventListener('ws:shift_closed', handleUpdate);
+    window.addEventListener('ws:damage_reported', handleUpdate);
+    window.addEventListener('ws:damage_reviewed', handleUpdate);
+    return () => {
+      window.removeEventListener('ws:shift_activated', handleUpdate);
+      window.removeEventListener('ws:shift_closed', handleUpdate);
+      window.removeEventListener('ws:damage_reported', handleUpdate);
+      window.removeEventListener('ws:damage_reviewed', handleUpdate);
+    };
+  }, [load]);
+
   function openCreate() {
     setEditVehicle(null);
     setForm({ plateNumber: '', model: '', year: 2024, capacity: 4, qrCode: '' });

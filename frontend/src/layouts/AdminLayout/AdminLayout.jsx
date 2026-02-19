@@ -102,6 +102,14 @@ export default function AdminLayout() {
           const data = JSON.parse(event.data);
           if (data.type === 'notification') {
             addNotification(data.payload);
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('ws:notification', { detail: data.payload }));
+              if (data.payload?.type) {
+                window.dispatchEvent(new CustomEvent(`ws:${data.payload.type}`, { detail: data.payload }));
+              }
+            }
+          } else if (data.type && typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent(`ws:${data.type}`, { detail: data }));
           }
         } catch (err) { console.error('WS Error:', err); }
       };

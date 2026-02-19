@@ -29,6 +29,16 @@ export default function DamageReportsPage() {
 
   useEffect(() => { load(); }, [load]);
 
+  useEffect(() => {
+    const handleUpdate = () => load();
+    window.addEventListener('ws:damage_reported', handleUpdate);
+    window.addEventListener('ws:damage_reviewed', handleUpdate);
+    return () => {
+      window.removeEventListener('ws:damage_reported', handleUpdate);
+      window.removeEventListener('ws:damage_reviewed', handleUpdate);
+    };
+  }, [load]);
+
   async function handleReview(id, action) {
     try {
       await api.reviewDamageReport(id, { action });

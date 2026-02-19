@@ -331,6 +331,13 @@ async function reviewIdentity(id, adminId, action, rejectionReason, ipAddress) {
     reason: rejectionReason
   });
 
+  notifyAdmins(
+    'identity_reviewed',
+    'Identity Review Updated',
+    `Driver identity was ${status}.`,
+    { driverId: verification.driverId, status }
+  );
+
   return updated;
 }
 

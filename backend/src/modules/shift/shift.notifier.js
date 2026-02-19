@@ -5,13 +5,19 @@ const { notifyAdmins, notifyDriver } = require('../tracking/tracking.ws');
  * Encapsulates real-time notifications for shift events.
  */
 class ShiftNotifier {
-  static onShiftStarted(driverName, shiftId) {
+  static onShiftStarted(driverName, shiftId, driverId) {
     notifyAdmins(
       'shift_started', 
       'New Shift Started', 
       `Driver ${driverName} has started a new shift and is pending verification.`, 
       { shiftId }
     );
+    if (driverId) {
+      notifyDriver(driverId, {
+        type: 'shift_started',
+        shiftId
+      });
+    }
   }
 
   static onShiftActivated(shiftId, driverId, vehicleId) {
@@ -33,6 +39,21 @@ class ShiftNotifier {
       type: 'shift_closed',
       reason,
       closedBy: 'admin'
+    });
+  }
+
+  static onShiftClosed(shiftId, driverId, closedBy, reason) {
+    notifyAdmins(
+      'shift_closed',
+      'Shift Closed',
+      `Shift ${shiftId} was closed by ${closedBy}.`,
+      { shiftId, driverId, closedBy, reason }
+    );
+    notifyDriver(driverId, {
+      type: 'shift_closed',
+      shiftId,
+      reason,
+      closedBy
     });
   }
 }

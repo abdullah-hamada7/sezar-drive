@@ -15,6 +15,10 @@ class TripNotifier {
         price: trip.price
       }
     });
+    notifyAdmins('trip_assigned', 'Trip Assigned', 'A trip has been assigned', {
+      tripId: trip.id,
+      driverId
+    });
   }
 
   static onTripStarted(driverName, details) {
@@ -36,13 +40,15 @@ class TripNotifier {
 
     if (isAdmin) {
       notifyDriver(trip.driverId, notification);
-    } else {
-      notifyAdmins('trip_cancelled', 'Trip Cancelled', 'Driver cancelled a trip', {
-        tripId: trip.id,
-        driverId: trip.driverId,
-        reason
-      });
     }
+
+    notifyAdmins('trip_cancelled', 'Trip Cancelled', isAdmin ? 'Admin cancelled a trip' : 'Driver cancelled a trip', {
+      tripId: trip.id,
+      driverId: trip.driverId,
+      reason,
+      cancelledBy: userId,
+      isAdmin
+    });
   }
 }
 

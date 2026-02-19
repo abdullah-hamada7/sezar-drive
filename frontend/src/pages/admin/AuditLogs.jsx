@@ -40,6 +40,12 @@ export default function AuditPage() {
 
   useEffect(() => { load(); }, [load]);
 
+  useEffect(() => {
+    const handleUpdate = () => load();
+    window.addEventListener('ws:notification', handleUpdate);
+    return () => window.removeEventListener('ws:notification', handleUpdate);
+  }, [load]);
+
   function handleFilterChange(e) {
     const { name, value } = e.target;
     setFilters(prev => ({ ...prev, [name]: value }));

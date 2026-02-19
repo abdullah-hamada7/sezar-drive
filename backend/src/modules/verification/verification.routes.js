@@ -213,6 +213,10 @@ router.post('/review', authenticate, authorize('admin'), async (req, res, next) 
         type: 'shift_activated',
         shiftId
       });
+      notifyAdmins('shift_activated', 'Shift Activated', 'Shift verification approved and activated.', {
+        shiftId,
+        driverId: shift.driverId
+      });
       res.json({ message: 'Shift approved and active' });
     } else if (decision === 'REJECT') {
       await prisma.shift.update({
@@ -230,6 +234,11 @@ router.post('/review', authenticate, authorize('admin'), async (req, res, next) 
         shiftId,
         reason: reason || 'Identity verification failed',
         closedBy: 'admin'
+      });
+      notifyAdmins('shift_closed', 'Shift Closed', 'Shift verification rejected and closed.', {
+        shiftId,
+        driverId: shift.driverId,
+        reason: reason || 'Identity verification failed'
       });
       res.json({ message: 'Shift rejected and closed' });
     } else {

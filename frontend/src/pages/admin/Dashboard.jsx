@@ -51,6 +51,15 @@ export default function DashboardPage() {
     initDashboard();
   }, [loadDashboardStats, loadRecentActivity]);
 
+  useEffect(() => {
+    const handleUpdate = () => {
+      loadDashboardStats();
+      loadRecentActivity();
+    };
+    window.addEventListener('ws:notification', handleUpdate);
+    return () => window.removeEventListener('ws:notification', handleUpdate);
+  }, [loadDashboardStats, loadRecentActivity]);
+
 
   function formatActivityDate(d) {
     return new Date(d).toLocaleString(i18n.language, { hour: 'numeric', minute: 'numeric', day: 'numeric', month: 'short' });

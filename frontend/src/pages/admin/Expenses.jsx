@@ -36,6 +36,16 @@ export default function ExpensesPage() {
     load();
   }, [page, statusFilter, refresh]);
 
+  useEffect(() => {
+    const handleUpdate = () => setRefresh(r => r + 1);
+    window.addEventListener('ws:expense_pending', handleUpdate);
+    window.addEventListener('ws:expense_reviewed', handleUpdate);
+    return () => {
+      window.removeEventListener('ws:expense_pending', handleUpdate);
+      window.removeEventListener('ws:expense_reviewed', handleUpdate);
+    };
+  }, []);
+
   async function handleReview(id, action, reason = null) {
     if (action === 'rejected' && !reason) {
       setPromptData({ isOpen: true, expenseId: id });

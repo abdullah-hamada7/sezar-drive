@@ -35,6 +35,16 @@ export default function VerificationQueue() {
     loadPending();
   }, [loadPending]);
 
+  useEffect(() => {
+    const handleUpdate = () => loadPending();
+    window.addEventListener('ws:identity_upload', handleUpdate);
+    window.addEventListener('ws:identity_reviewed', handleUpdate);
+    return () => {
+      window.removeEventListener('ws:identity_upload', handleUpdate);
+      window.removeEventListener('ws:identity_reviewed', handleUpdate);
+    };
+  }, [loadPending]);
+
   async function handleReview(id, decision, reason = '') {
     const action = decision.toLowerCase();
     try {

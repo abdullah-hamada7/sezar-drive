@@ -43,6 +43,18 @@ export default function ShiftsPage() {
 
   useEffect(() => { load(); }, [load]);
 
+  useEffect(() => {
+    const handleUpdate = () => load();
+    window.addEventListener('ws:shift_started', handleUpdate);
+    window.addEventListener('ws:shift_activated', handleUpdate);
+    window.addEventListener('ws:shift_closed', handleUpdate);
+    return () => {
+      window.removeEventListener('ws:shift_started', handleUpdate);
+      window.removeEventListener('ws:shift_activated', handleUpdate);
+      window.removeEventListener('ws:shift_closed', handleUpdate);
+    };
+  }, [load]);
+
   async function handleAdminClose(id) {
     setPromptData({ isOpen: true, shiftId: id });
   }

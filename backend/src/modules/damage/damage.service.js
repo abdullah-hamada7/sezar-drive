@@ -111,6 +111,13 @@ async function reviewDamageReport(reportId, adminId, action, ipAddress) {
     reportId
   });
 
+  notifyAdmins(
+    'damage_reviewed',
+    'Damage Report Updated',
+    `Damage report ${reportId} was ${newStatus}.`,
+    { reportId, status: newStatus }
+  );
+
   return FileService.signDamageReport(updated);
 }
 

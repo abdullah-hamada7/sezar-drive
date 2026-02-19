@@ -60,6 +60,12 @@ export default function DriversPage() {
 
   useEffect(() => { load(); }, [load]);
 
+  useEffect(() => {
+    const handleUpdate = () => load();
+    window.addEventListener('ws:identity_reviewed', handleUpdate);
+    return () => window.removeEventListener('ws:identity_reviewed', handleUpdate);
+  }, [load]);
+
   function openCreate() {
     setEditDriver(null);
     setForm({ name: '', email: '', phone: '', licenseNumber: '', password: '' });
