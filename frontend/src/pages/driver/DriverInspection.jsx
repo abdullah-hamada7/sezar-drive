@@ -19,6 +19,7 @@ export default function DriverInspection() {
   const [inspectionId, setInspectionId] = useState(null);
 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const fileRef = useRef(null);
   const [currentDirection, setCurrentDirection] = useState(null);
 
@@ -31,18 +32,30 @@ export default function DriverInspection() {
       addToast(t('inspection.no_shift_title'), 'error');
       return;
     }
+    const vehicleId = shift.vehicleId
+      || shift.vehicle?.id
+      || shift.assignments?.[0]?.vehicleId
+      || shift.assignments?.[0]?.vehicle?.id;
+    if (!vehicleId) {
+      addToast(t('errors.NO_VEHICLE_ASSIGNED'), 'error');
+      return;
+    }
     setLoading(true);
+    setError('');
     try {
       const type = 'full';
       const res = await api.createInspection({
         shiftId: shift.id,
-        vehicleId: shift.vehicleId || shift.assignments[0]?.vehicleId,
+        vehicleId,
         type,
         notes
       });
       setInspectionId(res.data.id);
       setStep('photos');
-    } catch (err) { addToast(err.message || t('common.error'), 'error'); }
+    } catch (err) {
+      setError(err.message || t('common.error'));
+      addToast(err.message || t('common.error'), 'error');
+    }
     finally { setLoading(false); }
   }
 
@@ -55,6 +68,7 @@ export default function DriverInspection() {
     const file = e.target.files?.[0];
     if (!file || !currentDirection || !inspectionId) return;
 
+    setError('');
     const formData = new FormData();
     formData.append('photo', file);
     formData.append('direction', currentDirection);
@@ -62,7 +76,10 @@ export default function DriverInspection() {
     try {
       await api.uploadInspectionPhoto(inspectionId, currentDirection, formData);
       setPhotos(prev => ({ ...prev, [currentDirection]: URL.createObjectURL(file) }));
-    } catch (err) { addToast(err.message || t('common.error'), 'error'); }
+    } catch (err) {
+      setError(err.message || t('common.error'));
+      addToast(err.message || t('common.error'), 'error');
+    }
 
     e.target.value = '';
   }
@@ -73,10 +90,14 @@ export default function DriverInspection() {
       return;
     }
     setLoading(true);
+    setError('');
     try {
       await api.completeInspection(inspectionId, { checklistData: { checks, notes } });
       setStep('done');
-    } catch (err) { addToast(err.message || t('common.error'), 'error'); }
+    } catch (err) {
+      setError(err.message || t('common.error'));
+      addToast(err.message || t('common.error'), 'error');
+    }
     finally { setLoading(false); }
   }
 
