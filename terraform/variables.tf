@@ -10,7 +10,7 @@ variable "project_name" {
 
 variable "instance_type" {
   description = "EC2 instance type"
-  default     = "t3.micro"
+  default     = "c7i-flex.large"
 }
 
 variable "ami_id" {

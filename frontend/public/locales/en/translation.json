@@ -236,6 +236,7 @@
     "title": "Vehicle Inspection",
     "no_shift_title": "No Active Shift",
     "no_shift_desc": "You need an active shift to perform a vehicle inspection.",
+    "camera_error": "Could not access the camera. Please check your permissions and try again.",
     "go_shifts": "Go to Shifts",
     "done_title": "Inspection Complete!",
     "done_desc": "Your vehicle inspection has been recorded successfully.",

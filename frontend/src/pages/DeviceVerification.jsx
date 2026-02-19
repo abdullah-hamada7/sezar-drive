@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Camera, ShieldAlert, RefreshCw, CheckCircle2 } from 'lucide-react';
@@ -19,17 +19,33 @@ export default function DeviceVerificationPage() {
 
   const { userId, deviceFingerprint } = location.state || {};
 
+  // Attach stream to video element whenever stream changes
+  useEffect(() => {
+    if (stream && videoRef.current) {
+      const video = videoRef.current;
+      video.srcObject = stream;
+      // Explicitly call play to handle some browser playback policies
+      video.play().catch(e => console.error("Video play failed:", e));
+    }
+  }, [stream]);
+
   if (!userId || !deviceFingerprint) {
     return <Navigate to="/login" replace />;
   }
 
   const startCamera = async () => {
     try {
-      const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+      const s = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          facingMode: 'user',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        } 
+      });
       setStream(s);
-      if (videoRef.current) videoRef.current.srcObject = s;
       setError('');
-    } catch {
+    } catch (err) {
+      console.error('Camera Access Error:', err);
       setError(t('inspection.camera_error'));
     }
   };
@@ -42,21 +58,28 @@ export default function DeviceVerificationPage() {
   };
 
   const captureAndVerify = async () => {
-    if (!videoRef.current) return;
+    if (!videoRef.current || !stream) return;
 
     setLoading(true);
     setError('');
 
     try {
+      const video = videoRef.current;
+      
+      // Safety check for video readiness
+      if (video.readyState < 2 || video.videoWidth === 0) {
+        throw new Error('Video is not ready. Please wait a moment.');
+      }
+
       const canvas = document.createElement('canvas');
-      canvas.width = videoRef.current.videoWidth;
-      canvas.height = videoRef.current.videoHeight;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
       const ctx = canvas.getContext('2d');
-      ctx.drawImage(videoRef.current, 0, 0);
+      ctx.drawImage(video, 0, 0);
 
       const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.8));
       if (!blob) {
-        throw new Error(t('inspection.camera_error'));
+        throw new Error('Failed to capture image from camera.');
       }
 
       const formData = new FormData();

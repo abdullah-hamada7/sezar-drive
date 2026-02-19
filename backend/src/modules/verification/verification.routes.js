@@ -143,7 +143,18 @@ router.get('/pending', authenticate, authorize('admin'), async (req, res, next) 
       orderBy: { createdAt: 'asc' }
     });
 
-    res.json(pendingShifts);
+    // Sign URLs for all drivers and selfie photos in the list
+    const signedShifts = await Promise.all(pendingShifts.map(async shift => {
+      if (shift.driver) {
+        shift.driver = await fileService.signDriverUrls(shift.driver);
+      }
+      if (shift.startSelfieUrl) {
+        shift.startSelfieUrl = await fileService.getUrl(shift.startSelfieUrl);
+      }
+      return shift;
+    }));
+
+    res.json(signedShifts);
   } catch (error) {
     next(error);
   }
