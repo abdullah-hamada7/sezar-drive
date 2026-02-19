@@ -1,6 +1,7 @@
 const prisma = require('../../config/database');
 const { NotFoundError, ConflictError, ValidationError, ForbiddenError } = require('../../errors');
 const AuditService = require('../../services/audit.service');
+const FileService = require('../../services/FileService');
 const { notifyAdmins, notifyDriver } = require('../tracking/tracking.ws');
 
 /**
@@ -47,6 +48,7 @@ async function createExpense(data, driverId, ipAddress) {
     entityType: 'expense',
     entityId: expense.id,
     newState: { amount, category: category.name, status },
+    expenseId: expense.id,
     ipAddress,
   });
 
@@ -54,7 +56,7 @@ async function createExpense(data, driverId, ipAddress) {
     notifyAdmins('expense_pending', 'New Expense Approval', `Driver ${shift.driver.name} submitted a $${amount} expense for ${category.name}.`, { expenseId: expense.id });
   }
 
-  return expense;
+  return FileService.signExpense(expense);
 }
 
 /**
@@ -83,7 +85,9 @@ async function getExpenses({ page = 1, limit = 20, driverId, shiftId, status }) 
     prisma.expense.count({ where }),
   ]);
 
-  return { expenses, total, page: pageNum, limit: limitNum, totalPages: Math.ceil(total / limitNum) };
+  const signedExpenses = await FileService.signExpenses(expenses);
+
+  return { expenses: signedExpenses, total, page: pageNum, limit: limitNum, totalPages: Math.ceil(total / limitNum) };
 }
 
 /**
@@ -116,7 +120,7 @@ async function updateExpense(expenseId, data, driverId, ipAddress) {
     ipAddress,
   });
 
-  return updated;
+  return FileService.signExpense(updated);
 }
 
 /**
@@ -157,7 +161,7 @@ async function reviewExpense(expenseId, adminId, action, rejectionReason, ipAddr
     reason: rejectionReason
   });
 
-  return updated;
+  return FileService.signExpense(updated);
 }
 
 // ─── Expense Categories ───────────────────────────

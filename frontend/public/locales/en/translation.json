@@ -64,7 +64,14 @@
     "bags": "Bags",
     "no_phone": "No Phone",
     "scheduled": "Scheduled",
-    "status_in_progress": "Active"
+    "status_in_progress": "Active",
+    "no_active_shift_warning": "You must start and activate a shift before trips."
+  },
+  "status": {
+    "active": "Active"
+  },
+  "driver": {
+    "view_details": "View Details"
   },
   "shift": {
     "management": "Shift Management",
@@ -74,6 +81,8 @@
     "active": "Shift Active",
     "pending": "Pending Verification",
     "awaiting_verification": "Awaiting verification to activate",
+    "scan_vehicle": "Scan Vehicle",
+    "manual_qr_label": "Enter QR Code",
     "biometric_title": "Biometric Verification",
     "biometric_desc": "Please capture a clear selfie to verify your identity and start your shift.",
     "activate_btn": "Activate Shift",
@@ -88,6 +97,8 @@
   "driver_home": {
     "identity_pending": "Identity verification pending",
     "identity_required": "Action Required: Verify Identity",
+    "identity_approved": "Identity approved",
+    "identity_rejected": "Identity rejected",
     "admin_review_desc": "Admin is reviewing your documents. Tap refresh once approved.",
     "upload_needed_desc": "Please upload your photo and National ID to start driving.",
     "refresh_status": "Refresh Status",
@@ -112,6 +123,7 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
+    "details": "Details",
     "approve": "Approve",
     "reject": "Reject",
     "loading": "Loading...",
@@ -125,7 +137,12 @@
     "view": "View",
     "yes": "Yes",
     "no": "No",
+    "or": "or",
     "currency": "EGP",
+    "errors": {
+      "validation_failed": "Validation failed. Please check the fields below.",
+      "check_fields": "Please fix the errors in the form before submitting."
+    },
     "inspection_type": {
       "start_shift": "Start Shift",
       "end_shift": "End Shift",
@@ -221,6 +238,7 @@
   },
   "expenses": {
     "title": "My Expenses",
+    "success_create": "Expense submitted successfully",
     "new": "New",
     "no_expenses": "No expenses submitted",
     "submit_title": "Submit Expense",
@@ -239,6 +257,8 @@
   },
   "inspection": {
     "title": "Vehicle Inspection",
+    "photos": "Photos",
+    "photos_missing_error": "Please capture photos of all sides before completing.",
     "no_shift_title": "No Active Shift",
     "no_shift_desc": "You need an active shift to perform a vehicle inspection.",
     "camera_error": "Could not access the camera. Please check your permissions and try again.",
@@ -366,6 +386,7 @@
     "modal": {
       "details_title": "Driver Details",
       "id_cards": "Identity Documents",
+      "photos_section": "Photos",
       "add_title": "Add New Driver",
       "edit_title": "Edit Driver",
       "avatar": "Personal Photo",
@@ -397,7 +418,9 @@
       "approve_confirm": "Approve identity for {{name}}?",
       "delete_confirm": "Are you sure you want to deactivate this driver?",
       "op_failed": "Operation failed",
-      "delete_failed": "Delete failed"
+      "delete_failed": "Delete failed",
+      "validation_failed": "Validation failed. Please check the fields below.",
+      "check_fields": "Please fix the errors in the form before submitting."
     }
   },
   "trips": {
@@ -560,6 +583,7 @@
     },
     "messages": {
       "reject_prompt": "Enter rejection reason:",
+      "reject_reason_placeholder": "Reason for rejection",
       "confirm_approve": "Are you sure you want to approve this verification?",
       "confirm_reject": "Are you sure you want to reject this verification?",
       "success_approve": "Verification approved",
@@ -650,6 +674,9 @@
       "start": "Start Date",
       "end": "End Date",
       "generate": "Generate"
+    },
+    "messages": {
+      "select_dates": "Select start and end dates"
     },
     "stats": {
       "revenue": "Total Revenue",

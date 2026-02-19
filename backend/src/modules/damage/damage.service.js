@@ -1,6 +1,7 @@
 const prisma = require('../../config/database');
 const { NotFoundError, ValidationError } = require('../../errors');
 const AuditService = require('../../services/audit.service');
+const FileService = require('../../services/FileService');
 const { notifyAdmins, notifyDriver } = require('../tracking/tracking.ws');
 
 /**
@@ -45,9 +46,11 @@ async function uploadDamagePhoto(reportId, photoUrl, driverId) {
   const report = await prisma.damageReport.findUnique({ where: { id: reportId } });
   if (!report || report.driverId !== driverId) throw new NotFoundError('Damage report');
 
-  return prisma.damagePhoto.create({
+  const photo = await prisma.damagePhoto.create({
     data: { damageReportId: reportId, photoUrl },
   });
+
+  return { ...photo, photoUrl: await FileService.getUrl(photo.photoUrl) };
 }
 
 /**
@@ -108,7 +111,7 @@ async function reviewDamageReport(reportId, adminId, action, ipAddress) {
     reportId
   });
 
-  return updated;
+  return FileService.signDamageReport(updated);
 }
 
 /**
@@ -137,7 +140,9 @@ async function getDamageReports({ page = 1, limit = 20, vehicleId, status }) {
     prisma.damageReport.count({ where }),
   ]);
 
-  return { reports, total, page: pageNum, limit: limitNum, totalPages: Math.ceil(total / limitNum) };
+  const signedReports = await FileService.signDamageReports(reports);
+
+  return { reports: signedReports, total, page: pageNum, limit: limitNum, totalPages: Math.ceil(total / limitNum) };
 }
 
 module.exports = { createDamageReport, uploadDamagePhoto, reviewDamageReport, getDamageReports };

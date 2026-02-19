@@ -1,6 +1,7 @@
 const prisma = require('../../config/database');
 const { ConflictError, NotFoundError, ValidationError, ForbiddenError } = require('../../errors');
 const AuditService = require('../../services/audit.service');
+const FileService = require('../../services/FileService');
 
 /**
  * Create a full or checklist inspection for a shift.
@@ -49,7 +50,7 @@ async function uploadInspectionPhoto(inspectionId, direction, photoUrl, driverId
     data: { inspectionId, direction, photoUrl },
   });
 
-  return photo;
+  return { ...photo, photoUrl: await FileService.getUrl(photo.photoUrl) };
 }
 
 /**
@@ -92,10 +93,12 @@ async function completeInspection(inspectionId, driverId, checklistData, ipAddre
     ipAddress,
   });
 
-  return prisma.inspection.findUnique({
+  const finalInspection = await prisma.inspection.findUnique({
     where: { id: inspectionId },
     include: { photos: true },
   });
+
+  return FileService.signInspection(finalInspection);
 }
 
 /**
@@ -112,11 +115,13 @@ async function getInspections(shiftId, requestingUser = null) {
     }
   }
 
-  return prisma.inspection.findMany({
+  const inspections = await prisma.inspection.findMany({
     where: { shiftId },
     include: { photos: true },
     orderBy: { createdAt: 'desc' },
   });
+
+  return FileService.signInspections(inspections);
 }
 
 module.exports = { createInspection, uploadInspectionPhoto, completeInspection, getInspections };

@@ -65,6 +65,78 @@ class FileService {
     
     return d;
   }
+
+  /**
+   * Signs URLs for a single damage report
+   * @param {Object} report 
+   */
+  async signDamageReport(report) {
+    if (!report) return report;
+    const r = { ...report };
+    if (r.photos && Array.isArray(r.photos)) {
+      r.photos = await Promise.all(r.photos.map(async p => ({
+        ...p,
+        photoUrl: await this.getUrl(p.photoUrl)
+      })));
+    }
+    return r;
+  }
+
+  /**
+   * Signs URLs for multiple damage reports
+   * @param {Array} reports 
+   */
+  async signDamageReports(reports) {
+    if (!reports || !Array.isArray(reports)) return reports;
+    return await Promise.all(reports.map(r => this.signDamageReport(r)));
+  }
+
+  /**
+   * Signs URLs for a single expense
+   * @param {Object} expense 
+   */
+  async signExpense(expense) {
+    if (!expense) return expense;
+    const e = { ...expense };
+    if (e.receiptUrl) {
+      e.receiptUrl = await this.getUrl(e.receiptUrl);
+    }
+    return e;
+  }
+
+  /**
+   * Signs URLs for multiple expenses
+   * @param {Array} expenses 
+   */
+  async signExpenses(expenses) {
+    if (!expenses || !Array.isArray(expenses)) return expenses;
+    return await Promise.all(expenses.map(e => this.signExpense(e)));
+  }
+
+  /**
+   * Signs URLs for a single inspection
+   * @param {Object} inspection 
+   */
+  async signInspection(inspection) {
+    if (!inspection) return inspection;
+    const i = { ...inspection };
+    if (i.photos && Array.isArray(i.photos)) {
+      i.photos = await Promise.all(i.photos.map(async p => ({
+        ...p,
+        photoUrl: await this.getUrl(p.photoUrl)
+      })));
+    }
+    return i;
+  }
+
+  /**
+   * Signs URLs for multiple inspections
+   * @param {Array} inspections 
+   */
+  async signInspections(inspections) {
+    if (!inspections || !Array.isArray(inspections)) return inspections;
+    return await Promise.all(inspections.map(i => this.signInspection(i)));
+  }
 }
 
 module.exports = new FileService();
