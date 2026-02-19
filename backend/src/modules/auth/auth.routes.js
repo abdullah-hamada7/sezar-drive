@@ -66,6 +66,7 @@ router.post(
       );
       res.json(result);
     } catch (err) {
+      console.error('[VERIFY_ERROR] Verification failed:', err.message);
       next(err);
     }
   }
