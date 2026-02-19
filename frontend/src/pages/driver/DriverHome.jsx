@@ -97,6 +97,25 @@ export default function DriverHome() {
   const [refreshing, setRefreshing] = useState(false);
   const [biometricPending, setBiometricPending] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const refreshStatus = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      const res = await api.getMe();
+      if (res.data?.user) {
+        updateUser(res.data.user);
+        if (res.data.accessToken) {
+          api.setTokens(res.data.accessToken, undefined);
+        }
+        addToast(t('driver_home.status_refreshed'), 'success');
+      }
+    } catch (err) {
+      addToast(err.message || t('common.error'), 'error');
+    } finally {
+      setRefreshing(false);
+    }
+  }, [t, updateUser, addToast]);
  
   useEffect(() => {
     const handleIdentityUpdate = (e) => {
@@ -153,24 +172,6 @@ export default function DriverHome() {
       setIsVerifying(false);
     }
   }
-
-  const refreshStatus = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      const res = await api.getMe();
-      if (res.data?.user) {
-        updateUser(res.data.user);
-        if (res.data.accessToken) {
-          api.setTokens(res.data.accessToken, undefined);
-        }
-        addToast(t('driver_home.status_refreshed'), 'success');
-      }
-    } catch (err) {
-      addToast(err.message || t('common.error'), 'error');
-    } finally {
-      setRefreshing(false);
-    }
-  }, [t, updateUser, addToast]);
 
   if (shiftLoading) return <div className="loading-page"><div className="spinner"></div></div>;
 
