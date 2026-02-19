@@ -21,6 +21,11 @@ class ShiftNotifier {
       'Driver shift has been activated and is now live.', 
       { shiftId, driverId, vehicleId }
     );
+    notifyDriver(driverId, {
+      type: 'shift_activated',
+      shiftId,
+      vehicleId
+    });
   }
 
   static onShiftAdminClosed(driverId, reason) {

@@ -28,6 +28,7 @@
     "email": "Email Address",
     "password": "Password",
     "forgot_password": "Forgot Password?",
+    "change_password": "Change Password",
     "session_expired": "Session expired. Please login again.",
     "signing_in": "Signing in...",
     "sign_in": "Sign In",

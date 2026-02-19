@@ -12,6 +12,7 @@ export function useDriverTracking() {
   const connectWebSocket = useCallback(() => {
     const token = localStorage.getItem('accessToken');
     if (!token) return;
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) return;
 
     const ws = new WebSocket(buildTrackingWsUrl(token));
 
@@ -35,6 +36,9 @@ export function useDriverTracking() {
 
     ws.onclose = () => {
       console.log('Driver tracking disconnected');
+      if (user?.role === 'driver') {
+        setTimeout(connectWebSocket, 5000);
+      }
     };
 
     wsRef.current = ws;
@@ -88,20 +92,18 @@ export function useDriverTracking() {
   }, []);
 
   const stopTracking = useCallback(() => {
-    if (wsRef.current) {
-      wsRef.current.close();
-      wsRef.current = null;
-    }
     if (watchIdRef.current !== null) {
       navigator.geolocation.clearWatch(watchIdRef.current);
       watchIdRef.current = null;
     }
-  }, []);
+  }, [user?.role]);
 
   useEffect(() => {
     if (user?.role !== 'driver') return;
 
     let checkInterval;
+
+    connectWebSocket();
 
     const startTracking = async () => {
       try {
@@ -127,6 +129,10 @@ export function useDriverTracking() {
     return () => {
       clearInterval(checkInterval);
       stopTracking();
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
     };
-  }, [user?.role]); // Only re-run if role changes
+  }, [user?.role, connectWebSocket, startGeolocation, stopTracking]);
 }

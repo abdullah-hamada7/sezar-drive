@@ -6,6 +6,7 @@ const { createUploader } = require('../../middleware/upload');
 const fileService = require('../../services/FileService');
 const { DriverVerificationStatus } = require('../../config/constants');
 const { ValidationError } = require('../../errors');
+const { notifyAdmins, notifyDriver } = require('../tracking/tracking.ws');
 
 const upload = createUploader();
 
@@ -49,6 +50,13 @@ router.post('/identity', authenticate, upload.fields([
         status: DriverVerificationStatus.PENDING
       }
     });
+
+    notifyAdmins(
+      'identity_upload',
+      'New Identity Verification',
+      `Driver ${driverId} uploaded identity documents for review.`,
+      { driverId }
+    );
 
     res.json({ message: 'Identity photo uploaded, waiting for admin approval', verificationId: verification.id });
   } catch (error) {
@@ -201,6 +209,10 @@ router.post('/review', authenticate, authorize('admin'), async (req, res, next) 
           startedAt: new Date()
         }
       });
+      notifyDriver(shift.driverId, {
+        type: 'shift_activated',
+        shiftId
+      });
       res.json({ message: 'Shift approved and active' });
     } else if (decision === 'REJECT') {
       await prisma.shift.update({
@@ -212,6 +224,12 @@ router.post('/review', authenticate, authorize('admin'), async (req, res, next) 
           closedAt: new Date(),
           closeReason: 'admin_override' 
         }
+      });
+      notifyDriver(shift.driverId, {
+        type: 'shift_closed',
+        shiftId,
+        reason: reason || 'Identity verification failed',
+        closedBy: 'admin'
       });
       res.json({ message: 'Shift rejected and closed' });
     } else {
