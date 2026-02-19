@@ -165,7 +165,7 @@ async function reviewExpense(expenseId, adminId, action, rejectionReason, ipAddr
     'expense_reviewed',
     'Expense Review Updated',
     `Expense ${expenseId} was ${status}.`,
-    { expenseId, status }
+    { expenseId, status, actorId: adminId }
   );
 
   return FileService.signExpense(updated);

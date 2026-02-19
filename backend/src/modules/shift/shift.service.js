@@ -144,7 +144,7 @@ async function closeShift(shiftId, driverId, ipAddress) {
     ipAddress,
   });
 
-  ShiftNotifier.onShiftClosed(shiftId, driverId, 'driver', 'driver_closed');
+  ShiftNotifier.onShiftClosed(shiftId, driverId, 'driver', 'driver_closed', driverId);
 
   return prisma.shift.findUnique({ where: { id: shiftId } });
 }
@@ -212,7 +212,7 @@ async function adminCloseShift(shiftId, adminId, reason, ipAddress) {
     metadata: { override: true, reason, cancelledTrips: activeTrips.length },
   });
 
-  ShiftNotifier.onShiftClosed(shiftId, shift.driverId, 'admin', reason || 'admin_override');
+  ShiftNotifier.onShiftClosed(shiftId, shift.driverId, 'admin', reason || 'admin_override', adminId);
 
   return prisma.shift.findUnique({ where: { id: shiftId } });
 }

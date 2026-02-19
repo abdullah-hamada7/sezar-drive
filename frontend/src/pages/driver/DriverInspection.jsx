@@ -19,7 +19,6 @@ export default function DriverInspection() {
   const [inspectionId, setInspectionId] = useState(null);
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const fileRef = useRef(null);
   const [currentDirection, setCurrentDirection] = useState(null);
 
@@ -41,7 +40,6 @@ export default function DriverInspection() {
       return;
     }
     setLoading(true);
-    setError('');
     try {
       const type = 'full';
       const res = await api.createInspection({
@@ -52,10 +50,7 @@ export default function DriverInspection() {
       });
       setInspectionId(res.data.id);
       setStep('photos');
-    } catch (err) {
-      setError(err.message || t('common.error'));
-      // Handled by HttpService
-    }
+    } catch (err) { addToast(err.message || t('common.error'), 'error'); }
     finally { setLoading(false); }
   }
 
@@ -68,7 +63,6 @@ export default function DriverInspection() {
     const file = e.target.files?.[0];
     if (!file || !currentDirection || !inspectionId) return;
 
-    setError('');
     const formData = new FormData();
     formData.append('photo', file);
     formData.append('direction', currentDirection);
@@ -76,10 +70,7 @@ export default function DriverInspection() {
     try {
       await api.uploadInspectionPhoto(inspectionId, currentDirection, formData);
       setPhotos(prev => ({ ...prev, [currentDirection]: URL.createObjectURL(file) }));
-    } catch (err) {
-      setError(err.message || t('common.error'));
-      // Handled by HttpService
-    }
+    } catch (err) { addToast(err.message || t('common.error'), 'error'); }
 
     e.target.value = '';
   }
@@ -90,14 +81,10 @@ export default function DriverInspection() {
       return;
     }
     setLoading(true);
-    setError('');
     try {
       await api.completeInspection(inspectionId, { checklistData: { checks, notes } });
       setStep('done');
-    } catch (err) {
-      setError(err.message || t('common.error'));
-      // Handled by HttpService
-    }
+    } catch (err) { addToast(err.message || t('common.error'), 'error'); }
     finally { setLoading(false); }
   }
 
@@ -126,8 +113,6 @@ export default function DriverInspection() {
     <div>
       <h2 className="page-title" style={{ marginBottom: 'var(--space-lg)' }}>{t('inspection.title')}</h2>
       <input type="file" ref={fileRef} accept="image/*" capture="environment" onChange={handlePhotoUpload} style={{ display: 'none' }} />
-
-      {error && <div className="alert alert-error">{error}</div>}
 
       <div style={{ display: 'flex', gap: '0.25rem', marginBottom: 'var(--space-lg)' }}>
         {['checklist', 'photos', 'review'].map((s, i) => (

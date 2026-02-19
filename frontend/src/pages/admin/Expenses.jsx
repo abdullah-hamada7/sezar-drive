@@ -55,7 +55,6 @@ export default function ExpensesPage() {
       await api.reviewExpense(id, { action, rejectionReason: reason });
       setRefresh(r => r + 1);
       setSelected(null);
-      addToast(t('common.success'), 'success');
     } catch (err) { addToast(err.message || t('common.error'), 'error'); }
   }
 

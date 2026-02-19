@@ -36,6 +36,10 @@ const api = {
   forgotPassword: authService.forgotPassword,
   verifyResetToken: authService.verifyResetToken,
   resetPassword: authService.resetPassword,
+  requestRescue: authService.requestRescue,
+  verifyRescueCode: authService.verifyRescueCode,
+  generateRescueCode: authService.generateRescueCode,
+  getPendingRescueRequests: authService.getPendingRescueRequests,
   getPendingShiftVerifications: verificationService.getPendingShiftVerifications,
   reviewShiftVerification: verificationService.reviewShiftVerification,
 

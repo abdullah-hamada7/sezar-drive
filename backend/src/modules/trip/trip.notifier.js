@@ -5,7 +5,7 @@ const { notifyAdmins, notifyDriver } = require('../tracking/tracking.ws');
  * Encapsulates real-time notifications for trip events.
  */
 class TripNotifier {
-  static onTripAssigned(driverId, trip) {
+  static onTripAssigned(driverId, trip, actorId = null) {
     notifyDriver(driverId, { 
       type: 'trip_assigned', 
       trip: {
@@ -17,7 +17,8 @@ class TripNotifier {
     });
     notifyAdmins('trip_assigned', 'Trip Assigned', 'A trip has been assigned', {
       tripId: trip.id,
-      driverId
+      driverId,
+      actorId
     });
   }
 
@@ -47,7 +48,8 @@ class TripNotifier {
       driverId: trip.driverId,
       reason,
       cancelledBy: userId,
-      isAdmin
+      isAdmin,
+      actorId: userId
     });
   }
 }

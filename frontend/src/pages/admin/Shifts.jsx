@@ -62,7 +62,6 @@ export default function ShiftsPage() {
   async function onConfirmClose(reason) {
     try {
       await api.adminCloseShift(promptData.shiftId, { reason });
-      addToast(t('common.success'), 'success');
       load();
     } catch (err) { addToast(err.message || t('common.error'), 'error'); }
   }

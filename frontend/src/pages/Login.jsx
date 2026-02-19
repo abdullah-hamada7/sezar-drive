@@ -1,6 +1,7 @@
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ThemeContext } from '../contexts/theme';
+import { ToastContext } from '../contexts/toastContext';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { Car, Eye, EyeOff, LogIn, Sun, Moon } from 'lucide-react';
@@ -11,13 +12,16 @@ import './Login.css';
 export default function LoginPage() {
   const { t } = useTranslation();
   const { theme, toggleTheme } = useContext(ThemeContext);
+  const { addToast } = useContext(ToastContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [view, setView] = useState('login'); // login | forgot-password
+  const [view, setView] = useState('login'); // login | forgot-password | rescue-request | rescue-verify
   const [resetSent, setResetSent] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
+  const [rescueCode, setRescueCode] = useState('');
+  const [rescueLoading, setRescueLoading] = useState(false);
   const { login, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -58,6 +62,34 @@ export default function LoginPage() {
       setError(getErrorMessage(err));
     } finally {
       setResetLoading(false);
+    }
+  };
+
+  const handleRequestRescue = async (e) => {
+    e.preventDefault();
+    setError('');
+    setRescueLoading(true);
+    try {
+      const res = await api.requestRescue(email);
+      setRescueLoading(false);
+      setView('rescue-verify');
+      if (res?.message) addToast(res.message, 'success');
+    } catch (err) {
+      setError(getErrorMessage(err));
+      setRescueLoading(false);
+    }
+  };
+
+  const handleVerifyRescue = async (e) => {
+    e.preventDefault();
+    setError('');
+    setRescueLoading(true);
+    try {
+      const res = await api.verifyRescueCode(email, rescueCode);
+      navigate(`/reset-password?token=${res.data.resetToken}`);
+    } catch (err) {
+      setError(getErrorMessage(err));
+      setRescueLoading(false);
     }
   };
 
@@ -155,50 +187,106 @@ export default function LoginPage() {
         ) : (
           <div className="forgot-password-view">
             <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.5rem' }}>
-              {t('auth.forgot_password_title')}
+              {view === 'forgot-password' ? t('auth.forgot_password_title') : 
+               view === 'rescue-request' ? t('auth.rescue_request_title', 'Admin Help') : 
+               t('auth.rescue_verify_title', 'Enter Rescue Code')}
             </h2>
             <p className="login-subtitle" style={{ marginBottom: '1.5rem', textAlign: 'left' }}>
-              {t('auth.forgot_password_desc')}
+              {view === 'forgot-password' ? t('auth.forgot_password_desc') : 
+               view === 'rescue-request' ? t('auth.rescue_request_desc', 'Please enter your email to request a rescue code from your supervisor.') : 
+               t('auth.rescue_verify_desc', 'Enter the 6-digit code provided by your admin.')}
             </p>
 
-            {resetSent ? (
-              <div className="alert alert-success">
-                {t('auth.reset_link_sent')}
-                <button 
-                  className="btn btn-primary login-btn" 
-                  onClick={() => setView('login')}
-                >
-                  {t('auth.back_to_login')}
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleForgotPassword} className="login-form">
+            {view === 'forgot-password' && (
+              <>
+                {resetSent ? (
+                  <div className="alert alert-success">
+                    {t('auth.reset_link_sent')}
+                    <button className="btn btn-primary login-btn" onClick={() => setView('login')}>
+                      {t('auth.back_to_login')}
+                    </button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleForgotPassword} className="login-form">
+                    <div className="form-group">
+                      <label className="form-label">{t('auth.email')}</label>
+                      <input
+                        type="email"
+                        className="form-input"
+                        placeholder={t('auth.enter_email')}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        autoFocus
+                      />
+                    </div>
+
+                    <button type="submit" className="btn btn-primary login-btn" disabled={resetLoading}>
+                      {resetLoading ? <span className="spinner"></span> : t('auth.send_reset_link')}
+                    </button>
+
+                    <div style={{ textAlign: 'center', margin: '1rem 0', opacity: 0.6 }}>— {t('common.or', 'OR')} —</div>
+
+                    <button 
+                      type="button" 
+                      className="btn" 
+                      style={{ background: 'var(--color-bg-alt)', color: 'var(--color-text)', width: '100%', border: '1px solid var(--color-border)' }}
+                      onClick={() => setView('rescue-request')}
+                    >
+                      {t('auth.request_admin_help', 'Request Admin Help')}
+                    </button>
+
+                    <button type="button" className="btn-ghost" onClick={() => setView('login')}>
+                      {t('auth.back_to_login')}
+                    </button>
+                  </form>
+                )}
+              </>
+            )}
+
+            {view === 'rescue-request' && (
+              <form onSubmit={handleRequestRescue} className="login-form">
                 <div className="form-group">
                   <label className="form-label">{t('auth.email')}</label>
                   <input
                     type="email"
                     className="form-input"
-                    placeholder={t('auth.enter_email')}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     autoFocus
                   />
                 </div>
-
-                <button type="submit" className="btn btn-primary login-btn" disabled={resetLoading}>
-                  {resetLoading ? <span className="spinner"></span> : t('auth.send_reset_link')}
+                <button type="submit" className="btn btn-primary login-btn" disabled={rescueLoading}>
+                  {rescueLoading ? <span className="spinner"></span> : t('auth.request_rescue_btn', 'Request Rescue Code')}
                 </button>
+                <button type="button" className="btn-ghost" onClick={() => setView('forgot-password')}>
+                  {t('common.back', 'Back')}
+                </button>
+              </form>
+            )}
 
-                <button 
-                  type="button" 
-                  className="btn-ghost" 
-                  onClick={() => {
-                    setView('login');
-                    setError('');
-                  }}
-                >
-                  {t('auth.back_to_login')}
+            {view === 'rescue-verify' && (
+              <form onSubmit={handleVerifyRescue} className="login-form">
+                <div className="form-group">
+                  <label className="form-label">{t('auth.rescue_code', 'Rescue Code')}</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="000000"
+                    maxLength={6}
+                    value={rescueCode}
+                    onChange={(e) => setRescueCode(e.target.value)}
+                    required
+                    autoFocus
+                    style={{ letterSpacing: '0.5rem', textAlign: 'center', fontSize: '1.5rem' }}
+                  />
+                </div>
+                <button type="submit" className="btn btn-primary login-btn" disabled={rescueLoading}>
+                  {rescueLoading ? <span className="spinner"></span> : t('auth.verify_rescue_btn', 'Verify Code')}
+                </button>
+                <button type="button" className="btn-ghost" onClick={() => setView('rescue-request')}>
+                  {t('auth.resend_request', 'Resend Request')}
                 </button>
               </form>
             )}

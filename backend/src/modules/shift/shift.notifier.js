@@ -42,12 +42,12 @@ class ShiftNotifier {
     });
   }
 
-  static onShiftClosed(shiftId, driverId, closedBy, reason) {
+  static onShiftClosed(shiftId, driverId, closedBy, reason, actorId = null) {
     notifyAdmins(
       'shift_closed',
       'Shift Closed',
       `Shift ${shiftId} was closed by ${closedBy}.`,
-      { shiftId, driverId, closedBy, reason }
+      { shiftId, driverId, closedBy, reason, actorId }
     );
     notifyDriver(driverId, {
       type: 'shift_closed',

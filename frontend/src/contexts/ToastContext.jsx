@@ -7,6 +7,12 @@ export function ToastProvider({ children }) {
   const lastToastRef = useRef({ message: '', type: '', time: 0 });
 
   function addToast(message, type = 'info', duration = 5000) {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash || '';
+      if (hash.startsWith('#/admin')) {
+        return;
+      }
+    }
     const now = Date.now();
     const last = lastToastRef.current;
     if (last.message === message && last.type === type && now - last.time < 800) {

@@ -115,7 +115,7 @@ async function reviewDamageReport(reportId, adminId, action, ipAddress) {
     'damage_reviewed',
     'Damage Report Updated',
     `Damage report ${reportId} was ${newStatus}.`,
-    { reportId, status: newStatus }
+    { reportId, status: newStatus, actorId: adminId }
   );
 
   return FileService.signDamageReport(updated);

@@ -27,37 +27,38 @@ async function login(email, password, ipAddress, deviceFingerprint) {
     throw new UnauthorizedError('Invalid email or password', 'INVALID_CREDENTIALS');
   }
 
-  // Device Security Check (Drivers only)
+  // Device Security & Mandatory Biometric Check (Drivers only)
   let requiresVerification = false;
-  if (deviceFingerprint && user.role === 'driver') {
-    const device = await prisma.userDevice.findUnique({
-      where: { userId_deviceFingerprint: { userId: user.id, deviceFingerprint } }
-    });
+  if (user.role === 'driver') {
+    requiresVerification = true;
+    
+    // Still track device used
+    if (deviceFingerprint) {
+      const device = await prisma.userDevice.findUnique({
+        where: { userId_deviceFingerprint: { userId: user.id, deviceFingerprint } }
+      });
 
-    if (!device) {
-      // New device detected — create record but mark as not verified
-      await prisma.userDevice.create({
-        data: { userId: user.id, deviceFingerprint, isVerified: false }
-      });
-      requiresVerification = true;
-    } else if (!device.isVerified) {
-      requiresVerification = true;
-    } else {
-      // Known device — update last used
-      await prisma.userDevice.update({
-        where: { id: device.id },
-        data: { lastUsedAt: new Date() }
-      });
+      if (!device) {
+        await prisma.userDevice.create({
+          data: { userId: user.id, deviceFingerprint, isVerified: false }
+        });
+      } else {
+        await prisma.userDevice.update({
+          where: { id: device.id },
+          data: { lastUsedAt: new Date() }
+        });
+      }
     }
   }
 
   if (requiresVerification) {
     return {
       requiresVerification: true,
-      message: 'New device detected. Face verification required.',
+      message: 'Face verification required to complete login.',
       userId: user.id
     };
   }
+
 
   const accessToken = generateAccessToken(user);
   const refreshToken = await generateRefreshToken(user.id);
@@ -335,7 +336,7 @@ async function reviewIdentity(id, adminId, action, rejectionReason, ipAddress) {
     'identity_reviewed',
     'Identity Review Updated',
     `Driver identity was ${status}.`,
-    { driverId: verification.driverId, status }
+    { driverId: verification.driverId, status, actorId: adminId }
   );
 
   return updated;

@@ -82,7 +82,6 @@ export default function TripsPage() {
       setShowCreateModal(false);
       setForm({ driverId: '', pickupLocation: '', dropoffLocation: '', price: '', scheduledTime: '', passengers: [] });
       setRefresh(r => r + 1);
-      addToast(t('common.success'), 'success');
     } catch (err) { 
       const driverName = drivers.find(d => d.id === form.driverId)?.name || '';
       setError(err.code ? t(`errors.${err.code}`, { name: driverName }) : err.message);
@@ -97,7 +96,6 @@ export default function TripsPage() {
     try {
       await api.cancelTrip(promptData.tripId, { reason });
       setRefresh(r => r + 1);
-      addToast(t('common.success'), 'success');
     } catch (err) { addToast(err.message, 'error'); }
   }
 

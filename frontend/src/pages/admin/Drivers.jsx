@@ -122,7 +122,6 @@ export default function DriversPage() {
       }
       setShowModal(false);
       load();
-      addToast(t('common.success'), 'success');
     } catch (err) {
       if (err.response?.data?.errors) {
         const backendErrs = {};
@@ -154,7 +153,6 @@ export default function DriversPage() {
         await api.reviewIdentity(data.id, { action: 'approve' });
       }
       load();
-      addToast(t('common.success'), 'success');
     } catch (err) {
       addToast(err.message || t('common.error'), 'error');
     }

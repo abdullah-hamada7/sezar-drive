@@ -83,7 +83,6 @@ export default function VehiclesPage() {
       }
       setShowModal(false);
       load();
-      addToast(t('common.success'), 'success');
     } catch (err) {
       setError(err.message || t('vehicles.messages.op_failed'));
     }
@@ -97,7 +96,6 @@ export default function VehiclesPage() {
     try {
       await api.deleteVehicle(confirmData.vehicleId);
       load();
-      addToast(t('common.success'), 'success');
     } catch (err) { addToast(err.message, 'error'); }
   }
 

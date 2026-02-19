@@ -52,7 +52,6 @@ export default function VerificationQueue() {
         action: action,
         rejectionReason: reason
       });
-      addToast(t(`verification.messages.success_${action}`), 'success');
       loadPending();
     } catch (err) {
       addToast(err.message, 'error');

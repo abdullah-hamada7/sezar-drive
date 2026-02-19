@@ -44,7 +44,6 @@ export default function DamageReportsPage() {
       await api.reviewDamageReport(id, { action });
       setSelected(null);
       load();
-      addToast(t('common.success'), 'success');
     } catch (err) { addToast(err.message || t('common.error'), 'error'); }
   }
 

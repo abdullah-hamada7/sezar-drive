@@ -28,10 +28,6 @@ export default function AdminLayout() {
 
   // Clear badges based on current route
   useEffect(() => {
-    if (location.pathname === '/admin/verification') {
-      // eslint-disable-next-line
-      setPendingCounts(p => p.verification !== 0 ? { ...p, verification: 0 } : p);
-    }
     if (location.pathname === '/admin/expenses') {
       // eslint-disable-next-line
       setPendingCounts(p => p.expenses !== 0 ? { ...p, expenses: 0 } : p);
@@ -47,9 +43,7 @@ export default function AdminLayout() {
     
     // Update local pending counts based on notification type
     // Only increment if not currently on that page
-    if (notif.type === 'identity_upload' && window.location.pathname !== '/admin/verification') {
-      setPendingCounts(prev => ({ ...prev, verification: prev.verification + 1 }));
-    } else if (notif.type === 'expense_pending' && window.location.pathname !== '/admin/expenses') {
+    if (notif.type === 'expense_pending' && window.location.pathname !== '/admin/expenses') {
       setPendingCounts(prev => ({ ...prev, expenses: prev.expenses + 1 }));
     } else if (notif.type === 'damage_reported' && window.location.pathname !== '/admin/damage') {
       setPendingCounts(prev => ({ ...prev, damage: prev.damage + 1 }));
@@ -63,7 +57,6 @@ export default function AdminLayout() {
 
   const translatedNavItems = [
     { to: '/admin', icon: LayoutDashboard, label: t('nav.dashboard'), end: true },
-    { to: '/admin/verification', icon: UserCheck, label: t('nav.verification'), countKey: 'verification' },
     { to: '/admin/drivers', icon: Users, label: t('nav.drivers') },
     { to: '/admin/vehicles', icon: Car, label: t('nav.vehicles') },
     { to: '/admin/shifts', icon: ClipboardCheck, label: t('nav.shifts') },
@@ -81,7 +74,6 @@ export default function AdminLayout() {
       try {
         const res = await api.getSummaryStats();
         setPendingCounts({
-          verification: res.data.pendingVerifications || 0,
           expenses: res.data.pendingExpenses || 0,
           damage: res.data.pendingDamages || 0
         });
@@ -101,11 +93,12 @@ export default function AdminLayout() {
         try {
           const data = JSON.parse(event.data);
           if (data.type === 'notification') {
-            addNotification(data.payload);
+            const payload = data.payload;
+            addNotification(payload);
             if (typeof window !== 'undefined') {
-              window.dispatchEvent(new CustomEvent('ws:notification', { detail: data.payload }));
-              if (data.payload?.type) {
-                window.dispatchEvent(new CustomEvent(`ws:${data.payload.type}`, { detail: data.payload }));
+              window.dispatchEvent(new CustomEvent('ws:notification', { detail: payload }));
+              if (payload?.type) {
+                window.dispatchEvent(new CustomEvent(`ws:${payload.type}`, { detail: payload }));
               }
             }
           } else if (data.type && typeof window !== 'undefined') {

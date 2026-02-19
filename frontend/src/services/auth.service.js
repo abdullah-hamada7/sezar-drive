@@ -41,5 +41,17 @@ export const authService = {
   },
   reviewIdentity(id, data) {
     return http.request(`/auth/identity/${id}/review`, { method: 'PUT', body: data });
+  },
+  requestRescue(email) {
+    return http.request('/auth/rescue/request', { method: 'POST', body: { email }, skipAuth: true });
+  },
+  verifyRescueCode(email, code) {
+    return http.request('/auth/rescue/verify', { method: 'POST', body: { email, code }, skipAuth: true });
+  },
+  generateRescueCode(requestId) {
+    return http.request('/auth/admin/rescue/generate', { method: 'POST', body: { requestId } });
+  },
+  getPendingRescueRequests() {
+    return http.request('/auth/admin/rescue/pending');
   }
 };

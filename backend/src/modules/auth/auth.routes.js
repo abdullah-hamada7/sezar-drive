@@ -1,6 +1,7 @@
 const express = require('express');
 const { body, param } = require('express-validator');
 const authService = require('./auth.service');
+const rescueService = require('./rescue.service');
 const { authenticate, enforcePasswordChanged, authorize } = require('../../middleware/auth');
 const { createUploader } = require('../../middleware/upload');
 const { ValidationError } = require('../../errors');
@@ -264,6 +265,71 @@ router.post(
     try {
       handleValidation(req);
       const result = await authService.resetPassword(req.body.token, req.body.newPassword, req.clientIp);
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+// ─── GET /api/v1/auth/admin/rescue/pending ────────
+router.get(
+  '/admin/rescue/pending',
+  authenticate,
+  authorize('admin'),
+  async (req, res, next) => {
+    try {
+      const result = await rescueService.listPendingRescueRequests();
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+// ─── POST /api/v1/auth/rescue/request ─────────────
+router.post(
+  '/rescue/request',
+  [body('email').isEmail().normalizeEmail()],
+  async (req, res, next) => {
+    try {
+      handleValidation(req);
+      const result = await rescueService.requestRescue(req.body.email);
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+// ─── POST /api/v1/auth/rescue/verify ──────────────
+router.post(
+  '/rescue/verify',
+  [
+    body('email').isEmail().normalizeEmail(),
+    body('code').isLength({ min: 6, max: 6 })
+  ],
+  async (req, res, next) => {
+    try {
+      handleValidation(req);
+      const result = await rescueService.verifyRescueCode(req.body.email, req.body.code);
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+// ─── POST /api/v1/auth/admin/rescue/generate ──────
+router.post(
+  '/admin/rescue/generate',
+  authenticate,
+  authorize('admin'),
+  [body('requestId').isUUID()],
+  async (req, res, next) => {
+    try {
+      handleValidation(req);
+      const result = await rescueService.generateRescueCode(req.user.id, req.body.requestId);
       res.json(result);
     } catch (err) {
       next(err);

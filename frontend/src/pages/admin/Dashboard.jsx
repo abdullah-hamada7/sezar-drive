@@ -3,19 +3,18 @@ import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 import {
   Users, Car, Route, ClipboardCheck, Receipt,
-  Clock, Info, TrendingUp, AlertTriangle
+  Clock, Info, TrendingUp, AlertTriangle, Shield
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { ToastContext } from '../../contexts/toastContext';
-
 
 export default function DashboardPage() {
   const { t, i18n } = useTranslation();
   const { addToast } = useContext(ToastContext);
   const [stats, setStats] = useState(null);
   const [recentActivity, setRecentActivity] = useState([]);
+  const [rescueRequests, setRescueRequests] = useState([]);
   const [loading, setLoading] = useState(true);
-
 
   // Stats loader
   const loadDashboardStats = useCallback(async () => {
@@ -38,6 +37,25 @@ export default function DashboardPage() {
     }
   }, []);
 
+  // Rescue Requests loader
+  const loadRescueRequests = useCallback(async () => {
+    try {
+      const res = await api.getPendingRescueRequests();
+      setRescueRequests(res.data || []);
+    } catch (err) {
+      console.error('Rescue requests load error:', err);
+    }
+  }, []);
+
+  const handleGenerateRescueCode = async (requestId) => {
+    try {
+      const res = await api.generateRescueCode(requestId);
+      addToast(`${t('auth.rescue_code')}: ${res.data.code}`, 'success', { duration: 15000 });
+      loadRescueRequests();
+    } catch (err) {
+      addToast(t('common.error'), 'error');
+    }
+  };
 
   useEffect(() => {
     async function initDashboard() {
@@ -45,21 +63,26 @@ export default function DashboardPage() {
       await Promise.allSettled([
         loadDashboardStats(),
         loadRecentActivity(),
+        loadRescueRequests()
       ]);
       setLoading(false);
     }
     initDashboard();
-  }, [loadDashboardStats, loadRecentActivity]);
+  }, [loadDashboardStats, loadRecentActivity, loadRescueRequests]);
 
   useEffect(() => {
     const handleUpdate = () => {
       loadDashboardStats();
       loadRecentActivity();
+      loadRescueRequests();
     };
     window.addEventListener('ws:notification', handleUpdate);
-    return () => window.removeEventListener('ws:notification', handleUpdate);
-  }, [loadDashboardStats, loadRecentActivity]);
-
+    window.addEventListener('ws:rescue_request', handleUpdate);
+    return () => {
+      window.removeEventListener('ws:notification', handleUpdate);
+      window.removeEventListener('ws:rescue_request', handleUpdate);
+    };
+  }, [loadDashboardStats, loadRecentActivity, loadRescueRequests]);
 
   function formatActivityDate(d) {
     return new Date(d).toLocaleString(i18n.language, { hour: 'numeric', minute: 'numeric', day: 'numeric', month: 'short' });
@@ -108,7 +131,34 @@ export default function DashboardPage() {
         ))}
       </div>
 
-
+      {rescueRequests.length > 0 && (
+        <div className="card mt-lg" style={{ borderColor: '#f59e0b', background: 'rgba(245, 158, 11, 0.05)' }}>
+          <div className="card-header">
+            <h3 className="card-title flex items-center gap-xs" style={{ color: '#d97706' }}>
+              <Shield size={18} />
+              {t('auth.rescue_request_title')}
+            </h3>
+            <span className="badge badge-warning">{rescueRequests.length}</span>
+          </div>
+          <div className="flex flex-col gap-sm p-sm">
+            {rescueRequests.map(req => (
+              <div key={req.id} className="flex items-center justify-between p-sm glass-card">
+                <div>
+                  <div className="font-semibold">{req.user?.name}</div>
+                  <div className="text-xs text-muted">{req.user?.email}</div>
+                  <div className="text-[10px] opacity-60 mt-xs">{formatActivityDate(req.createdAt)}</div>
+                </div>
+                <button 
+                  className="btn btn-primary btn-sm"
+                  onClick={() => handleGenerateRescueCode(req.id)}
+                >
+                  {t('auth.generate_rescue_code')}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-1 mt-lg">
         <div className="card">

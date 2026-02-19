@@ -215,7 +215,8 @@ router.post('/review', authenticate, authorize('admin'), async (req, res, next) 
       });
       notifyAdmins('shift_activated', 'Shift Activated', 'Shift verification approved and activated.', {
         shiftId,
-        driverId: shift.driverId
+        driverId: shift.driverId,
+        actorId: req.user.id
       });
       res.json({ message: 'Shift approved and active' });
     } else if (decision === 'REJECT') {
@@ -238,7 +239,8 @@ router.post('/review', authenticate, authorize('admin'), async (req, res, next) 
       notifyAdmins('shift_closed', 'Shift Closed', 'Shift verification rejected and closed.', {
         shiftId,
         driverId: shift.driverId,
-        reason: reason || 'Identity verification failed'
+        reason: reason || 'Identity verification failed',
+        actorId: req.user.id
       });
       res.json({ message: 'Shift rejected and closed' });
     } else {

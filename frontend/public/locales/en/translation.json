@@ -49,7 +49,17 @@
     "invalid_token": "Invalid or expired reset link.",
     "reset_btn": "Reset Password",
     "reset_link_sent": "If an account exists with that email, we have sent a password reset link.",
-    "email_sent_check": "Please check your email for a password reset link."
+    "email_sent_check": "Please check your email for a password reset link.",
+    "request_admin_help": "Request Admin Rescue",
+    "rescue_request_title": "Admin Rescue",
+    "rescue_request_desc": "If you don't have access to your email, you can request a rescue code from your supervisor.",
+    "request_rescue_btn": "Request Rescue Code",
+    "rescue_verify_title": "Identify Yourself",
+    "rescue_verify_desc": "Enter the 6-digit rescue code provided by your admin.",
+    "rescue_code": "Rescue Code",
+    "verify_rescue_btn": "Verify & Unlock",
+    "resend_request": "Resend Request",
+    "generate_rescue_code": "Generate Rescue Code"
   },
   "trip": {
     "start_trip": "Start Trip",

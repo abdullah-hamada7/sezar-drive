@@ -51,7 +51,7 @@ async function assignTrip(data, adminId, ipAddress) {
     ipAddress,
   });
 
-  TripNotifier.onTripAssigned(driverId, trip);
+  TripNotifier.onTripAssigned(driverId, trip, adminId);
 
   return trip;
 }
