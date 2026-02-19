@@ -2,7 +2,8 @@ const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
 const path = require('path');
 const fs = require('fs');
-const reshaper = require('arabic-persian-reshaper').ArabicReshaper;
+const ArabicReshaper = require('arabic-persian-reshaper').ArabicReshaper;
+const reshaper = new ArabicReshaper();
 const bidi = require('bidi-js')();
 const prisma = require('../../config/database');
 const { ValidationError } = require('../../errors');
@@ -35,11 +36,15 @@ function isValidFontFile(filePath) {
  */
 function prepareRTL(text) {
   if (!text) return '';
-  // 1. Reshape Arabic characters (handle connected forms)
-  const reshaped = reshaper.reshape(text);
-  // 2. Reorder for RTL display
-  const reordered = bidi.getReorderedText(reshaped);
-  return reordered;
+  try {
+    // 1. Reshape Arabic characters (handle connected forms)
+    const reshaped = reshaper.reshape(text);
+    // 2. Reorder for RTL display
+    return bidi.getReorderedText(reshaped);
+  } catch (err) {
+    console.warn('[RTL_WARN] Failed to reshape text:', text, err.message);
+    return text; // Fallback to original text
+  }
 }
 
 /**
