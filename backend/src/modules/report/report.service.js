@@ -156,32 +156,34 @@ async function generatePDF(reportData, res) {
   res.setHeader('Content-Disposition', 'attachment; filename=revenue_report.pdf');
   doc.pipe(res);
 
-  // Register Fonts (fallback to built-in fonts if custom fonts fail)
-  try {
-    const hasRegular = isValidFontFile(FONT_REGULAR);
-    const hasBold = isValidFontFile(FONT_BOLD);
-    if (hasRegular) doc.registerFont('Cairo', FONT_REGULAR);
-    if (hasBold) doc.registerFont('Cairo-Bold', FONT_BOLD);
-    if (hasRegular) {
-      doc.font('Cairo');
-    } else {
-      doc.font('Helvetica');
+    // Register Fonts (fallback to built-in fonts if custom fonts fail)
+    let fontsLoaded = false;
+    try {
+      const hasRegular = isValidFontFile(FONT_REGULAR);
+      const hasBold = isValidFontFile(FONT_BOLD);
+      if (hasRegular && hasBold) {
+        doc.registerFont('Cairo', FONT_REGULAR);
+        doc.registerFont('Cairo-Bold', FONT_BOLD);
+        fontsLoaded = true;
+      }
+    } catch (err) {
+      console.warn('[REPORT_WARN] Failed to load custom fonts, using default.', err.message);
     }
-  } catch (err) {
-    console.warn('[REPORT_WARN] Failed to load custom fonts, using default.', err.message);
-    doc.font('Helvetica');
-  }
+
+    const fontRegular = fontsLoaded ? 'Cairo' : 'Helvetica';
+    const fontBold = fontsLoaded ? 'Cairo-Bold' : 'Helvetica-Bold';
+    doc.font(fontRegular);
 
   // Header
-  doc.fontSize(20).font('Cairo-Bold').text(prepareRTL('Fleet Management — Revenue Report / تقرير الإيرادات'), { align: 'center' });
+  doc.fontSize(20).font(fontBold).text(prepareRTL('Fleet Management — Revenue Report / تقرير الإيرادات'), { align: 'center' });
   doc.moveDown();
-  doc.fontSize(12).font('Cairo').text(prepareRTL(`Period / الفترة: ${reportData.startDate.slice(0, 10)} to ${reportData.endDate.slice(0, 10)}`));
+  doc.fontSize(12).font(fontRegular).text(prepareRTL(`Period / الفترة: ${reportData.startDate.slice(0, 10)} to ${reportData.endDate.slice(0, 10)}`));
   doc.moveDown();
 
   // Summary table
-  doc.fontSize(14).font('Cairo-Bold').text(prepareRTL('Summary / الملخص'), { underline: true });
+  doc.fontSize(14).font(fontBold).text(prepareRTL('Summary / الملخص'), { underline: true });
   doc.moveDown(0.5);
-  doc.fontSize(11).font('Cairo');
+  doc.fontSize(11).font(fontRegular);
   doc.text(prepareRTL(`Total Revenue / إجمالي الإيرادات: ${reportData.totalRevenue.toFixed(2)} EGP`));
   doc.text(prepareRTL(`Total Expenses / إجمالي المصروفات: ${reportData.totalExpenses.toFixed(2)} EGP`));
   doc.text(prepareRTL(`Net Revenue / صافي الربح: ${reportData.netRevenue.toFixed(2)} EGP`));
@@ -189,9 +191,9 @@ async function generatePDF(reportData, res) {
   doc.moveDown();
 
   // Driver breakdown
-  doc.fontSize(14).font('Cairo-Bold').text(prepareRTL('Driver Breakdown / تفاصيل السائقين'), { underline: true });
+  doc.fontSize(14).font(fontBold).text(prepareRTL('Driver Breakdown / تفاصيل السائقين'), { underline: true });
   doc.moveDown(0.5);
-  doc.fontSize(11).font('Cairo');
+  doc.fontSize(11).font(fontRegular);
   for (const driver of reportData.driverSummaries) {
     doc.text(prepareRTL(`${driver.driverName}: Revenue ${driver.totalRevenue.toFixed(2)} EGP | Expenses ${driver.totalExpenses.toFixed(2)} EGP | Net ${driver.netRevenue.toFixed(2)} EGP | Trips: ${driver.tripCount}`));
   }
