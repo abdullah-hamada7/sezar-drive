@@ -2,8 +2,9 @@ const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
 const path = require('path');
 const fs = require('fs');
-const ArabicReshaper = require('arabic-persian-reshaper').ArabicReshaper;
-const reshaper = new ArabicReshaper();
+const reshaperModule = require('arabic-persian-reshaper');
+const ArabicReshaper = reshaperModule.ArabicReshaper || reshaperModule;
+const reshaper = typeof ArabicReshaper === 'function' ? new ArabicReshaper() : ArabicReshaper;
 const bidi = require('bidi-js')();
 const prisma = require('../../config/database');
 const { ValidationError } = require('../../errors');
@@ -38,7 +39,7 @@ function prepareRTL(text) {
   if (!text) return '';
   try {
     // 1. Reshape Arabic characters (handle connected forms)
-    const reshaped = reshaper.reshape(text);
+    const reshaped = typeof reshaper?.reshape === 'function' ? reshaper.reshape(text) : text;
     // 2. Reorder for RTL display
     return bidi.getReorderedText(reshaped);
   } catch (err) {

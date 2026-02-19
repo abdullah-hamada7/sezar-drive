@@ -1,13 +1,19 @@
 import { createContext, useState, useEffect, useCallback, useContext } from 'react';
 import api from '../services/api';
+import { useAuth } from '../hooks/useAuth';
 
 const ShiftContext = createContext();
 
 export function ShiftProvider({ children }) {
+  const { isAuthenticated } = useAuth();
   const [activeShift, setActiveShift] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const refreshShift = useCallback(async () => {
+    if (!isAuthenticated) {
+      setLoading(false);
+      return;
+    }
     try {
       const res = await api.getActiveShift();
       setActiveShift(res.data.shift);
@@ -16,9 +22,11 @@ export function ShiftProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     refreshShift();
 
     // Listen for shift-related WebSocket events
@@ -36,7 +44,7 @@ export function ShiftProvider({ children }) {
       window.removeEventListener('ws:shift_closed', handleShiftClosed);
       window.removeEventListener('ws:trip_assigned', handleShiftUpdate);
     };
-  }, [refreshShift]);
+  }, [refreshShift, isAuthenticated]);
 
   return (
     <ShiftContext.Provider value={{ activeShift, loading, refreshShift, setActiveShift }}>
