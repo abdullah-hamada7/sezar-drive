@@ -155,6 +155,10 @@
     "driver": "سائق",
     "vehicle": "مركبة",
     "trip": "رحلة",
+    "shift": "مناوبة",
+    "expense": "مصروف",
+    "user": "مستخدم"
+  },
   "roles": {
     "admin": "مدير",
     "driver": "سائق",
