@@ -90,8 +90,9 @@ resource "aws_security_group" "sezar_sg" {
 
 # --- S3 Bucket & Security ---
 resource "aws_s3_bucket" "photos" {
-  bucket = "${var.project_name}-photos-${random_id.bucket_id.hex}"
-  tags   = local.common_tags
+  bucket        = "${var.project_name}-photos-${random_id.bucket_id.hex}"
+  force_destroy = true
+  tags          = local.common_tags
 }
 
 resource "random_id" "bucket_id" {
