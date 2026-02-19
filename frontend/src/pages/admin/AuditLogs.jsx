@@ -11,20 +11,6 @@ export default function AuditPage() {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
 
-```
-import { useState, useEffect, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-import api from '../../services/api';
-import { Shield, Search, Filter, Eye, X, Calendar, User, Tag } from 'lucide-react';
-
-export default function AuditPage() {
-  const { t, i18n } = useTranslation();
-  const [logs, setLogs] = useState([]);
-  const [pagination, setPagination] = useState({});
-  const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState(null);
-
   // Filters
   const [filters, setFilters] = useState({
     entityType: '',
@@ -57,6 +43,82 @@ export default function AuditPage() {
     window.addEventListener('ws:notification', handleUpdate);
     return () => window.removeEventListener('ws:notification', handleUpdate);
   }, [load]);
+
+  function handleFilterChange(e) {
+    const { name, value } = e.target;
+    setFilters(prev => ({ ...prev, [name]: value }));
+    setPage(1);
+  }
+
+  function formatDate(d) {
+    return new Date(d).toLocaleString(i18n.language, { dateStyle: 'short', timeStyle: 'medium' });
+  }
+
+  function translateState(obj) {
+    if (!obj || typeof obj !== 'object') return obj;
+    const translated = {};
+    for (const [key, value] of Object.entries(obj)) {
+      const translatedKey = t(`audit.fields.${key}`, key);
+      let translatedValue = value;
+      if (key === 'status') {
+         translatedValue = t(`common.status.${String(value).toLowerCase()}`, String(value));
+      }
+      translated[translatedKey] = translatedValue;
+    }
+    return translated;
+  }
+
+  const entities = ['', 'user', 'driver', 'vehicle', 'shift', 'trip', 'expense', 'damage_report', 'inspection'];
+
+  return (
+    <div>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">{t('audit.title')}</h1>
+          <p className="page-subtitle">{t('audit.subtitle')}</p>
+        </div>
+      </div>
+
+      {/* Filter Bar */}
+      <div className="card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
+        <div className="grid grid-4" style={{ gap: '1rem' }}>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label className="form-label flex items-center gap-sm"><Tag size={14} /> {t('audit.filter.entity_type')}</label>
+            <select className="form-select" name="entityType" value={filters.entityType} onChange={handleFilterChange}>
+              <option value="">{t('audit.filter.all_entities')}</option>
+              {entities.filter(Boolean).map(e => (
+                <option key={e} value={e}>{t(`audit.entity.${e}`, e.toUpperCase())}</option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label className="form-label flex items-center gap-sm"><Search size={14} /> {t('audit.filter.action_type')}</label>
+            <input type="text" className="form-input" name="actionType" placeholder={t('audit.filter.action_ph')} value={filters.actionType} onChange={handleFilterChange} />
+          </div>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label className="form-label flex items-center gap-sm"><Calendar size={14} /> {t('audit.filter.from')}</label>
+            <input type="date" className="form-input" name="startDate" value={filters.startDate} onChange={handleFilterChange} />
+          </div>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label className="form-label flex items-center gap-sm"><Calendar size={14} /> {t('audit.filter.to')}</label>
+            <input type="date" className="form-input" name="endDate" value={filters.endDate} onChange={handleFilterChange} />
+          </div>
+        </div>
+        <div className="flex gap-sm mt-md">
+           <div className="form-group" style={{ marginBottom: 0, flex: 1 }}>
+             <label className="form-label flex items-center gap-sm"><User size={14} /> {t('audit.filter.actor_search')}</label>
+             <input type="text" className="form-input" name="actorSearch" placeholder={t('audit.filter.actor_ph')} value={filters.actorSearch} onChange={handleFilterChange} />
+           </div>
+           <button className="btn btn-secondary" style={{ alignSelf: 'flex-end' }} onClick={() => {
+             setFilters({ entityType: '', actionType: '', startDate: '', endDate: '', actorSearch: '' });
+             setPage(1);
+           }}>{t('audit.filter.clear_btn')}</button>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="loading-page" style={{ minHeight: '300px' }}><div className="spinner"></div></div>
+      ) : (
         <div className="table-container">
           <table>
             <thead>
@@ -177,7 +239,7 @@ export default function AuditPage() {
                   padding: '1rem', 
                   borderRadius: 'var(--radius-md)', 
                   fontSize: '0.85rem', 
-                  overflowX: 'auto',
+                  overflowX: 'auto', 
                   border: '1px solid var(--color-border)',
                   color: 'var(--color-text)'
                 }}>
