@@ -133,8 +133,10 @@ export default function DriverShift() {
         <h2 className="page-title">{t('shift.scan_vehicle')}</h2>
         <div className="card">
           <QRScanner onScan={handleQRScan} onCancel={() => setActiveStep(null)} />
-          <div className="mt-md" style={{ borderTop: '1px solid var(--color-border)', paddingTop: '1rem' }}>
-            <div className="text-sm text-muted" style={{ marginBottom: '0.5rem' }}>{t('driver_home.enter_qr')}</div>
+          <div className="mt-md" style={{ borderTop: '1px solid var(--color-border)', paddingTop: '1rem', marginTop: '1rem' }}>
+            <div style={{ textAlign: 'center', marginBottom: '1rem', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+              — {t('common.or')} —
+            </div>
             <div className="flex gap-sm">
               <input
                 type="text"
