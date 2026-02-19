@@ -1,8 +1,5 @@
 const API_BASE =
-  import.meta.env.VITE_API_URL ||
-  (typeof window !== 'undefined' && window.location.protocol === 'file:'
-    ? 'http://192.168.1.12:3000/api/v1'
-    : '/api/v1');
+  import.meta.env.VITE_API_URL || '/api/v1';
 
 class HttpService {
   constructor() {
