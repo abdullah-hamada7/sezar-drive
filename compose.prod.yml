@@ -53,7 +53,9 @@ services:
       PORT: 3000
       NODE_ENV: production
       CORS_ORIGIN: http://${DOMAIN_NAME}
+      FRONTEND_URL: ${FRONTEND_URL}
       S3_BUCKET: ${S3_BUCKET}
+      S3_REGION: ${S3_REGION}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
 
