@@ -119,5 +119,6 @@ export function useDriverTracking() {
       clearInterval(checkInterval);
       stopTracking();
     };
-  }, [user, connectWebSocket, startGeolocation, stopTracking]);
+    };
+  }, [user?.role]); // Only re-run if role changes
 }
