@@ -13,7 +13,7 @@
     }
 
     # ─── Tracking WebSockets ───
-    handle_path /ws/* {
+    handle /ws/* {
         reverse_proxy backend:3000
     }
 
