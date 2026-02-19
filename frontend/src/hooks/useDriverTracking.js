@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useAuth } from './useAuth';
 import api from '../services/api';
+import { buildTrackingWsUrl } from '../utils/trackingWs';
 
 export function useDriverTracking() {
   const { user } = useAuth();
@@ -12,8 +13,7 @@ export function useDriverTracking() {
     const token = localStorage.getItem('accessToken');
     if (!token) return;
 
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const ws = new WebSocket(`${protocol}://${window.location.host}/ws/tracking?token=${token}`);
+    const ws = new WebSocket(buildTrackingWsUrl(token));
 
     ws.onopen = () => {
       console.log('Driver tracking connected');

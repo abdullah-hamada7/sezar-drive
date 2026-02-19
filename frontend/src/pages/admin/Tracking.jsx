@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { ToastContext } from '../../contexts/toastContext';
+import { buildTrackingWsUrl } from '../../utils/trackingWs';
 
 // Fix Leaflet icon issue
 delete L.Icon.Default.prototype._getIconUrl;
@@ -35,8 +36,7 @@ export default function TrackingPage() {
     const token = localStorage.getItem('accessToken');
     if (!token) return;
 
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const ws = new WebSocket(`${protocol}://${window.location.host}/ws/tracking?token=${token}`);
+    const ws = new WebSocket(buildTrackingWsUrl(token));
     wsRef.current = ws;
 
     ws.onopen = () => {
@@ -145,7 +145,7 @@ export default function TrackingPage() {
             />
             <MapRecenter center={activeCenter} />
             {drivers.map(d => (
-              d.lat && d.lng && (
+              d.lat != null && d.lng != null && (
                 <Marker key={d.id} position={[d.lat, d.lng]}>
                   <Popup>
                     <div style={{ color: 'var(--color-bg)' }}>
