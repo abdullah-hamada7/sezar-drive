@@ -18,6 +18,14 @@ export const shiftService = {
     }
     return http.request('/verify/shift-selfie', { method: 'POST', body: formData });
   },
+  verifyFaceMatch(formData) {
+    if (formData.has('selfie')) {
+      const file = formData.get('selfie');
+      formData.delete('selfie');
+      formData.append('photo', file);
+    }
+    return http.request('/verify/shift-selfie', { method: 'POST', body: formData });
+  },
   activateShift(id) {
     return http.request(`/shifts/${id}/activate`, { method: 'PUT' });
   },

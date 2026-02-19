@@ -125,10 +125,9 @@ export default function DriverHome() {
     if (files.front) formData.append('idCardFront', files.front);
     if (files.back) formData.append('idCardBack', files.back);
     try {
-      const res = await api.uploadIdentityPhoto(formData);
+      await api.uploadIdentityPhoto(formData);
       addToast(t('driver_home.upload_success'), 'success');
-      if (res.user) updateUser(res.user);
-      else window.location.reload();
+      refreshStatus();
     } catch (err) {
       addToast(err.message || t('common.error'), 'error');
     }
@@ -212,7 +211,13 @@ export default function DriverHome() {
                     formData.append('avatar', e.target.files[0]);
                     try {
                         const res = await api.updateProfileAvatar(formData);
-                        updateUser(res);
+                        if (res?.data) {
+                          updateUser(res.data);
+                        } else if (res) {
+                          updateUser(res);
+                        } else {
+                          refreshStatus();
+                        }
                         addToast(t('driver_home.photo_updated'), 'success');
                     } catch (err) {
                         addToast(err.message || t('common.error'), 'error');

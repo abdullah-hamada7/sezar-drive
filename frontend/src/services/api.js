@@ -31,6 +31,7 @@ const api = {
   getPendingVerifications: authService.getPendingVerifications,
   reviewIdentity: authService.reviewIdentity,
   verifyShift: shiftService.verifyShift,
+  verifyFaceMatch: shiftService.verifyFaceMatch,
   forgotPassword: authService.forgotPassword,
   verifyResetToken: authService.verifyResetToken,
   resetPassword: authService.resetPassword,
