@@ -31,7 +31,7 @@ export default function DriverShift() {
   }
 
   async function startShift() {
-    if (!user?.identityPhotoUrl) {
+    if (!user?.avatarUrl && !user?.profilePhotoUrl) {
       addToast(t('driver_home.identity_required'), 'warning');
       return;
     }

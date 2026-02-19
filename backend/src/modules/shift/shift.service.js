@@ -21,9 +21,8 @@ function validateShiftTransition(from, to) {
 async function createShift(driverId, ipAddress) {
   // Check identity verified
   const driver = await prisma.user.findUnique({ where: { id: driverId } });
-  if (!driver || !driver.identityVerified) {
-    throw new ForbiddenError('IDENTITY_NOT_VERIFIED', 'Your identity must be verified by an admin before you can start a shift. Please upload your photo on the home page.');
-  }
+    // Identity verification check removed as Admin-created drivers are implicitly verified.
+    // Biometric check happens at activateShift.
 
   // Check no active shift
   const existing = await prisma.shift.findFirst({

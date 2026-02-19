@@ -65,7 +65,7 @@ async function createDriver(data, adminId, ipAddress) {
       role: 'driver',
       licenseNumber,
       mustChangePassword: true,
-      identityVerified: false,
+      identityVerified: true, // Auto-verified by Admin since they created the account
     },
   });
 
