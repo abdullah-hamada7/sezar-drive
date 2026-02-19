@@ -55,7 +55,7 @@ async function generateRescueCode(adminId, requestId) {
 
   const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
   const expiresAt = new Date();
-  expiresAt.setMinutes(expiresAt.getMinutes() + 15); // Valid for 15 mins
+  expiresAt.setMinutes(expiresAt.getMinutes() + 60); // Valid for 60 mins
 
   await prisma.rescueRequest.update({
     where: { id: requestId },
@@ -103,7 +103,7 @@ async function verifyRescueCode(email, code) {
   const resetToken = jwt.sign(
     { id: user.id, email: user.email, type: 'password_reset' },
     config.jwtSecret,
-    { expiresIn: '10m' }
+    { expiresIn: '30m' }
   );
 
   return { token: resetToken, resetToken };

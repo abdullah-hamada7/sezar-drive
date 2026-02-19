@@ -50,7 +50,7 @@ export default function DashboardPage() {
   const handleGenerateRescueCode = async (requestId) => {
     try {
       const res = await api.generateRescueCode(requestId);
-      addToast(`${t('auth.rescue_code')}: ${res.data.code}`, 'success', { duration: 15000 });
+      addToast(`${t('auth.rescue_code')}: ${res.data.code}`, 'success', 15000);
       loadRescueRequests();
     } catch (err) {
       addToast(t('common.error'), 'error');
