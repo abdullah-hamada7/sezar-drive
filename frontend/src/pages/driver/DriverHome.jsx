@@ -95,8 +95,27 @@ export default function DriverHome() {
   const { addToast } = useContext(ToastContext);
   const { activeShift, refreshShift, loading: shiftLoading } = useShift();
   const [refreshing, setRefreshing] = useState(false);
+  const [assigningVehicle, setAssigningVehicle] = useState(false);
   const [biometricPending, setBiometricPending] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
+
+  const refreshStatus = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      const res = await api.getMe();
+      if (res.data?.user) {
+        updateUser(res.data.user);
+        if (res.data.accessToken) {
+          api.setTokens(res.data.accessToken, undefined);
+        }
+        addToast(t('driver_home.status_refreshed'), 'success');
+      }
+    } catch (err) {
+      addToast(err.message || t('common.error'), 'error');
+    } finally {
+      setRefreshing(false);
+    }
+  }, [t, updateUser, addToast]);
  
   useEffect(() => {
     const handleIdentityUpdate = (e) => {
@@ -153,24 +172,6 @@ export default function DriverHome() {
     }
   }
 
-  const refreshStatus = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      const res = await api.getMe();
-      if (res.data?.user) {
-        updateUser(res.data.user);
-        if (res.data.accessToken) {
-          api.setTokens(res.data.accessToken, undefined);
-        }
-        addToast(t('driver_home.status_refreshed'), 'success');
-      }
-    } catch (err) {
-      addToast(err.message || t('common.error'), 'error');
-    } finally {
-      setRefreshing(false);
-    }
-  }, [t, updateUser, addToast]);
-
   if (shiftLoading) return <div className="loading-page"><div className="spinner"></div></div>;
 
   return (
@@ -185,8 +186,8 @@ export default function DriverHome() {
       <div className="card glass-card mb-md flex items-center justify-between">
          <div className="flex items-center gap-md">
             <div className="glow-effect" style={{ width: 64, height: 64, borderRadius: 'var(--radius-full)', background: 'var(--color-bg-tertiary)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--color-primary)', boxShadow: 'var(--shadow-glow)' }}>
-                {user?.profilePhotoUrl
-                  ? <img src={user.profilePhotoUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                {user?.avatarUrl || user?.profilePhotoUrl
+                  ? <img src={user.avatarUrl || user.profilePhotoUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   : <User size={32} className="text-primary" />}
             </div>
             <div>
@@ -255,23 +256,24 @@ export default function DriverHome() {
                             placeholder={t('driver_home.enter_qr')}
                             id="qr-input"
                          />
-                         <button 
-                            className="btn btn-primary"
-                            onClick={async () => {
-                                const qr = document.getElementById('qr-input').value;
-                                if(!qr) return addToast(t('driver_home.enter_qr'), 'error');
-                                setLoading(true);
-                                try {
-                                    await api.assignSelfVehicle(qr);
-                                    addToast(t('common.success'), 'success');
-                                    refreshShift(); // Refresh to show vehicle
-                                } catch(err) {
-                                    addToast(err.message, 'error');
-                                } finally {
-                                    setLoading(false);
-                                }
-                            }}
-                         >
+                          <button 
+                             className="btn btn-primary"
+                             disabled={assigningVehicle}
+                             onClick={async () => {
+                                 const qr = document.getElementById('qr-input').value;
+                                 if(!qr) return addToast(t('driver_home.enter_qr'), 'error');
+                                 setAssigningVehicle(true);
+                                 try {
+                                     await api.assignSelfVehicle(qr);
+                                     addToast(t('common.success'), 'success');
+                                     refreshShift(); // Refresh to show vehicle
+                                 } catch(err) {
+                                     addToast(err.message, 'error');
+                                 } finally {
+                                     setAssigningVehicle(false);
+                                 }
+                             }}
+                          >
                             {t('driver_home.assign_btn')}
                          </button>
                      </div>

@@ -11,6 +11,7 @@ import { trackingService } from './tracking.service';
 import { reportService } from './report.service';
 import { auditService } from './audit.service';
 import { statsService } from './stats.service';
+import { verificationService } from './verification.service';
 
 // Legacy API object for backward compatibility
 const api = {
@@ -35,6 +36,8 @@ const api = {
   forgotPassword: authService.forgotPassword,
   verifyResetToken: authService.verifyResetToken,
   resetPassword: authService.resetPassword,
+  getPendingShiftVerifications: verificationService.getPendingShiftVerifications,
+  reviewShiftVerification: verificationService.reviewShiftVerification,
 
   // Drivers
   getDrivers: driverService.getDrivers,

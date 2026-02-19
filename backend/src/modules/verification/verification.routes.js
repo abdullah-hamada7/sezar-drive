@@ -138,7 +138,7 @@ router.get('/pending', authenticate, authorize('admin'), async (req, res, next) 
             id: true,
             name: true,
             email: true,
-            profilePhotoUrl: true
+            avatarUrl: true
           }
         }
       },

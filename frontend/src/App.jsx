@@ -84,7 +84,7 @@ function AppRoutes() {
     const dir = i18n.dir();
     document.documentElement.dir = dir;
     document.documentElement.lang = i18n.language;
-  }, [i18n]);
+  }, [i18n, i18n.language]);
 
   return (
     <Routes>

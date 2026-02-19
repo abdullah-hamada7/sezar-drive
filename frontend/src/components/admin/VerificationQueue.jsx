@@ -20,7 +20,7 @@ export default function VerificationQueue() {
       if (filterStatus) params.append('status', filterStatus);
       if (filterName) params.append('name', filterName);
 
-      const res = await api.getPendingVerifications(params.toString());
+      const res = await api.getPendingShiftVerifications(params.toString());
       setItems(res.data || []);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
