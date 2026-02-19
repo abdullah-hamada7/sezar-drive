@@ -85,7 +85,7 @@ async function login(email, password, ipAddress, deviceFingerprint) {
 async function verifyDevice(userId, deviceFingerprint, selfieBuffer, ipAddress) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new NotFoundError('User');
-  if (!user.identityPhotoUrl) throw new ValidationError('No reference identity photo found for this user');
+  if (!user.avatarUrl) throw new ValidationError('No profile photo (avatar) found for this user');
 
   const device = await prisma.userDevice.findUnique({
     where: { userId_deviceFingerprint: { userId, deviceFingerprint } }
@@ -93,11 +93,11 @@ async function verifyDevice(userId, deviceFingerprint, selfieBuffer, ipAddress) 
 
   if (!device) throw new NotFoundError('Device');
 
-  // Face comparison using AWS Rekognition
-  const verification = await faceVerificationService.verify(user.identityPhotoUrl, selfieBuffer);
+  // Face comparison using AWS Rekognition against Profile Photo
+  const verification = await faceVerificationService.verify(user.avatarUrl, selfieBuffer);
   
   if (verification.status !== 'VERIFIED') {
-    throw new ForbiddenError('FACE_VERIFICATION_FAILED', 'Face verification failed. Please ensure your face is clearly visible.');
+    throw new ForbiddenError('FACE_VERIFICATION_FAILED', 'Face verification failed. Please ensure your face is clearly visible and matches your profile photo.');
   }
 
   // Success — mark device as verified
@@ -526,6 +526,7 @@ async function resetPassword(token, newPassword, ipAddress) {
 
   return { message: 'Password has been reset successfully. You can now log in with your new password.' };
 }
+
 
 module.exports = {
   login,
