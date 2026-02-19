@@ -119,6 +119,5 @@ export function useDriverTracking() {
       clearInterval(checkInterval);
       stopTracking();
     };
-    };
   }, [user?.role]); // Only re-run if role changes
 }
