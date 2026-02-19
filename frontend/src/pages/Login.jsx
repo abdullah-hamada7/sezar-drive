@@ -187,11 +187,9 @@ export default function LoginPage() {
         ) : (
           <div className="forgot-password-view">
             <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.5rem' }}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.5rem' }}>
               {view === 'rescue-request' ? t('auth.rescue_request_title', 'Admin Help') : 
                t('auth.rescue_verify_title', 'Enter Rescue Code')}
             </h2>
-            <p className="login-subtitle" style={{ marginBottom: '1.5rem', textAlign: 'left' }}>
             <p className="login-subtitle" style={{ marginBottom: '1.5rem', textAlign: 'left' }}>
               {view === 'rescue-request' ? t('auth.rescue_request_desc', 'Please enter your email to request a rescue code from your supervisor.') : 
                t('auth.rescue_verify_desc', 'Enter the 6-digit code provided by your admin.')}
