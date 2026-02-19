@@ -5,12 +5,12 @@ import { useAuth } from '../hooks/useAuth';
 const ShiftContext = createContext();
 
 export function ShiftProvider({ children }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isDriver } = useAuth();
   const [activeShift, setActiveShift] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const refreshShift = useCallback(async () => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated || !isDriver) {
       setLoading(false);
       return;
     }
@@ -22,10 +22,10 @@ export function ShiftProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isDriver]);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || !isDriver) return;
 
     refreshShift();
 
@@ -44,7 +44,7 @@ export function ShiftProvider({ children }) {
       window.removeEventListener('ws:shift_closed', handleShiftClosed);
       window.removeEventListener('ws:trip_assigned', handleShiftUpdate);
     };
-  }, [refreshShift, isAuthenticated]);
+  }, [refreshShift, isAuthenticated, isDriver]);
 
   return (
     <ShiftContext.Provider value={{ activeShift, loading, refreshShift, setActiveShift }}>
