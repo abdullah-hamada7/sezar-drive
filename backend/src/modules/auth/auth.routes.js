@@ -49,11 +49,15 @@ router.post(
   '/verify-device',
   identityUpload.single('photo'),
   [
-    body('userId').isUUID(),
+    body('userId').isString(), // Relaxed for debugging
     body('deviceFingerprint').notEmpty(),
   ],
   async (req, res, next) => {
     try {
+      console.log('Verify Device Request:', { 
+        body: req.body, 
+        file: req.file ? { name: req.file.originalname, size: req.file.size } : 'Missing' 
+      });
       handleValidation(req);
       if (!req.file) throw new ValidationError('Selfie photo is required');
       

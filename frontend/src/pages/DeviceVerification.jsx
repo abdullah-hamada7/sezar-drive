@@ -18,6 +18,14 @@ export default function DeviceVerificationPage() {
   const videoRef = useRef(null);
 
   const { userId, deviceFingerprint } = location.state || {};
+  
+  // Debug logging to catch why validation might fail
+  useEffect(() => {
+    console.log('Verification State:', { userId, deviceFingerprint });
+    if (!userId || !deviceFingerprint) {
+      console.warn('Missing userId or deviceFingerprint in location state');
+    }
+  }, [userId, deviceFingerprint]);
 
   // Attach stream to video element whenever stream changes
   useEffect(() => {
