@@ -1,11 +1,8 @@
 const express = require('express');
 const { body, param } = require('express-validator');
 const authService = require('./auth.service');
-const shiftService = require('../shift/shift.service'); // Import shiftService
 const { authenticate, enforcePasswordChanged, authorize } = require('../../middleware/auth');
 const { createUploader } = require('../../middleware/upload');
-const fileService = require('../../services/FileService');
-const faceVerificationService = require('../../services/FaceVerificationService');
 const { ValidationError } = require('../../errors');
 
 const router = express.Router();
@@ -54,10 +51,10 @@ router.post(
   ],
   async (req, res, next) => {
     try {
-      console.log('Verify Device Request:', { 
+      console.log(`[VERIFY_LOG] Request Data: ${JSON.stringify({ 
         body: req.body, 
         file: req.file ? { name: req.file.originalname, size: req.file.size } : 'Missing' 
-      });
+      })}`);
       handleValidation(req);
       if (!req.file) throw new ValidationError('Selfie photo is required');
       

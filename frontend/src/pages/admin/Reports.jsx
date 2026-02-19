@@ -45,7 +45,8 @@ export default function ReportsPage() {
 
       if (!response.ok) {
         const error = await response.json().catch(() => ({ message: response.statusText }));
-        throw new Error(error.message || t('common.error'));
+        const message = error.error?.message || error.message || t('common.error');
+        throw new Error(message);
       }
 
       const blob = await response.blob();
