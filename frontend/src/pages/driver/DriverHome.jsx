@@ -3,104 +3,17 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import { useShift } from '../../contexts/ShiftContext';
 import api from '../../services/api';
-import {
-  ClipboardCheck, User, DollarSign, RefreshCw, Upload, Camera, Car
-} from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { ClipboardCheck, User, Car } from 'lucide-react';
 import { ToastContext } from '../../contexts/toastContext';
-import FaceCapture from '../../components/FaceCapture';
-
-/* ─── Inline Identity Upload Form ─── */
-function IdentityUploadForm({ onUpload, user }) {
-  const { t } = useTranslation();
-  const [files, setFiles] = useState({ photo: null, front: null, back: null });
-  /* Removed useEffect for state sync - derived in render instead */
-  const [previews, setPreviews] = useState({});
-
-  function handleFile(key, file) {
-    if (!file) return;
-    setFiles(prev => ({ ...prev, [key]: file }));
-    setPreviews(prev => ({ ...prev, [key]: URL.createObjectURL(file) }));
-  }
-
-
-  const allSelected = files.photo && files.front && files.back;
-
-  return (
-    <div style={{ marginTop: '0.75rem' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem', marginBottom: '0.75rem' }}>
-        {[
-          { key: 'photo', label: t('driver_home.selfie_label') },
-          { key: 'front', label: t('driver_home.id_front') },
-          { key: 'back',  label: t('driver_home.id_back') },
-          ].map(({ key, label }) => {
-            const hasImage = previews[key] || (
-               key === 'photo' ? user?.identityPhotoUrl :
-               key === 'front' ? user?.idCardFront :
-               user?.idCardBack
-            );
-            return (
-          <label key={key} style={{
-            border: '2px dashed var(--color-border)',
-            borderRadius: 'var(--radius-md)',
-            padding: '0.5rem',
-            textAlign: 'center',
-            cursor: 'pointer',
-            background: hasImage ? 'var(--color-success-bg)' : 'var(--color-bg-secondary)',
-            borderColor: hasImage ? 'var(--color-success)' : undefined,
-            transition: 'all 0.2s',
-          }}>
-            <input
-              type="file"
-              accept="image/*"
-              capture={key === 'photo' ? 'user' : undefined}
-              style={{ display: 'none' }}
-              onChange={e => handleFile(key, e.target.files?.[0])}
-            />
-            {(() => {
-                // Derived display logic
-                const local = previews[key];
-                const server = key === 'photo' ? user?.identityPhotoUrl 
-                             : key === 'front' ? user?.idCardFront 
-                             : user?.idCardBack;
-                const displaySrc = local || server;
-                
-                return displaySrc ? (
-                  <img src={displaySrc} alt={label} style={{ width: '100%', height: 60, objectFit: 'cover', borderRadius: 4, marginBottom: 4 }} />
-                ) : (
-                  <Camera size={20} style={{ color: 'var(--color-text-muted)', margin: '0.25rem auto' }} />
-                );
-            })()}
-            <div className="text-xs" style={{ fontWeight: 500 }}>{label}</div>
-            <div className="text-xs text-muted">{previews[key] ? t('driver_home.selected') : t('driver_home.tap_select')}</div>
-          </label>
-            );
-          })}
-      </div>
-      <button
-        className="btn btn-primary btn-sm"
-        disabled={!allSelected}
-        onClick={() => onUpload(files)}
-        style={{ width: '100%' }}
-      >
-        <Upload size={14} /> {t('driver_home.upload_docs')}
-      </button>
-    </div>
-  );
-}
 
 export default function DriverHome() {
   const { t } = useTranslation();
   const { user, updateUser } = useAuth();
   const { addToast } = useContext(ToastContext);
   const { activeShift, refreshShift, loading: shiftLoading } = useShift();
-  const [refreshing, setRefreshing] = useState(false);
   const [assigningVehicle, setAssigningVehicle] = useState(false);
-  const [biometricPending, setBiometricPending] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(false);
 
   const refreshStatus = useCallback(async () => {
-    setRefreshing(true);
     try {
       const res = await api.getMe();
       if (res.data?.user) {
@@ -112,8 +25,6 @@ export default function DriverHome() {
       }
     } catch (err) {
       addToast(err.message || t('common.error'), 'error');
-    } finally {
-      setRefreshing(false);
     }
   }, [t, updateUser, addToast]);
  
@@ -135,42 +46,6 @@ export default function DriverHome() {
     };
   }, [t, addToast, refreshStatus]);
 
-  // Biometric Check Logic
-  const needsBiometric = user?.identityPhotoUrl && (!user?.lastBiometricVerifiedAt || (new Date() - new Date(user.lastBiometricVerifiedAt)) > 24 * 60 * 60 * 1000);
-
-  async function handleIdentityUpload(files) {
-    const formData = new FormData();
-    if (files.photo) formData.append('photo', files.photo);
-    if (files.front) formData.append('idCardFront', files.front);
-    if (files.back) formData.append('idCardBack', files.back);
-    try {
-      await api.uploadIdentityPhoto(formData);
-      addToast(t('driver_home.upload_success'), 'success');
-      refreshStatus();
-    } catch (err) {
-      addToast(err.message || t('common.error'), 'error');
-    }
-  }
-
-  async function handleBiometricCapture(file) {
-    setIsVerifying(true);
-    const formData = new FormData();
-    if (file) formData.append('photo', file);
-    try {
-      const res = await api.verifyFaceMatch(formData);
-      if (res.data.status === 'VERIFIED') {
-        addToast(t('common.success'), 'success');
-        refreshStatus();
-        setBiometricPending(false);
-      } else {
-        addToast(t('shift.failed_alert'), 'error');
-      }
-    } catch (err) {
-      addToast(err.message || t('common.error'), 'error');
-    } finally {
-      setIsVerifying(false);
-    }
-  }
 
   if (shiftLoading) return <div className="loading-page"><div className="spinner"></div></div>;
 

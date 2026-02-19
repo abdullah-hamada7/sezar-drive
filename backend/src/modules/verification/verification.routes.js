@@ -4,7 +4,6 @@ const prisma = require('../../config/database');
 const { authenticate, authorize } = require('../../middleware/auth');
 const { createUploader } = require('../../middleware/upload');
 const fileService = require('../../services/FileService');
-const faceVerificationService = require('../../services/FaceVerificationService');
 const { DriverVerificationStatus } = require('../../config/constants');
 const { ValidationError } = require('../../errors');
 
@@ -127,11 +126,27 @@ router.post('/shift-selfie', authenticate, upload.single('photo'), async (req, r
 // Admin lists all pending shift verifications
 router.get('/pending', authenticate, authorize('admin'), async (req, res, next) => {
   try {
+    const statusParam = (req.query.status || 'pending').toString().toLowerCase();
+    const nameParam = req.query.name ? req.query.name.toString() : '';
+    const statusMap = {
+      pending: DriverVerificationStatus.PENDING,
+      approved: DriverVerificationStatus.VERIFIED,
+      rejected: DriverVerificationStatus.REJECTED,
+    };
+    const verificationStatus = statusParam === 'all' ? undefined : statusMap[statusParam] || DriverVerificationStatus.PENDING;
+
+    const where = {
+      ...(verificationStatus && { verificationStatus }),
+      ...(verificationStatus === DriverVerificationStatus.PENDING && { status: 'PendingVerification' }),
+      ...(nameParam && {
+        driver: {
+          name: { contains: nameParam, mode: 'insensitive' },
+        },
+      }),
+    };
+
     const pendingShifts = await prisma.shift.findMany({
-      where: {
-        verificationStatus: DriverVerificationStatus.PENDING,
-        status: 'PendingVerification'
-      },
+      where,
       include: {
         driver: {
           select: {

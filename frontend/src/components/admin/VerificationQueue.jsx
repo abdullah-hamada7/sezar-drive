@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import api from '../../services/api';
-import { Check, X, User, Loader, AlertTriangle, ClipboardCheck } from 'lucide-react';
+import { Check, X, User, Loader, ClipboardCheck } from 'lucide-react';
 import { ToastContext } from '../../contexts/toastContext';
 import PromptModal from '../common/PromptModal';
 
