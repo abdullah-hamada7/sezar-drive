@@ -2,10 +2,10 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Calendar, CreditCard, User } from 'lucide-react';
 
-export default function DriverDetailsModal({ driver, onClose }) {
+export default function DriverDetailsModal({ driver, isOpen, onClose }) {
   const { t } = useTranslation();
 
-  if (!driver) return null;
+  if (!isOpen || !driver) return null;
 
   return (
     <div className="modal-overlay" onClick={onClose}>

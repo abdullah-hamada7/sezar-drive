@@ -152,7 +152,11 @@
       "manual_review": "Manual Review",
       "in_progress": "Active",
       "all": "All"
-    }
+    },
+    "email": "Email",
+    "phone": "Phone",
+    "close": "Close",
+    "not_provided": "Not Provided"
   },
   "entities": {
     "driver": "Driver",
@@ -360,6 +364,8 @@
       "pending": "Pending"
     },
     "modal": {
+      "details_title": "Driver Details",
+      "id_cards": "Identity Documents",
       "add_title": "Add New Driver",
       "edit_title": "Edit Driver",
       "avatar": "Personal Photo",

@@ -145,16 +145,16 @@
       "manual_review": "مراجعة يدوية",
       "in_progress": "نشطة",
       "all": "الكل"
-    }
+    },
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "close": "إغلاق",
+    "not_provided": "غير متوفر"
   },
   "entities": {
     "driver": "سائق",
     "vehicle": "مركبة",
     "trip": "رحلة",
-    "shift": "مناوبة",
-    "expense": "مصروف",
-    "user": "مستخدم"
-  },
   "roles": {
     "admin": "مدير",
     "driver": "سائق",
@@ -349,6 +349,8 @@
       "pending": "معلق"
     },
     "modal": {
+      "details_title": "تفاصيل السائق",
+      "id_cards": "وِثائق الهوية",
       "add_title": "إضافة سائق جديد",
       "edit_title": "تعديل السائق",
       "avatar": "الصورة الشخصية",
