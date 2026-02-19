@@ -53,7 +53,7 @@ async function createExpense(data, driverId, ipAddress) {
   });
 
   if (status === 'pending') {
-    notifyAdmins('expense_pending', 'New Expense Approval', `Driver ${shift.driver.name} submitted a $${amount} expense for ${category.name}.`, { expenseId: expense.id });
+    notifyAdmins('expense_pending', 'New Expense Approval', `Driver ${shift.driver.name} submitted a EGP${amount} expense for ${category.name}.`, { expenseId: expense.id });
   }
 
   return FileService.signExpense(expense);
