@@ -34,6 +34,9 @@ const auditRoutes = require('./modules/audit/audit.routes');
 
 const app = express();
 
+// Trust proxy for rate limiting behind Caddy
+app.set('trust proxy', 1);
+
 app.use(
   helmet({
     contentSecurityPolicy: {

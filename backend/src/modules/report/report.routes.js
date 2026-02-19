@@ -13,7 +13,10 @@ router.get(
     try {
       const data = await reportService.generateRevenueData(req.query);
       res.json(data);
-    } catch (err) { next(err); }
+    } catch (err) {
+      console.error('[REPORT_ERROR] Revenue Data Generation failed:', err);
+      next(err);
+    }
   }
 );
 
@@ -23,6 +26,7 @@ router.get(
   authenticate, enforcePasswordChanged, authorize('admin'),
   async (req, res, next) => {
     try {
+      console.log('[REPORT_LOG] Generating PDF for range:', req.query.startDate, 'to', req.query.endDate);
       const data = await reportService.generateRevenueData(req.query);
       await AuditService.log({
         actorId: req.user.id,
@@ -33,7 +37,10 @@ router.get(
         ipAddress: req.clientIp,
       });
       await reportService.generatePDF(data, res);
-    } catch (err) { next(err); }
+    } catch (err) {
+      console.error('[REPORT_ERROR] PDF Generation failed:', err);
+      next(err);
+    }
   }
 );
 
@@ -43,6 +50,7 @@ router.get(
   authenticate, enforcePasswordChanged, authorize('admin'),
   async (req, res, next) => {
     try {
+      console.log('[REPORT_LOG] Generating Excel for range:', req.query.startDate, 'to', req.query.endDate);
       const data = await reportService.generateRevenueData(req.query);
       await AuditService.log({
         actorId: req.user.id,
@@ -53,7 +61,10 @@ router.get(
         ipAddress: req.clientIp,
       });
       await reportService.generateExcel(data, res);
-    } catch (err) { next(err); }
+    } catch (err) {
+      console.error('[REPORT_ERROR] Excel Generation failed:', err);
+      next(err);
+    }
   }
 );
 
