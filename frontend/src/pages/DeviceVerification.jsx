@@ -91,9 +91,10 @@ export default function DeviceVerificationPage() {
       }
 
       const formData = new FormData();
-      formData.append('photo', blob, 'selfie.jpg');
+      // Append text fields FIRST for robust multer parsing
       formData.append('userId', userId);
       formData.append('deviceFingerprint', deviceFingerprint);
+      formData.append('photo', blob, 'selfie.jpg');
 
       const res = await api.verifyDevice(formData);
       const { user: userData, accessToken, refreshToken } = res.data;
