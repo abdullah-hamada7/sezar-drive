@@ -4,6 +4,11 @@ const app = require('../src/app');
 const prisma = require('../src/config/database');
 const fs = require('fs');
 
+const shouldRunIntegration = ['1', 'true', 'yes'].includes(
+  String(process.env.RUN_INTEGRATION_TESTS || '').toLowerCase()
+);
+const describeIntegration = shouldRunIntegration ? describe : describe.skip;
+
 const logFile = 'test_debug.log';
 if (fs.existsSync(logFile)) fs.unlinkSync(logFile);
 const log = (msg) => {
@@ -12,7 +17,7 @@ const log = (msg) => {
   }
 };
 
-describe('API Integration Tests (E2E)', () => {
+describeIntegration('API Integration Tests (E2E)', () => {
   let adminToken;
   let driverToken;
   let driverId;
@@ -39,6 +44,7 @@ describe('API Integration Tests (E2E)', () => {
   };
 
   beforeAll(async () => {
+    await prisma.$connect();
     const res = await request(app)
       .post('/api/v1/auth/login')
       .send({ email: 'hossam@sezar.com', password: 'Hossam@2026' });

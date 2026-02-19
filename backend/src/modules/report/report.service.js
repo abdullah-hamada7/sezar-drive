@@ -2,10 +2,22 @@ const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
 const path = require('path');
 const fs = require('fs');
-const reshaperModule = require('arabic-persian-reshaper');
-const ArabicReshaper = reshaperModule.ArabicReshaper || reshaperModule;
-const reshaper = typeof ArabicReshaper === 'function' ? new ArabicReshaper() : ArabicReshaper;
-const bidi = require('bidi-js')();
+let reshaper;
+try {
+  const reshaperModule = require('arabic-persian-reshaper');
+  const ArabicReshaper = reshaperModule.ArabicReshaper || reshaperModule;
+  reshaper = typeof ArabicReshaper === 'function' ? new ArabicReshaper() : ArabicReshaper;
+} catch (error) {
+  console.warn('[RTL_WARN] Failed to initialize ArabicReshaper:', error.message);
+  reshaper = { reshape: (text) => text }; // Dummy fallback
+}
+let bidi;
+try {
+  bidi = require('bidi-js')();
+} catch (error) {
+  console.warn('[RTL_WARN] Failed to initialize bidi-js:', error.message);
+  bidi = { getReorderedText: (text) => text }; // Dummy fallback
+}
 const prisma = require('../../config/database');
 const { ValidationError } = require('../../errors');
 
@@ -163,22 +175,31 @@ async function generatePDF(reportData, res) {
   doc.pipe(res);
 
     // Register Fonts (fallback to built-in fonts if custom fonts fail)
-    let fontsLoaded = false;
+    let fontRegular = 'Helvetica';
+    let fontBold = 'Helvetica-Bold';
     try {
       const hasRegular = isValidFontFile(FONT_REGULAR);
       const hasBold = isValidFontFile(FONT_BOLD);
       if (hasRegular && hasBold) {
         doc.registerFont('Cairo', FONT_REGULAR);
         doc.registerFont('Cairo-Bold', FONT_BOLD);
-        fontsLoaded = true;
+        doc.font('Cairo');
+        doc.font('Cairo-Bold');
+        fontRegular = 'Cairo';
+        fontBold = 'Cairo-Bold';
       }
     } catch (err) {
       console.warn('[REPORT_WARN] Failed to load custom fonts, using default.', err.message);
     }
 
-    const fontRegular = fontsLoaded ? 'Cairo' : 'Helvetica';
-    const fontBold = fontsLoaded ? 'Cairo-Bold' : 'Helvetica-Bold';
-    doc.font(fontRegular);
+    try {
+      doc.font(fontRegular);
+    } catch (err) {
+      console.warn('[REPORT_WARN] Failed to apply font, using default.', err.message);
+      fontRegular = 'Helvetica';
+      fontBold = 'Helvetica-Bold';
+      doc.font(fontRegular);
+    }
 
   // Header
   doc.fontSize(20).font(fontBold).text(prepareRTL('Fleet Management — Revenue Report / تقرير الإيرادات'), { align: 'center' });

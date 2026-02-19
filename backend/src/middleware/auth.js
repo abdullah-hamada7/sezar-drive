@@ -15,6 +15,9 @@ function authenticate(req, res, next) {
   const token = authHeader.split(' ')[1];
   try {
     const decoded = jwt.verify(token, config.jwtSecret);
+    if (decoded && decoded.role) {
+      decoded.role = String(decoded.role).toLowerCase();
+    }
     req.user = decoded;
     next();
   } catch (err) {
