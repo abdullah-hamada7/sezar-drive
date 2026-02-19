@@ -225,19 +225,20 @@ router.put(
 );
 
 // ─── POST /api/v1/auth/forgot-password ───────────
-router.post(
-  '/forgot-password',
-  [body('email').isEmail().normalizeEmail()],
-  async (req, res, next) => {
-    try {
-      handleValidation(req);
-      const result = await authService.forgotPassword(req.body.email, req.clientIp);
-      res.json(result);
-    } catch (err) {
-      next(err);
-    }
-  }
-);
+// ─── POST /api/v1/auth/forgot-password ───────────
+// router.post(
+//   '/forgot-password',
+//   [body('email').isEmail().normalizeEmail()],
+//   async (req, res, next) => {
+//     try {
+//       handleValidation(req);
+//       const result = await authService.forgotPassword(req.body.email, req.clientIp);
+//       res.json(result);
+//     } catch (err) {
+//       next(err);
+//     }
+//   }
+// );
 
 // ─── GET /api/v1/auth/verify-reset-token ───────────
 router.get(

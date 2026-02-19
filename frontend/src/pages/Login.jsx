@@ -152,7 +152,7 @@ export default function LoginPage() {
                   type="button" 
                   className="forgot-password-trigger" 
                   onClick={() => {
-                    setView('forgot-password');
+                    setView('rescue-request');
                     setError('');
                   }}
                 >
@@ -187,62 +187,17 @@ export default function LoginPage() {
         ) : (
           <div className="forgot-password-view">
             <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.5rem' }}>
-              {view === 'forgot-password' ? t('auth.forgot_password_title') : 
-               view === 'rescue-request' ? t('auth.rescue_request_title', 'Admin Help') : 
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.5rem' }}>
+              {view === 'rescue-request' ? t('auth.rescue_request_title', 'Admin Help') : 
                t('auth.rescue_verify_title', 'Enter Rescue Code')}
             </h2>
             <p className="login-subtitle" style={{ marginBottom: '1.5rem', textAlign: 'left' }}>
-              {view === 'forgot-password' ? t('auth.forgot_password_desc') : 
-               view === 'rescue-request' ? t('auth.rescue_request_desc', 'Please enter your email to request a rescue code from your supervisor.') : 
+            <p className="login-subtitle" style={{ marginBottom: '1.5rem', textAlign: 'left' }}>
+              {view === 'rescue-request' ? t('auth.rescue_request_desc', 'Please enter your email to request a rescue code from your supervisor.') : 
                t('auth.rescue_verify_desc', 'Enter the 6-digit code provided by your admin.')}
             </p>
 
-            {view === 'forgot-password' && (
-              <>
-                {resetSent ? (
-                  <div className="alert alert-success">
-                    {t('auth.reset_link_sent')}
-                    <button className="btn btn-primary login-btn" onClick={() => setView('login')}>
-                      {t('auth.back_to_login')}
-                    </button>
-                  </div>
-                ) : (
-                  <form onSubmit={handleForgotPassword} className="login-form">
-                    <div className="form-group">
-                      <label className="form-label">{t('auth.email')}</label>
-                      <input
-                        type="email"
-                        className="form-input"
-                        placeholder={t('auth.enter_email')}
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        autoFocus
-                      />
-                    </div>
 
-                    <button type="submit" className="btn btn-primary login-btn" disabled={resetLoading}>
-                      {resetLoading ? <span className="spinner"></span> : t('auth.send_reset_link')}
-                    </button>
-
-                    <div style={{ textAlign: 'center', margin: '1rem 0', opacity: 0.6 }}>— {t('common.or', 'OR')} —</div>
-
-                    <button 
-                      type="button" 
-                      className="btn" 
-                      style={{ background: 'var(--color-bg-alt)', color: 'var(--color-text)', width: '100%', border: '1px solid var(--color-border)' }}
-                      onClick={() => setView('rescue-request')}
-                    >
-                      {t('auth.request_admin_help', 'Request Admin Help')}
-                    </button>
-
-                    <button type="button" className="btn-ghost" onClick={() => setView('login')}>
-                      {t('auth.back_to_login')}
-                    </button>
-                  </form>
-                )}
-              </>
-            )}
 
             {view === 'rescue-request' && (
               <form onSubmit={handleRequestRescue} className="login-form">
@@ -260,7 +215,7 @@ export default function LoginPage() {
                 <button type="submit" className="btn btn-primary login-btn" disabled={rescueLoading}>
                   {rescueLoading ? <span className="spinner"></span> : t('auth.request_rescue_btn', 'Request Rescue Code')}
                 </button>
-                <button type="button" className="btn-ghost" onClick={() => setView('forgot-password')}>
+                <button type="button" className="btn-ghost" onClick={() => setView('login')}>
                   {t('common.back', 'Back')}
                 </button>
               </form>
