@@ -69,7 +69,7 @@ services:
       # These are now loaded from AWS Secrets Manager & SSM Parameter Store
       PORT: 3000
       NODE_ENV: production
-      CORS_ORIGIN: http://${DOMAIN_NAME}
+      CORS_ORIGIN: ${CORS_ORIGIN}
       FRONTEND_URL: ${FRONTEND_URL}
       PROJECT_NAME: ${PROJECT_NAME}
       S3_REGION: ${S3_REGION:-us-east-1}
