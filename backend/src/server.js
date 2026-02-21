@@ -28,7 +28,7 @@ async function startServer() {
     const prisma = require('./config/database');
     const { initWebSocketServer } = require('./modules/tracking/tracking.ws');
 
-    // 2.1 Explicitly connect to database with retries
+    // 4. Explicitly connect to database with retries
     let connected = false;
     let retries = 5;
     while (!connected && retries > 0) {
@@ -42,6 +42,20 @@ async function startServer() {
         if (retries === 0) throw err;
         await new Promise((resolve) => setTimeout(resolve, 5000));
       }
+    }
+
+    // 5. Auto-seed if no admin user exists (first deployment only)
+    try {
+      const adminCount = await prisma.user.count({ where: { role: 'admin' } });
+      if (adminCount === 0) {
+        console.log('No admin found — running seed...');
+        execSync('npm run seed', { stdio: 'inherit', cwd: '/app' });
+        console.log('✅ Seed completed successfully');
+      } else {
+        console.log('✅ Admin user exists — skipping seed');
+      }
+    } catch (err) {
+      console.error('❌ Seed check/run failed:', err.message);
     }
 
     // 3. Create Server

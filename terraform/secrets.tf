@@ -31,7 +31,7 @@ resource "aws_ssm_parameter" "db_url" {
   type = "String"
   # Host must be the Docker service name 'postgres' (NOT the EC2 IP)
   # because the backend runs inside Docker alongside the database container.
-  value = "postgresql://postgres:${random_password.db_password.result}@postgres:5432/sezar_drive"
+  value = "postgresql://postgres:${urlencode(random_password.db_password.result)}@postgres:5432/sezar_drive"
   tags  = local.common_tags
 }
 
