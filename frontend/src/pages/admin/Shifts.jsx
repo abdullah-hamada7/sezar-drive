@@ -6,7 +6,6 @@ import { ClipboardCheck, X, XCircle, Check, AlertCircle, Calendar, Gauge, Info }
 import { useContext } from 'react';
 import { ToastContext } from '../../contexts/toastContext';
 import PromptModal from '../../components/common/PromptModal';
-import DetailModal from '../../components/common/DetailModal';
 
 const STATUS_BADGES = {
   PendingVerification: 'badge-warning',

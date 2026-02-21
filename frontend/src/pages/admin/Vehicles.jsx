@@ -2,8 +2,9 @@ import { useState, useEffect, useCallback, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { vehicleService as api } from '../../services/vehicle.service';
 import { ToastContext } from '../../contexts/toastContext';
-import { Car, Plus, Search, Edit, Trash2, X, QrCode } from 'lucide-react';
+import { Car, Plus, Search, Edit, Trash2, X, QrCode, Printer } from 'lucide-react';
 import ConfirmModal from '../../components/common/ConfirmModal';
+import { QRCodeCanvas } from 'qrcode.react';
 
 const STATUS_BADGES = {
   available: 'badge-success',
@@ -23,6 +24,8 @@ export default function VehiclesPage() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [qrVehicle, setQrVehicle] = useState(null);
   const [editVehicle, setEditVehicle] = useState(null);
   const [form, setForm] = useState({ plateNumber: '', model: '', year: 2024, capacity: 4, qrCode: '' });
   const [error, setError] = useState('');
@@ -167,6 +170,13 @@ export default function VehiclesPage() {
                   </td>
                   <td>
                     <div className="flex gap-sm">
+                      <button
+                        className="btn-icon"
+                        onClick={() => { setQrVehicle(v); setShowQRModal(true); }}
+                        title={t('vehicles.table.view_qr') || 'View QR'}
+                      >
+                        <QrCode size={16} />
+                      </button>
                       <button className="btn-icon" onClick={() => openEdit(v)} title={t('common.edit')}><Edit size={16} /></button>
                       <button className="btn-icon" onClick={() => handleDelete(v.id)} title={t('common.delete')} style={{ color: 'var(--color-danger)' }}>
                         <Trash2 size={16} />
@@ -234,6 +244,57 @@ export default function VehiclesPage() {
           </div>
         </div>
       )}
+
+      {showQRModal && qrVehicle && (
+        <div className="modal-overlay" onClick={() => setShowQRModal(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
+            <div className="modal-header">
+              <h2 className="modal-title">{t('vehicles.modal.qr_title') || 'Vehicle QR Code'}</h2>
+              <button className="btn-icon" onClick={() => setShowQRModal(false)}><X size={18} /></button>
+            </div>
+            <div className="modal-body text-center" style={{ padding: '2rem' }}>
+              <div id="printable-qr" style={{ background: 'white', padding: '2rem', borderRadius: '1rem', display: 'inline-block' }}>
+                <QRCodeCanvas
+                  value={qrVehicle.qrCode}
+                  size={200}
+                  level="H"
+                  includeMargin={true}
+                />
+                <div style={{ marginTop: '1rem', color: 'black', fontWeight: 'bold', fontSize: '1.2rem' }}>
+                  {qrVehicle.plateNumber}
+                </div>
+                <div style={{ color: '#666', fontSize: '0.8rem' }}>
+                  {qrVehicle.model} ({qrVehicle.year})
+                </div>
+              </div>
+
+              <div className="mt-xl flex flex-col gap-sm">
+                <button className="btn btn-primary w-full" onClick={() => window.print()}>
+                  <Printer size={18} /> {t('common.print') || 'Print QR Code'}
+                </button>
+                <p className="text-xs text-muted mt-sm">
+                  {t('vehicles.modal.qr_help') || 'Print this code and place it clearly on the vehicle dashboard or windshield.'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @media print {
+          body * { visibility: hidden; }
+          #printable-qr, #printable-qr * { visibility: visible; }
+          #printable-qr {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            padding: 40px !important;
+            border: 1px solid #eee;
+          }
+        }
+      `}</style>
 
       <ConfirmModal
         isOpen={confirmData.isOpen}
