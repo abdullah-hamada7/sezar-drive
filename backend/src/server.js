@@ -10,7 +10,18 @@ async function startServer() {
     // This must happen BEFORE requiring app/config to ensure process.env is populated
     await loadSecrets();
 
-    // 2. Load dependencies after env is ready
+    // 2. Run database migrations automatically
+    const { execSync } = require('child_process');
+    try {
+      console.log('Running database migrations...');
+      execSync('npx prisma migrate deploy', { stdio: 'inherit', cwd: '/app' });
+      console.log('✅ Migrations applied successfully');
+    } catch (err) {
+      console.error('❌ Migration failed:', err.message);
+      // Don't exit — the database schema may already be up to date
+    }
+
+    // 3. Load dependencies after env is ready
     const http = require('http');
     const app = require('./app');
     const config = require('./config');
