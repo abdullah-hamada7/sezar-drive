@@ -34,6 +34,30 @@ jobs:
         env:
           NODE_ENV: test
           JWT_SECRET: test-secret-key-at-least-32-characters-long
+
+  frontend-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run Lint
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Run Build
+        working-directory: frontend
+        run: npm run build
           
   docker-build:
     runs-on: ubuntu-latest
@@ -67,8 +91,13 @@ jobs:
         
       - name: Terraform Init
         working-directory: terraform
-        run: terraform init -backend=false
+        run: |
+          export TF_DATA_DIR="$(mktemp -d)"
+          terraform init -backend=false -input=false
         
       - name: Terraform Validate
         working-directory: terraform
-        run: terraform validate
+        run: |
+          export TF_DATA_DIR="$(mktemp -d)"
+          terraform init -backend=false -input=false
+          terraform validate

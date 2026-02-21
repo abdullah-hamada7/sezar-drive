@@ -7,7 +7,10 @@ const fs = require('fs');
 const shouldRunIntegration = ['1', 'true', 'yes'].includes(
   String(process.env.RUN_INTEGRATION_TESTS || '').toLowerCase()
 );
-const describeIntegration = shouldRunIntegration ? describe : describe.skip;
+const adminEmail = process.env.TEST_ADMIN_EMAIL;
+const adminPassword = process.env.TEST_ADMIN_PASSWORD;
+const hasAdminCreds = Boolean(adminEmail && adminPassword);
+const describeIntegration = shouldRunIntegration && hasAdminCreds ? describe : describe.skip;
 
 const logFile = 'test_debug.log';
 if (fs.existsSync(logFile)) fs.unlinkSync(logFile);
@@ -47,7 +50,7 @@ describeIntegration('API Integration Tests (E2E)', () => {
     await prisma.$connect();
     const res = await request(app)
       .post('/api/v1/auth/login')
-      .send({ email: 'hossam@sezar.com', password: 'Hossam@2026' });
+      .send({ email: adminEmail, password: adminPassword });
 
     expect(res.status).toBe(200);
     adminToken = res.body.accessToken;

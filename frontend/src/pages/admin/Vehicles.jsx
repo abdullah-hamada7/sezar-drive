@@ -87,7 +87,8 @@ export default function VehiclesPage() {
       setShowModal(false);
       load();
     } catch (err) {
-      setError(err.message || t('vehicles.messages.op_failed'));
+      const msg = err.errorCode ? t(`errors.${err.errorCode}`) : (err.message || t('vehicles.messages.op_failed'));
+      setError(msg);
     }
   }
 
@@ -99,7 +100,10 @@ export default function VehiclesPage() {
     try {
       await api.deleteVehicle(confirmData.vehicleId);
       load();
-    } catch (err) { addToast(err.message, 'error'); }
+    } catch (err) {
+      const msg = err.errorCode ? t(`errors.${err.errorCode}`) : err.message;
+      addToast(msg, 'error');
+    }
   }
 
   return (
@@ -173,7 +177,7 @@ export default function VehiclesPage() {
                       <button
                         className="btn-icon"
                         onClick={() => { setQrVehicle(v); setShowQRModal(true); }}
-                        title={t('vehicles.table.view_qr') || 'View QR'}
+                        title={t('vehicles.table.view_qr')}
                       >
                         <QrCode size={16} />
                       </button>
@@ -188,98 +192,105 @@ export default function VehiclesPage() {
             </tbody>
           </table>
         </div>
-      )}
+      )
+      }
 
-      {pagination.totalPages > 1 && (
-        <div className="pagination">
-          <button onClick={() => setPage(p => p - 1)} disabled={page <= 1}>{t('vehicles.pagination.prev')}</button>
-          <span className="text-sm text-muted">
-            {t('vehicles.pagination.info', { current: page, total: pagination.totalPages })}
-          </span>
-          <button onClick={() => setPage(p => p + 1)} disabled={page >= pagination.totalPages}>{t('vehicles.pagination.next')}</button>
-        </div>
-      )}
-
-      {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal modal-lg" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2 className="modal-title">{editVehicle ? t('vehicles.modal.edit_title') : t('vehicles.modal.add_title')}</h2>
-              <button className="btn-icon" onClick={() => setShowModal(false)}><X size={18} /></button>
-            </div>
-
-            {error && <div className="alert alert-error">{error}</div>}
-
-            <form onSubmit={handleSubmit} className="modal-body">
-              <div className="form-section mb-md">
-                <div className="grid grid-2 gap-md">
-                  <div className="form-group">
-                    <label className="form-label">{t('vehicles.modal.plate_label')}</label>
-                    <input className="form-input" name="plateNumber" value={form.plateNumber} onChange={e => setForm({ ...form, plateNumber: e.target.value })} required placeholder={t('vehicles.modal.plate_placeholder')} />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">{t('vehicles.modal.model_label')}</label>
-                    <input className="form-input" name="model" value={form.model} onChange={e => setForm({ ...form, model: e.target.value })} required placeholder={t('vehicles.modal.model_placeholder')} />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">{t('vehicles.modal.year_label')}</label>
-                    <input type="number" className="form-input" name="year" value={form.year} onChange={e => setForm({ ...form, year: e.target.value })} required min={2000} max={2030} />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">{t('vehicles.modal.capacity_label')}</label>
-                    <input type="number" className="form-input" name="capacity" value={form.capacity} onChange={e => setForm({ ...form, capacity: e.target.value })} required min={1} max={50} />
-                  </div>
-                  <div className="form-group col-span-2">
-                    <label className="form-label">{t('vehicles.modal.qr_label')}</label>
-                    <input className="form-input" name="qrCode" value={form.qrCode} onChange={e => setForm({ ...form, qrCode: e.target.value })} required placeholder={t('vehicles.modal.qr_placeholder')} />
-                  </div>
-                </div>
-              </div>
-
-              <div className="modal-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>{t('common.cancel')}</button>
-                <button type="submit" className="btn btn-primary">{editVehicle ? t('vehicles.modal.update_btn') : t('vehicles.modal.create_btn')}</button>
-              </div>
-            </form>
+      {
+        pagination.totalPages > 1 && (
+          <div className="pagination">
+            <button onClick={() => setPage(p => p - 1)} disabled={page <= 1}>{t('vehicles.pagination.prev')}</button>
+            <span className="text-sm text-muted">
+              {t('vehicles.pagination.info', { current: page, total: pagination.totalPages })}
+            </span>
+            <button onClick={() => setPage(p => p + 1)} disabled={page >= pagination.totalPages}>{t('vehicles.pagination.next')}</button>
           </div>
-        </div>
-      )}
+        )
+      }
 
-      {showQRModal && qrVehicle && (
-        <div className="modal-overlay" onClick={() => setShowQRModal(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
-            <div className="modal-header">
-              <h2 className="modal-title">{t('vehicles.modal.qr_title') || 'Vehicle QR Code'}</h2>
-              <button className="btn-icon" onClick={() => setShowQRModal(false)}><X size={18} /></button>
-            </div>
-            <div className="modal-body text-center" style={{ padding: '2rem' }}>
-              <div id="printable-qr" style={{ background: 'white', padding: '2rem', borderRadius: '1rem', display: 'inline-block' }}>
-                <QRCodeCanvas
-                  value={qrVehicle.qrCode}
-                  size={200}
-                  level="H"
-                  includeMargin={true}
-                />
-                <div style={{ marginTop: '1rem', color: 'black', fontWeight: 'bold', fontSize: '1.2rem' }}>
-                  {qrVehicle.plateNumber}
-                </div>
-                <div style={{ color: '#666', fontSize: '0.8rem' }}>
-                  {qrVehicle.model} ({qrVehicle.year})
-                </div>
+      {
+        showModal && (
+          <div className="modal-overlay" onClick={() => setShowModal(false)}>
+            <div className="modal modal-lg" onClick={e => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2 className="modal-title">{editVehicle ? t('vehicles.modal.edit_title') : t('vehicles.modal.add_title')}</h2>
+                <button className="btn-icon" onClick={() => setShowModal(false)}><X size={18} /></button>
               </div>
 
-              <div className="mt-xl flex flex-col gap-sm">
-                <button className="btn btn-primary w-full" onClick={() => window.print()}>
-                  <Printer size={18} /> {t('common.print') || 'Print QR Code'}
-                </button>
-                <p className="text-xs text-muted mt-sm">
-                  {t('vehicles.modal.qr_help') || 'Print this code and place it clearly on the vehicle dashboard or windshield.'}
-                </p>
-              </div>
+              {error && <div className="alert alert-error">{error}</div>}
+
+              <form onSubmit={handleSubmit} className="modal-body">
+                <div className="form-section mb-md">
+                  <div className="grid grid-2 gap-md">
+                    <div className="form-group">
+                      <label className="form-label">{t('vehicles.modal.plate_label')}</label>
+                      <input className="form-input" name="plateNumber" value={form.plateNumber} onChange={e => setForm({ ...form, plateNumber: e.target.value })} required placeholder={t('vehicles.modal.plate_placeholder')} />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">{t('vehicles.modal.model_label')}</label>
+                      <input className="form-input" name="model" value={form.model} onChange={e => setForm({ ...form, model: e.target.value })} required placeholder={t('vehicles.modal.model_placeholder')} />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">{t('vehicles.modal.year_label')}</label>
+                      <input type="number" className="form-input" name="year" value={form.year} onChange={e => setForm({ ...form, year: e.target.value })} required min={2000} max={2030} />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">{t('vehicles.modal.capacity_label')}</label>
+                      <input type="number" className="form-input" name="capacity" value={form.capacity} onChange={e => setForm({ ...form, capacity: e.target.value })} required min={1} max={50} />
+                    </div>
+                    <div className="form-group col-span-2">
+                      <label className="form-label">{t('vehicles.modal.qr_label')}</label>
+                      <input className="form-input" name="qrCode" value={form.qrCode} onChange={e => setForm({ ...form, qrCode: e.target.value })} required placeholder={t('vehicles.modal.qr_placeholder')} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="modal-actions">
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>{t('common.cancel')}</button>
+                  <button type="submit" className="btn btn-primary">{editVehicle ? t('vehicles.modal.update_btn') : t('vehicles.modal.create_btn')}</button>
+                </div>
+              </form>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
+
+      {
+        showQRModal && qrVehicle && (
+          <div className="modal-overlay" onClick={() => setShowQRModal(false)}>
+            <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
+              <div className="modal-header">
+                <h2 className="modal-title">{t('vehicles.modal.qr_title')}</h2>
+                <button className="btn-icon" onClick={() => setShowQRModal(false)}><X size={18} /></button>
+              </div>
+              <div className="modal-body text-center" style={{ padding: '2rem' }}>
+                <div id="printable-qr" style={{ background: 'white', padding: '2rem', borderRadius: '1rem', display: 'inline-block' }}>
+                  <QRCodeCanvas
+                    value={qrVehicle.qrCode}
+                    size={200}
+                    level="H"
+                    includeMargin={true}
+                  />
+                  <div style={{ marginTop: '1rem', color: 'black', fontWeight: 'bold', fontSize: '1.2rem' }}>
+                    {qrVehicle.plateNumber}
+                  </div>
+                  <div style={{ color: '#666', fontSize: '0.8rem' }}>
+                    {qrVehicle.model} ({qrVehicle.year})
+                  </div>
+                </div>
+
+                <div className="mt-xl flex flex-col gap-sm">
+                  <button className="btn btn-primary w-full" onClick={() => window.print()}>
+                    <Printer size={18} /> {t('common.print')}
+                  </button>
+                  <p className="text-xs text-muted mt-sm">
+                    {t('vehicles.modal.qr_help')}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      }
 
       <style>{`
         @media print {
@@ -303,7 +314,7 @@ export default function VehiclesPage() {
         title={t('common.delete')}
         message={t('vehicles.messages.delete_confirm')}
       />
-    </div>
+    </div >
   );
 }
 

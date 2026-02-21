@@ -1,339 +1,172 @@
-# Deployment Guide: Sezar Drive Platform
+# Master Deployment Guide: Sezar Drive Platform
 
-**Version**: 2.0
-**Author Role**: DevOps Engineer
-**Date**: 2026-02-21
-**Change Log**: Rewrote to match current Terraform + Docker Compose + Caddy architecture with automated secrets, backups, and CloudWatch logging.
-
----
-
-## Architecture Overview
-
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                         AWS Account                              │
-│                                                                  │
-│  ┌──────────────┐  ┌──────────────┐  ┌─────────────────────┐    │
-│  │ Secrets Mgr  │  │    SSM       │  │   S3 (Photos +      │    │
-│  │  DB Password │  │ DATABASE_URL │  │   DB Backups)       │    │
-│  │  JWT Secret  │  │ S3_BUCKET    │  └─────────────────────┘    │
-│  └──────┬───────┘  │ S3_REGION    │                              │
-│         │          └──────┬───────┘                              │
-│         │                 │                                      │
-│  ┌──────▼─────────────────▼──────────────────────────────────┐  │
-│  │              EC2 Instance (Ubuntu 24.04)                   │  │
-│  │  ┌────────────────────────────────────────────────────┐   │  │
-│  │  │              Docker Compose Stack                   │   │  │
-│  │  │                                                    │   │  │
-│  │  │  :80 → Caddy ──┬── /api/*  → Backend :3000        │   │  │
-│  │  │                │── /ws/*   → Backend :3000        │   │  │
-│  │  │                └── /*      → Frontend :80         │   │  │
-│  │  │                                                    │   │  │
-│  │  │  Backend → PostgreSQL (internal db-net only)       │   │  │
-│  │  └────────────────────────────────────────────────────┘   │  │
-│  │  CloudWatch Agent → /sezar-drive/docker logs              │  │
-│  │  Cron (3 AM) → backup.sh → S3 (7-day retention)          │  │
-│  └───────────────────────────────────────────────────────────┘  │
-│                                                                  │
-│  ┌──────────────────┐                                            │
-│  │ S3 (TF State)    │  ← Encrypted Remote Backend               │
-│  └──────────────────┘                                            │
-└──────────────────────────────────────────────────────────────────┘
-```
+**Version**: 3.0  
+**Author Role**: DevOps Engineer  
+**Date**: 2026-02-21  
+**Change Log**: Complete rewrite. Integrated Terraform (Infra), Cloudflare (DNS), and Docker Compose (App) into a single beginning-to-end workflow.
 
 ---
 
-## Phase 1: Prerequisites
+## Introduction
 
-| Tool | Version | Purpose |
-|------|---------|---------|
-| AWS CLI | v2+ | AWS resource management |
-| Terraform | ≥ 1.0.0 | Infrastructure provisioning |
-| Git | any | Source control |
-| SSH client | any | Server access |
-
-**AWS Permissions Required**: EC2, S3, IAM, Secrets Manager, SSM, CloudWatch Logs, Rekognition.
-
-**Create an EC2 Key Pair** (if not done already):
-
-```bash
-aws ec2 create-key-pair --key-name sezar-drive --query 'KeyMaterial' --output text > sezar-drive.pem
-chmod 400 sezar-drive.pem
-```
+This guide provides the complete sequence to deploy Sezar Drive from scratch to a production-ready AWS environment. We use **Terraform** for infrastructure, **Docker Compose** for orchestration, and **Caddy** for automated SSL.
 
 ---
 
-## Phase 2: Bootstrap Remote State (One-Time)
+## Phase 1: Local Prerequisites
 
-Terraform state contains sensitive values (DB passwords) in plaintext. This step stores state in an encrypted S3 bucket instead of locally.
+Before you begin, ensure your local machine has:
 
-```bash
-cd terraform/scripts
-bash bootstrap_tf_backend.sh
-```
-
-The script creates:
-
-- **S3 Bucket**: Versioned, encrypted (AES-256), with SSL-only access policy and public access blocked.
-- **DynamoDB Table**: For state locking (`sezar-drive-tf-lock`).
-
-Copy the output `backend "s3"` block into `terraform/main.tf` inside the `terraform {}` block, then:
-
-```bash
-cd ../
-terraform init -reconfigure
-```
-
-> [!IMPORTANT]
-> If you already have a remote backend configured (check `main.tf` for an existing `backend "s3"` block), skip this phase entirely.
+1. **AWS CLI**: Installed and configured (`aws configure`).
+2. **Terraform**: Installed (version >= 1.0.0).
+3. **SSH Key**: An AWS Key Pair created in `us-east-1` (or your target region).
 
 ---
 
-## Phase 3: Infrastructure Provisioning
+## Phase 2: Infrastructure Provisioning (Terraform)
 
-### 3.1 Configure Variables
+Terraform creates your VPC, Security Groups, S3 Bucket, IAM Roles, and the EC2 Instance.
 
-Create `terraform/terraform.tfvars` from the example:
+1. **Navigate to the terraform directory**:
 
-```bash
-cp terraform.tfvars.example terraform.tfvars
-```
+    ```bash
+    cd terraform
+    ```
 
-Edit `terraform.tfvars`:
+2. **Initialize Terraform**:
 
-```hcl
-# Required — your public IP for SSH access (https://ifconfig.me/ip)
-ssh_cidr_blocks = ["YOUR_IP/32"]
+    ```bash
+    terraform init
+    ```
 
-# Required — AWS EC2 Key Pair name
-key_name = "sezar-drive"
+3. **Deploy the infrastructure**:
 
-# Optional overrides
-aws_region    = "us-east-1"
-project_name  = "sezar-drive"
-instance_type = "c7i-flex.large"
-```
+    ```bash
+    # You will be prompted for ssh_cidr_blocks (your IP/32) and key_name
+    terraform apply
+    ```
 
-### 3.2 Deploy
-
-```bash
-cd terraform
-terraform init
-terraform apply
-```
-
-### What Gets Created
-
-| Resource | Details |
-|----------|---------|
-| **VPC** | `10.0.0.0/16` with public subnet, IGW, and route table |
-| **Security Group** | SSH (restricted to your IP), HTTP/HTTPS (public) |
-| **EC2** | Ubuntu 24.04, encrypted gp3 root volume (20 GB), IMDSv2 enforced |
-| **S3 Bucket** | `sezar-drive-photos-<random>`, versioned, encrypted, private |
-| **IAM Role** | S3 access, Rekognition (`CompareFaces`), Secrets Manager, SSM, CloudWatch Logs |
-| **Secrets Manager** | `sezar-drive-prod-secrets` with auto-generated `POSTGRES_PASSWORD` and `JWT_SECRET` |
-| **SSM Parameters** | `DATABASE_URL`, `S3_BUCKET`, `S3_REGION` |
-| **User Data** | Installs Docker, AWS CLI, CloudWatch Agent, configures daily backup cron |
-
-### 3.3 Note Outputs
-
-```bash
-terraform output
-```
-
-Save these values:
-
-- `public_ip` — server IP address
-- `s3_bucket_name` — photo storage bucket name
-- `ssh_command` — ready-to-use SSH command
+4. **Note the Outputs**:
+    - `public_ip`: Your server's static Elastic IP.
+    - `s3_bucket_name`: The auto-generated bucket name.
+    - `ssh_command`: The command used to log in.
 
 ---
 
-## Phase 4: Application Deployment
+## Phase 3: DNS Configuration (Cloudflare)
 
-### 4.1 SSH Into Server
+Since we are staying in the **AWS Free Tier**, we manage DNS externally.
 
-```bash
-ssh -i sezar-drive.pem ubuntu@<PUBLIC_IP>
-```
-
-### 4.2 Clone Repository
-
-```bash
-git clone https://github.com/your-org/sezar-drive.git
-cd sezar-drive
-```
-
-> [!TIP]
-> If you encounter `fatal: protocol 'https' is not supported`, ensure Git has SSL support by running:
->
-> ```bash
-> sudo apt-get update && sudo apt-get install --reinstall -y git git-man libcurl4-openssl-dev
-> ```
-
-### 4.3 Configure Production Environment
-
-Create `.env` at the project root using `.env.prod.example` as a template:
-
-```bash
-cp .env.prod.example .env
-nano .env
-```
-
-**Required values to set**:
-
-| Variable | Source | Example |
-|----------|--------|---------|
-| `DOMAIN_NAME` | Your domain or server IP | `54.123.45.67` |
-| `EMAIL_FOR_SSL` | Email for Let's Encrypt (used when HTTPS enabled) | `admin@sezar.com` |
-| `POSTGRES_DB` | Fixed | `sezar_drive` |
-| `POSTGRES_USER` | Fixed | `postgres` |
-| `POSTGRES_PASSWORD` | **AWS Secrets Manager** → `sezar-drive-prod-secrets` → `POSTGRES_PASSWORD` | auto-generated |
-| `FRONTEND_URL` | Same as `DOMAIN_NAME` with protocol | `http://54.123.45.67` |
-| `S3_BUCKET` | Terraform output `s3_bucket_name` | `sezar-drive-photos-a1b2c3d4` |
-| `S3_REGION` | Same as Terraform `aws_region` | `us-east-1` |
-
-> [!TIP]
-> Retrieve the auto-generated password from Secrets Manager:
->
-> ```bash
-> aws secretsmanager get-secret-value --secret-id sezar-drive-prod-secrets --query 'SecretString' --output text | python3 -c "import sys,json; print(json.loads(sys.stdin.read())['POSTGRES_PASSWORD'])"
-> ```
-
-### 4.4 Deploy
-
-```bash
-docker compose -f compose.prod.yml up -d --build
-```
-
-### 4.5 Run Database Migrations
-
-```bash
-docker compose -f compose.prod.yml exec backend npx prisma migrate deploy
-```
-
-### 4.6 Seed Admin User
-
-```bash
-docker compose -f compose.prod.yml exec backend npm run seed
-```
-
-This creates only the admin user (`hossam@sezar.com`). All drivers, vehicles, and other data must be created via the admin dashboard.
+1. **Login to [Cloudflare](https://dash.cloudflare.com/)**.
+2. **Select your domain** (`sezardrive.com`).
+3. **Go to DNS > Records**.
+4. **Add an 'A' Record**:
+    - **Type**: `A`
+    - **Name**: `@` (represents the root domain)
+    - **IPv4 address**: Paste the `public_ip` from Terraform.
+    - **Proxy status**: Proxied (Orange cloud) is recommended.
+5. **Add a 'WWW' Record**:
+    - **Type**: `CNAME`
+    - **Name**: `www`
+    - **Target**: `sezardrive.com`
 
 ---
 
-## Phase 5: Post-Deployment Verification
+## Phase 4: Server Preparation
 
-### Health Checks
+1. **SSH into the server**:
 
-```bash
-# Backend health
-curl http://<PUBLIC_IP>/api/v1/health
+    ```bash
+    # Use the ssh_command from Terraform output
+    ssh -i "your-key.pem" ubuntu@<PUBLIC_IP>
+    ```
 
-# Backend logs (should show "Successfully loaded Secrets Manager configuration")
-docker compose -f compose.prod.yml logs -f backend
+2. **Wait for Docker**: The server runs an automatic setup script on first boot. Wait ~5 minutes, then check if Docker is ready:
 
-# All containers running
-docker compose -f compose.prod.yml ps
-```
-
-### Verify Backup Cron
-
-```bash
-crontab -l
-# Expected: 0 3 * * * S3_BUCKET=<bucket> /home/ubuntu/scripts/backup.sh ...
-```
-
-### Verify CloudWatch Agent
-
-```bash
-sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status
-```
-
-Logs are shipped to CloudWatch log groups:
-
-- `/sezar-drive/docker` — all container logs
-- `/sezar-drive/backups` — daily backup logs
+    ```bash
+    docker --version
+    docker compose version
+    ```
 
 ---
 
-## Phase 6: Maintenance
+## Phase 5: Application Deployment
 
-### Updating the Application
+1. **Clone the Repository**:
 
-```bash
-cd ~/sezar-drive
-git pull
-docker compose -f compose.prod.yml up -d --build
-```
+    ```bash
+    git clone https://github.com/your-org/sezar-drive.git
+    cd sezar-drive
+    ```
 
-### Updating Secrets
+2. **Configure Environment Variables**:
 
-After changing a secret in AWS Secrets Manager, restart the backend to pick up new values:
+    ```bash
+    cp .env.prod.example .env
+    nano .env
+    ```
 
-```bash
-docker compose -f compose.prod.yml restart backend
-```
+    Set the following:
+    - `DOMAIN_NAME`: `sezardrive.com`
+    - `EMAIL_FOR_SSL`: `your-email@example.com`
+    - `FRONTEND_URL`: `https://sezardrive.com`
+    - `S3_BUCKET`: (From Terraform output)
+    - `S3_REGION`: `us-east-1`
+3. **Start the Containers**:
 
-### Manual Database Backup
-
-```bash
-S3_BUCKET=<bucket-name> /home/ubuntu/scripts/backup.sh
-```
-
-Automated backups run daily at **03:00 UTC** with **7-day local retention** and S3 upload.
-
-### Enabling HTTPS (When Domain is Ready)
-
-1. Point your domain's DNS A record to the server IP.
-2. Edit `.env`: set `DOMAIN_NAME=yourdomain.com` and `EMAIL_FOR_SSL=admin@yourdomain.com`.
-3. Edit `Caddyfile`: remove `auto_https off` and uncomment the `:443` port in `compose.prod.yml`.
-4. Restart: `docker compose -f compose.prod.yml up -d`.
-
-Caddy handles certificate provisioning and renewal automatically.
+    ```bash
+    docker compose -f compose.prod.yml up -d --build
+    ```
 
 ---
 
-## Phase 7: Teardown
+## Phase 6: Database & Initial Setup
 
-To destroy all provisioned infrastructure:
+1. **Run Migrations**:
+
+    ```bash
+    docker compose -f compose.prod.yml exec backend npx prisma migrate deploy
+    ```
+
+2. **Seed the Admin User**:
+
+    ```bash
+    docker compose -f compose.prod.yml exec backend npm run seed
+    ```
+
+---
+
+## Phase 7: Enabling SSL (HTTPS)
+
+1. **Edit `Caddyfile`**:
+
+    ```bash
+    nano Caddyfile
+    ```
+
+    - Remove/Comment out `auto_https off`.
+2. **Update `compose.prod.yml`**:
+    - Uncomment the port `"443:443"`.
+3. **Restart**:
+
+    ```bash
+    docker compose -f compose.prod.yml up -d
+    ```
+
+---
+
+## Maintenance & Verification
+
+- **Check Logs**: `docker compose -f compose.prod.yml logs -f backend`
+- **Daily Backups**: Automated script runs at 03:00 UTC and uploads to S3.
+- **Security**: Ensure your local IP is updated in `variables.tf` if your home internet changes.
+
+---
+
+## Phase 8: Teardown (Optional)
+
+To delete everything and stop costs:
 
 ```bash
-cd terraform
 terraform destroy
 ```
-
-> [!CAUTION]
-> This permanently deletes the EC2 instance, S3 bucket (if empty), secrets, SSM parameters, and all networking. Database data in the Docker volume is lost with the instance.
-
----
-
-## Security Checklist
-
-| Control | Status |
-|---------|--------|
-| SSH restricted to specific IP (`ssh_cidr_blocks`) | ✅ |
-| IMDSv2 enforced on EC2 | ✅ |
-| Root volume encrypted (gp3) | ✅ |
-| S3 bucket: private, encrypted (AES-256), versioned, SSL-only | ✅ |
-| Secrets in AWS Secrets Manager (auto-generated) | ✅ |
-| IAM role with least-privilege (S3, Rekognition, SSM, Secrets, CloudWatch) | ✅ |
-| Database on internal Docker network (`db-net`, no internet) | ✅ |
-| Terraform state encrypted in remote S3 backend | ✅ |
-| Docker log rotation (10 MB × 3 files) | ✅ |
-| Centralized logging via CloudWatch Agent | ✅ |
-| Daily automated backups to S3 (7-day retention) | ✅ |
-
----
-
-## Quick Reference
-
-| Item | Value |
-|------|-------|
-| **Admin Login** | `hossam@sezar.com` / `Hossam@2026` |
-| **SSH** | `ssh -i sezar-drive.pem ubuntu@<IP>` |
-| **Logs** | `docker compose -f compose.prod.yml logs -f backend` |
-| **Redeploy** | `git pull && docker compose -f compose.prod.yml up -d --build` |
-| **Backup** | `S3_BUCKET=<bucket> /home/ubuntu/scripts/backup.sh` |
-| **Migrations** | `docker compose -f compose.prod.yml exec backend npx prisma migrate deploy` |
-| **Seed (admin only)** | `docker compose -f compose.prod.yml exec backend npm run seed` |

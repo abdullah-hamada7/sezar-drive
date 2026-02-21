@@ -39,13 +39,10 @@ export default function DriverShift() {
     }
     setActionLoading(true);
     try {
-      const res = await shiftService.createShift();
+      await shiftService.createShift();
       await refreshShift();
-      // Automatically start with biometric if not verified recently
-      const verifiedToday = user.lastBiometricVerifiedAt && (new Date() - new Date(user.lastBiometricVerifiedAt)) < 24 * 60 * 60 * 1000;
-      if (!verifiedToday) {
-        setActiveStep('face');
-      }
+      // Force face verification for every shift start
+      setActiveStep('face');
     } catch (err) {
       // Handled by HttpService
     } finally {
@@ -168,8 +165,8 @@ export default function DriverShift() {
                 <ShieldCheck size={24} />
               </div>
               <div>
-                <h3 style={{ margin: 0 }}>The Gate</h3>
-                <p className="text-sm text-muted">Complete verification to start driving</p>
+                <h3 style={{ margin: 0 }}>{t('shift.gate_title')}</h3>
+                <p className="text-sm text-muted">{t('shift.gate_desc')}</p>
               </div>
             </div>
 
@@ -188,8 +185,8 @@ export default function DriverShift() {
                   {isVerified ? <CheckCircle2 size={24} /> : <Camera size={24} />}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600 }}>Face Verification</div>
-                  <div className="text-xs text-muted">{isVerified ? 'Identity Confirmed' : 'Action Required'}</div>
+                  <div style={{ fontWeight: 600 }}>{t('shift.face_verification')}</div>
+                  <div className="text-xs text-muted">{isVerified ? t('shift.identity_confirmed') : t('shift.action_required')}</div>
                 </div>
                 {!isVerified && <Play size={16} className="text-muted mirror-rtl" />}
               </div>
@@ -208,9 +205,9 @@ export default function DriverShift() {
                   {hasVehicle ? <CheckCircle2 size={24} /> : <QrCode size={24} />}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600 }}>Vehicle Check-in</div>
+                  <div style={{ fontWeight: 600 }}>{t('shift.vehicle_checkin')}</div>
                   <div className="text-xs text-muted">
-                    {hasVehicle ? `Assigned: ${shift.vehicle?.plateNumber || 'VH-101'}` : 'Scan Vehicle QR'}
+                    {hasVehicle ? `${t('shift.assigned')}: ${shift.vehicle?.plateNumber || ''}` : t('shift.scan_vehicle_desc')}
                   </div>
                 </div>
                 {!hasVehicle && <Play size={16} className="text-muted mirror-rtl" />}
@@ -225,13 +222,13 @@ export default function DriverShift() {
                 style={{ width: '100%', padding: '1rem' }}
               >
                 {actionLoading ? <Loader size={20} className="spinning" /> : <Play size={20} className="mirror-rtl" />}
-                <span style={{ marginLeft: '0.5rem' }}>Activate Shift & Start Driving</span>
+                <span style={{ marginLeft: '0.5rem' }}>{t('shift.activate_and_drive_btn')}</span>
               </button>
             </div>
           </div>
 
           <button className="btn btn-ghost" onClick={() => setShowConfirm(true)} style={{ width: '100%' }}>
-            Cancel Shift Request
+            {t('shift.cancel_request_btn')}
           </button>
         </div>
       ) : (
@@ -277,8 +274,8 @@ export default function DriverShift() {
         isOpen={showConfirm}
         onClose={() => setShowConfirm(false)}
         onConfirm={onConfirmClose}
-        title={shift?.status === 'Active' ? t('shift.end_btn') : 'Cancel Request'}
-        message={shift?.status === 'Active' ? t('shift.close_confirm') : 'Are you sure you want to cancel this shift request?'}
+        title={shift?.status === 'Active' ? t('shift.end_btn') : t('shift.cancel_request_btn')}
+        message={shift?.status === 'Active' ? t('shift.close_confirm') : t('shift.cancel_request_confirm')}
       />
     </div>
   );

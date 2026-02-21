@@ -66,7 +66,10 @@ export default function DriverExpenses() {
       addToast(t('expenses.success_create'), 'success');
       load();
     } catch (err) {
-      // Handled by HttpService
+      const code = err.errorCode || err.code;
+      // If code is present, HttpService/App.jsx might already handle it, 
+      // but we ensure it's translated here if needed.
+      if (code) addToast(t(`errors.${code}`), 'error');
     }
   }
 

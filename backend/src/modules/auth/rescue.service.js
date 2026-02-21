@@ -20,7 +20,7 @@ async function requestRescue(email) {
   });
 
   if (existing) {
-    return { message: 'A rescue request is already pending. Please wait for an admin.' };
+    throw new ConflictError('RESCUE_REQUEST_PENDING', 'A rescue request is already pending. Please wait for an admin.');
   }
 
   const request = await prisma.rescueRequest.create({
@@ -31,8 +31,8 @@ async function requestRescue(email) {
   });
 
   // Notify admins via WebSocket
-  notifyAdmins('rescue_request', 'Password Rescue Requested', `Driver ${user.name} is requesting a password rescue code.`, { 
-    requestId: request.id, 
+  notifyAdmins('rescue_request', 'Password Rescue Requested', `Driver ${user.name} is requesting a password rescue code.`, {
+    requestId: request.id,
     driverId: user.id,
     driverName: user.name,
     driverEmail: user.email
@@ -66,8 +66,8 @@ async function generateRescueCode(adminId, requestId) {
     }
   });
 
-  return { 
-    code, 
+  return {
+    code,
     driverName: request.user.name,
     requestId: request.id
   };
@@ -78,7 +78,7 @@ async function generateRescueCode(adminId, requestId) {
  */
 async function verifyRescueCode(email, code) {
   const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) throw new ValidationError('Invalid email or code');
+  if (!user) throw new ValidationError('Invalid email or code', 'INVALID_RESCUE_CODE');
 
   const request = await prisma.rescueRequest.findFirst({
     where: {
@@ -90,7 +90,7 @@ async function verifyRescueCode(email, code) {
   });
 
   if (!request) {
-    throw new ValidationError('Invalid or expired rescue code');
+    throw new ValidationError('Invalid or expired rescue code', 'INVALID_RESCUE_CODE');
   }
 
   // Mark as used

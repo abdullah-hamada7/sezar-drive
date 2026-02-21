@@ -22,9 +22,6 @@ export const authService = {
   updatePreferences(data) {
     return http.request('/auth/preferences', { method: 'PUT', body: data });
   },
-  forgotPassword(email) {
-    return http.request('/auth/forgot-password', { method: 'POST', body: { email }, skipAuth: true });
-  },
   verifyResetToken(token) {
     return http.request(`/auth/verify-reset-token?token=${token}`, { skipAuth: true });
   },

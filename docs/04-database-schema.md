@@ -293,9 +293,9 @@ ON trips (driver_id) WHERE status IN ('Assigned', 'Started');
 ## 3. Seed Data
 
 ```sql
--- Admin user (password: Admin@123)
+-- Admin user (password set by your seed process)
 INSERT INTO users (id, email, phone, password_hash, name, role, must_change_password, identity_verified)
-VALUES ('...', 'hossam@sezar.com', '+1000000000', '$bcrypt_hash', 'System Admin', 'admin', false, true);
+VALUES ('...', 'admin@example.com', '+1000000000', '$bcrypt_hash', 'System Admin', 'admin', false, true);
 
 -- Expense categories
 INSERT INTO expense_categories (name, requires_approval) VALUES

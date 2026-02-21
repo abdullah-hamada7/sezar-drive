@@ -9,7 +9,7 @@ const AuditService = require('../../services/audit.service');
  * Admin creates a new driver account with temporary password.
  */
 async function createDriver(data, adminId, ipAddress) {
-  const { name, email, phone, licenseNumber } = data;
+  const { name, email, phone, licenseNumber, avatarUrl, idCardFront, idCardBack } = data;
   const password = data.password || data.temporaryPassword;
 
   if (!password) {
@@ -33,9 +33,12 @@ async function createDriver(data, adminId, ipAddress) {
           phone, // potentially same
           passwordHash,
           licenseNumber,
+          avatarUrl,
+          idCardFront,
+          idCardBack,
           isActive: true,
           mustChangePassword: true,
-          identityVerified: false, // Require re-verification
+          identityVerified: !!(idCardFront && idCardBack), // Verify only if docs are provided
         },
       });
 
@@ -52,7 +55,13 @@ async function createDriver(data, adminId, ipAddress) {
       return updated;
     }
 
-    throw new ConflictError('EMAIL_ALREADY_EXISTS', 'User with this email or phone already exists');
+    if (existing.email === email) {
+      throw new ConflictError('EMAIL_ALREADY_EXISTS', 'User with this email already exists');
+    }
+    if (existing.phone === phone) {
+      throw new ConflictError('PHONE_ALREADY_EXISTS', 'User with this phone number already exists');
+    }
+    throw new ConflictError('USER_ALREADY_EXISTS', 'User with this email or phone already exists');
   }
 
   const passwordHash = await bcrypt.hash(password, config.bcryptRounds);
@@ -64,8 +73,11 @@ async function createDriver(data, adminId, ipAddress) {
       passwordHash,
       role: 'driver',
       licenseNumber,
+      avatarUrl,
+      idCardFront,
+      idCardBack,
       mustChangePassword: true,
-      identityVerified: true, // Auto-verified by Admin since they created the account
+      identityVerified: !!(idCardFront && idCardBack), // Verified since Admin provided docs
     },
   });
 
@@ -148,38 +160,48 @@ async function updateDriver(id, data, adminId, ipAddress) {
   if (!driver) throw new NotFoundError('Driver');
 
   const previousState = { name: driver.name, email: driver.email, phone: driver.phone };
-  
+
   // Map frontend/API field 'profilePhotoUrl' to DB field 'avatarUrl'
   const updateData = {
-      ...(data.name && { name: data.name }),
-      ...(data.phone && { phone: data.phone }),
-      ...(data.licenseNumber && { licenseNumber: data.licenseNumber }),
-      ...(data.profilePhotoUrl && { avatarUrl: data.profilePhotoUrl }),
-      ...(data.avatarUrl && { avatarUrl: data.avatarUrl }), // Handle direct usage too
-      ...(data.idCardFront && { idCardFront: data.idCardFront }),
-      ...(data.idCardBack && { idCardBack: data.idCardBack }),
-      ...(data.identityPhotoUrl && { identityPhotoUrl: data.identityPhotoUrl }),
-      ...(data.language_preference && { languagePreference: data.language_preference }),
-      ...(data.languagePreference && { languagePreference: data.languagePreference }),
+    ...(data.name && { name: data.name }),
+    ...(data.phone && { phone: data.phone }),
+    ...(data.licenseNumber && { licenseNumber: data.licenseNumber }),
+    ...(data.profilePhotoUrl && { avatarUrl: data.profilePhotoUrl }),
+    ...(data.avatarUrl && { avatarUrl: data.avatarUrl }), // Handle direct usage too
+    ...(data.idCardFront && { idCardFront: data.idCardFront }),
+    ...(data.idCardBack && { idCardBack: data.idCardBack }),
+    ...(data.identityPhotoUrl && { identityPhotoUrl: data.identityPhotoUrl }),
+    ...(data.language_preference && { languagePreference: data.language_preference }),
+    ...(data.languagePreference && { languagePreference: data.languagePreference }),
   };
 
-  const updated = await prisma.user.update({
-    where: { id },
-    data: updateData,
-  });
+  try {
+    const updated = await prisma.user.update({
+      where: { id },
+      data: updateData,
+    });
 
-  await AuditService.log({
-    actorId: adminId, // NOTE: If self-update, adminId passed is actually driverId
-    actionType: 'driver.updated',
-    entityType: 'driver',
-    entityId: id,
-    previousState,
-    newState: data,
-    ipAddress,
-  });
+    await AuditService.log({
+      actorId: adminId, // NOTE: If self-update, adminId passed is actually driverId
+      actionType: 'driver.updated',
+      entityType: 'driver',
+      entityId: id,
+      previousState,
+      newState: data,
+      ipAddress,
+    });
 
-  delete updated.passwordHash;
-  return await fileService.signDriverUrls(updated);
+    delete updated.passwordHash;
+    return await fileService.signDriverUrls(updated);
+  } catch (err) {
+    if (err.code === 'P2002') {
+      const target = err.meta?.target || [];
+      if (target.includes('email')) throw new ConflictError('EMAIL_ALREADY_EXISTS', 'Email already in use');
+      if (target.includes('phone')) throw new ConflictError('PHONE_ALREADY_EXISTS', 'Phone number already in use');
+      throw new ConflictError('USER_ALREADY_EXISTS', 'User with this email or phone already exists');
+    }
+    throw err;
+  }
 }
 
 /**

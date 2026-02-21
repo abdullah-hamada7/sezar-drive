@@ -1,53 +1,79 @@
 require('dotenv').config();
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const prisma = new PrismaClient();
 
+function isTruthyEnv(name) {
+  return ['1', 'true', 'yes', 'y', 'on'].includes(String(process.env[name] || '').toLowerCase());
+}
+
+function generatePassword() {
+  // URL-safe, no spaces; good enough for a one-time dev seed.
+  return crypto.randomBytes(24).toString('base64url');
+}
+
 async function main() {
-  console.log('🌱 Starting database seeding (Admin Only)...');
+  const nodeEnv = process.env.NODE_ENV || 'development';
+  const isProduction = nodeEnv === 'production';
+
+  // NOTE: Never ship hardcoded credentials. Provide them via env.
+  const adminEmail = (process.env.SEED_ADMIN_EMAIL || 'admin@example.com').trim().toLowerCase();
+  const adminPhone = (process.env.SEED_ADMIN_PHONE || '0000000000').trim();
+  const providedPassword = process.env.SEED_ADMIN_PASSWORD;
+  const overwriteAdminPassword = isTruthyEnv('SEED_OVERWRITE_ADMIN_PASSWORD');
+
+  // Dangerous operation: full reset REMOVED per user request.
+  // const resetDb = isTruthyEnv('SEED_RESET_DB');
+
+  if (isProduction && !providedPassword) {
+    throw new Error('Refusing to seed in production without SEED_ADMIN_PASSWORD');
+  }
+
+  console.log('🌱 Starting database seeding...');
 
   try {
-    // 1. Clean existing data (respecting foreign keys)
-    console.log('  🗑️ Cleaning existing data...');
+    console.log('  ℹ️ Automated data deletion is disabled for safety.');
 
-    // Deleting in reverse order of dependencies
-    await prisma.locationLog.deleteMany();
-    await prisma.damagePhoto.deleteMany();
-    await prisma.damageReport.deleteMany();
-    await prisma.inspectionPhoto.deleteMany();
-    await prisma.inspection.deleteMany();
-    await prisma.trip.deleteMany();
-    await prisma.expense.deleteMany();
-    await prisma.shift.deleteMany();
-    await prisma.vehicleAssignment.deleteMany();
-    await prisma.identityVerification.deleteMany();
-    await prisma.auditLog.deleteMany();
-    await prisma.refreshToken.deleteMany();
-    await prisma.userDevice.deleteMany();
-    await prisma.rescueRequest.deleteMany();
-    await prisma.adminConfig.deleteMany();
-    await prisma.user.deleteMany();
-    await prisma.vehicle.deleteMany();
-    await prisma.expenseCategory.deleteMany();
+    // Admin upsert (do not overwrite existing password by default)
+    const existingAdmin = await prisma.user.findUnique({ where: { email: adminEmail } });
+    let admin;
+    let didSetAdminPassword = false;
+    let adminPasswordPlain = null;
 
-    console.log('  ✅ Database cleaned.');
-
-    // 2. Create admin user
-    const adminPassword = await bcrypt.hash('Hossam@2026', 12);
-    const admin = await prisma.user.create({
-      data: {
-        email: 'hossam@sezar.com',
-        phone: '1234567890',
-        name: 'System Admin',
-        passwordHash: adminPassword,
-        role: 'admin',
-        mustChangePassword: false,
-        identityVerified: true,
-        isActive: true,
-      },
-    });
-    console.log(`  ✅ Admin created: ${admin.email}`);
+    if (existingAdmin) {
+      admin = existingAdmin;
+      if (overwriteAdminPassword) {
+        adminPasswordPlain = providedPassword || (isProduction ? null : generatePassword());
+        const adminPasswordHash = await bcrypt.hash(adminPasswordPlain, 12);
+        await prisma.user.update({
+          where: { id: existingAdmin.id },
+          data: { passwordHash: adminPasswordHash, mustChangePassword: false },
+        });
+        didSetAdminPassword = true;
+        console.log(`  ✅ Admin password updated (SEED_OVERWRITE_ADMIN_PASSWORD=true): ${admin.email}`);
+      } else {
+        console.log(`  ✅ Admin exists: ${admin.email}`);
+      }
+    } else {
+      adminPasswordPlain = providedPassword || (isProduction ? null : generatePassword());
+      const adminPasswordHash = await bcrypt.hash(adminPasswordPlain, 12);
+      admin = await prisma.user.create({
+        data: {
+          email: adminEmail,
+          phone: adminPhone,
+          name: process.env.SEED_ADMIN_NAME || 'System Admin',
+          passwordHash: adminPasswordHash,
+          role: 'admin',
+          mustChangePassword: false,
+          identityVerified: true,
+          isActive: true,
+        },
+      });
+      didSetAdminPassword = true;
+      console.log(`  ✅ Admin created: ${admin.email}`);
+    }
 
     // 3. Create default expense categories
     const defaultCategories = [
@@ -60,14 +86,27 @@ async function main() {
       { name: 'Other', requiresApproval: true },
     ];
 
-    for (const cat of defaultCategories) {
-      await prisma.expenseCategory.create({ data: cat });
-    }
-    console.log(`  ✅ ${defaultCategories.length} expense categories created.`);
+    await prisma.expenseCategory.createMany({
+      data: defaultCategories,
+      skipDuplicates: true,
+    });
+    console.log('  ✅ Expense categories ensured.');
 
     console.log('\n🎉 Seed completed successfully!');
-    console.log('\n📋 Login credentials:');
-    console.log('  Admin:  hossam@sezar.com / Hossam@2026');
+    if (!isProduction) {
+      console.log('\n📋 Seeded admin credentials (dev only):');
+      console.log(`  Email: ${adminEmail}`);
+      if (didSetAdminPassword) {
+        if (!providedPassword) {
+          console.log(`  Password (generated): ${adminPasswordPlain}`);
+          console.log('  TIP: set SEED_ADMIN_PASSWORD to control this value.');
+        } else {
+          console.log('  Password: (from SEED_ADMIN_PASSWORD)');
+        }
+      } else {
+        console.log('  Password: (unchanged; admin already existed)');
+      }
+    }
 
   } catch (error) {
     console.error('\n❌ Seeding Error:', error);

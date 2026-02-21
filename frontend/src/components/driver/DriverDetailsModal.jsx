@@ -11,7 +11,7 @@ export default function DriverDetailsModal({ driver, isOpen, onClose }) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px', width: '90%' }}>
         <div className="modal-header">
-          <h3 className="modal-title">{t('driver.details_title', 'Driver Details')}</h3>
+          <h3 className="modal-title">{t('driver.details_title')}</h3>
           <button className="btn-icon" onClick={onClose}>
             <X size={20} />
           </button>
@@ -58,22 +58,22 @@ export default function DriverDetailsModal({ driver, isOpen, onClose }) {
 
           {/* ID Cards */}
           <div className="mb-lg">
-            <label className="text-xs text-muted uppercase tracking-wider font-bold mb-sm block">{t('driver.id_cards', 'Identity Documents')}</label>
+            <label className="text-xs text-muted uppercase tracking-wider font-bold mb-sm block">{t('driver.id_cards')}</label>
             <div className="grid grid-2 gap-md">
               <div className="flex flex-col gap-xs">
-                <span className="text-xs text-muted">Front Side</span>
+                <span className="text-xs text-muted">{t('driver.id_front')}</span>
                 {driver.idCardFront ? (
                   <img src={driver.idCardFront} alt="ID Front" className="rounded border border-border" style={{ height: '120px', objectFit: 'cover' }} />
                 ) : (
-                  <div className="p-md bg-bg-tertiary rounded border border-border flex items-center justify-center h-[120px] text-muted text-xs">Not Uploaded</div>
+                  <div className="p-md bg-bg-tertiary rounded border border-border flex items-center justify-center h-[120px] text-muted text-xs">{t('common.not_uploaded')}</div>
                 )}
               </div>
               <div className="flex flex-col gap-xs">
-                <span className="text-xs text-muted">Back Side</span>
+                <span className="text-xs text-muted">{t('driver.id_back')}</span>
                 {driver.idCardBack ? (
                   <img src={driver.idCardBack} alt="ID Back" className="rounded border border-border" style={{ height: '120px', objectFit: 'cover' }} />
                 ) : (
-                  <div className="p-md bg-bg-tertiary rounded border border-border flex items-center justify-center h-[120px] text-muted text-xs">Not Uploaded</div>
+                  <div className="p-md bg-bg-tertiary rounded border border-border flex items-center justify-center h-[120px] text-muted text-xs">{t('common.not_uploaded')}</div>
                 )}
               </div>
             </div>

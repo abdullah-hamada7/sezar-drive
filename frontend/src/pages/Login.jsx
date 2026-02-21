@@ -17,18 +17,15 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [view, setView] = useState('login'); // login | forgot-password | rescue-request | rescue-verify
-  const [resetSent, setResetSent] = useState(false);
-  const [resetLoading, setResetLoading] = useState(false);
+  const [view, setView] = useState('login'); // login | rescue-request | rescue-verify
   const [rescueCode, setRescueCode] = useState('');
   const [rescueLoading, setRescueLoading] = useState(false);
   const { login, loading } = useAuth();
   const navigate = useNavigate();
 
   const getErrorMessage = (err) => {
-    if (err.code === 'INVALID_CREDENTIALS') return t('auth.login_failed');
-    if (err.code === 'USER_NOT_FOUND') return t('auth.login_failed'); // generic
-    if (err.code === 'IDENTITY_NOT_VERIFIED') return t('driver_home.identity_pending');
+    const code = err.errorCode || err.code;
+    if (code) return t(`errors.${code}`);
     return err.message || t('common.error');
   };
 
@@ -47,21 +44,6 @@ export default function LoginPage() {
       }
     } catch (err) {
       setError(getErrorMessage(err));
-    }
-  };
-
-  const handleForgotPassword = async (e) => {
-    e.preventDefault();
-    setError('');
-    setResetLoading(true);
-    try {
-      await api.forgotPassword(email);
-      setResetSent(true);
-      setError('');
-    } catch (err) {
-      setError(getErrorMessage(err));
-    } finally {
-      setResetLoading(false);
     }
   };
 
@@ -119,7 +101,7 @@ export default function LoginPage() {
           </div>
           <h1 className="login-title text-gradient">{t('common.brand')}</h1>
           <p className="login-subtitle">
-            {view === 'forgot-password' ? t('auth.forgot_password_title') : t('nav.dashboard')}
+            {t('nav.dashboard')}
           </p>
         </div>
 
@@ -187,12 +169,12 @@ export default function LoginPage() {
         ) : (
           <div className="forgot-password-view">
             <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.5rem' }}>
-              {view === 'rescue-request' ? t('auth.rescue_request_title', 'Admin Help') :
-                t('auth.rescue_verify_title', 'Enter Rescue Code')}
+              {view === 'rescue-request' ? t('auth.rescue_request_title') :
+                t('auth.rescue_verify_title')}
             </h2>
             <p className="login-subtitle" style={{ marginBottom: '1.5rem', textAlign: 'left' }}>
-              {view === 'rescue-request' ? t('auth.rescue_request_desc', 'Please enter your email to request a rescue code from your supervisor.') :
-                t('auth.rescue_verify_desc', 'Enter the 6-digit code provided by your admin.')}
+              {view === 'rescue-request' ? t('auth.rescue_request_desc') :
+                t('auth.rescue_verify_desc')}
             </p>
 
 
@@ -211,10 +193,10 @@ export default function LoginPage() {
                   />
                 </div>
                 <button type="submit" className="btn btn-primary login-btn" disabled={rescueLoading}>
-                  {rescueLoading ? <span className="spinner"></span> : t('auth.request_rescue_btn', 'Request Rescue Code')}
+                  {rescueLoading ? <span className="spinner"></span> : t('auth.request_rescue_btn')}
                 </button>
                 <button type="button" className="btn-ghost" onClick={() => setView('login')}>
-                  {t('common.back', 'Back')}
+                  {t('common.back')}
                 </button>
               </form>
             )}
@@ -222,7 +204,7 @@ export default function LoginPage() {
             {view === 'rescue-verify' && (
               <form onSubmit={handleVerifyRescue} className="login-form">
                 <div className="form-group">
-                  <label className="form-label">{t('auth.rescue_code', 'Rescue Code')}</label>
+                  <label className="form-label">{t('auth.rescue_code')}</label>
                   <input
                     type="text"
                     className="form-input"
@@ -236,10 +218,10 @@ export default function LoginPage() {
                   />
                 </div>
                 <button type="submit" className="btn btn-primary login-btn" disabled={rescueLoading}>
-                  {rescueLoading ? <span className="spinner"></span> : t('auth.verify_rescue_btn', 'Verify Code')}
+                  {rescueLoading ? <span className="spinner"></span> : t('auth.verify_rescue_btn')}
                 </button>
                 <button type="button" className="btn-ghost" onClick={() => setView('rescue-request')}>
-                  {t('auth.resend_request', 'Resend Request')}
+                  {t('auth.resend_request')}
                 </button>
               </form>
             )}

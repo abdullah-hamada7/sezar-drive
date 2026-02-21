@@ -19,11 +19,11 @@ export default function ChangePasswordPage() {
     setError('');
 
     if (newPassword !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('auth.passwords_dont_match'));
       return;
     }
     if (newPassword.length < 8) {
-      setError('Password must be at least 8 characters');
+      setError(t('drivers.modal.password_invalid'));
       return;
     }
 
@@ -49,7 +49,9 @@ export default function ChangePasswordPage() {
         }
       }, 1500);
     } catch (err) {
-      setError(err.message || 'Failed to change password');
+      const code = err.errorCode || err.code;
+      const msg = code ? t(`errors.${code}`) : (err.message || t('auth.change_password_failed'));
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -63,21 +65,21 @@ export default function ChangePasswordPage() {
       </div>
       <div className="login-card" style={{ maxWidth: '460px' }}>
         <div className="login-header">
-          <div className="login-logo">
+          <div className="login-logo text-gradient shadow-glow">
             <Lock size={28} />
           </div>
-          <h1 className="login-title">Change Password</h1>
+          <h1 className="login-title text-gradient">{t('auth.change_password')}</h1>
           <p className="login-subtitle">
             {user?.mustChangePassword
-              ? 'You must change your temporary password before continuing'
-              : 'Update your account password'}
+              ? t('auth.must_change_password')
+              : t('auth.update_password')}
           </p>
         </div>
 
         {success ? (
-          <div className="alert alert-success">
+          <div className="alert alert-success card-glass">
             <CheckCircle size={18} />
-            Password changed successfully! Redirecting...
+            {t('auth.change_password_success')}
           </div>
         ) : (
           <>
@@ -85,7 +87,7 @@ export default function ChangePasswordPage() {
 
             <form onSubmit={handleSubmit} className="login-form">
               <div className="form-group">
-                <label className="form-label">Current Password</label>
+                <label className="form-label">{t('auth.current_password')}</label>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   name="currentPassword"
@@ -97,7 +99,7 @@ export default function ChangePasswordPage() {
               </div>
 
               <div className="form-group">
-                <label className="form-label">New Password</label>
+                <label className="form-label">{t('auth.new_password')}</label>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   name="newPassword"
@@ -110,7 +112,7 @@ export default function ChangePasswordPage() {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Confirm New Password</label>
+                <label className="form-label">{t('auth.confirm_password')}</label>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   name="confirmPassword"
@@ -127,12 +129,12 @@ export default function ChangePasswordPage() {
                   checked={showPassword}
                   onChange={() => setShowPassword(!showPassword)}
                 />
-                Show passwords
+                {t('auth.show_passwords')}
               </label>
 
               <button type="submit" className="btn btn-primary login-btn" disabled={loading}>
                 {loading ? <span className="spinner"></span> : <Lock size={18} />}
-                {loading ? 'Changing...' : 'Change Password'}
+                {loading ? t('common.loading') : t('auth.change_password_btn')}
               </button>
             </form>
           </>

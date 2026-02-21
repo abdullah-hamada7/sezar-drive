@@ -5,12 +5,17 @@ const API_HOST = 'localhost';
 const API_PORT = 3001;
 const API_BASE = '/api/v1';
 
-// Seed Data
-const ADMIN_EMAIL = 'hossam@sezar.com';
-const ADMIN_PASSWORD = 'Hossam@2026';
+// Credentials (do not hardcode real logins in repo)
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@example.com';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const DRIVER_EMAIL = 'driver1@fleet.com';
 const DRIVER_PASSWORD = 'Driver123!';
 const NEW_DRIVER_PASSWORD = 'NewDriverPassword123!';
+
+if (!ADMIN_PASSWORD) {
+  console.error('Missing ADMIN_PASSWORD env var. Refusing to run.');
+  process.exit(1);
+}
 
 // State
 let adminToken = '';

@@ -31,7 +31,7 @@ router.put(
       if (req.file) {
         data.profilePhotoUrl = await fileService.upload(req.file, 'profiles');
       }
-      
+
       const driver = await driverService.updateDriver(req.user.id, data, req.user.id, req.clientIp);
       res.json(driver);
     } catch (err) { next(err); }
@@ -42,6 +42,11 @@ router.put(
 router.post(
   '/',
   authenticate, enforcePasswordChanged, authorize('admin'),
+  upload.fields([
+    { name: 'avatar', maxCount: 1 },
+    { name: 'idCardFront', maxCount: 1 },
+    { name: 'idCardBack', maxCount: 1 }
+  ]),
   [
     body('name').notEmpty().withMessage('Name is required').trim().escape(),
     body('email').isEmail().withMessage('Valid email is required').normalizeEmail(),
@@ -49,8 +54,8 @@ router.post(
     body('password').optional().isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
     body('temporaryPassword').optional().isLength({ min: 8 }).withMessage('Temporary password must be at least 8 characters long'),
     body('licenseNumber').notEmpty().withMessage('License number is required').matches(/^[A-Z0-9-]+$/i).withMessage('Invalid license number format').trim().escape(),
-    body().custom(body => {
-      if (!body.password && !body.temporaryPassword) {
+    body().custom((value, { req }) => {
+      if (!req.body.password && !req.body.temporaryPassword) {
         throw new Error('Either password or temporaryPassword is required');
       }
       return true;
@@ -59,7 +64,14 @@ router.post(
   async (req, res, next) => {
     try {
       handleValidation(req);
-      const driver = await driverService.createDriver(req.body, req.user.id, req.clientIp);
+      const data = { ...req.body };
+
+      const files = req.files || {};
+      if (files.avatar?.[0]) data.avatarUrl = await fileService.upload(files.avatar[0], 'profiles');
+      if (files.idCardFront?.[0]) data.idCardFront = await fileService.upload(files.idCardFront[0], 'identity');
+      if (files.idCardBack?.[0]) data.idCardBack = await fileService.upload(files.idCardBack[0], 'identity');
+
+      const driver = await driverService.createDriver(data, req.user.id, req.clientIp);
       res.status(201).json(driver);
     } catch (err) { next(err); }
   }
@@ -101,9 +113,9 @@ router.put(
   '/:id',
   authenticate, enforcePasswordChanged, authorize('admin'),
   upload.fields([
-      { name: 'avatar', maxCount: 1 }, 
-      { name: 'idCardFront', maxCount: 1 }, 
-      { name: 'idCardBack', maxCount: 1 }
+    { name: 'avatar', maxCount: 1 },
+    { name: 'idCardFront', maxCount: 1 },
+    { name: 'idCardBack', maxCount: 1 }
   ]),
   [
     param('id').isUUID(),
@@ -117,7 +129,7 @@ router.put(
     try {
       handleValidation(req);
       const data = { ...req.body };
-      
+
       const files = req.files || {};
       if (files.avatar?.[0]) data.avatarUrl = await fileService.upload(files.avatar[0], 'profiles');
       if (files.idCardFront?.[0]) data.idCardFront = await fileService.upload(files.idCardFront[0], 'identity');

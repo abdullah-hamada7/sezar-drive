@@ -47,8 +47,12 @@ export default function DriverTrips() {
     try {
       await api.startTrip(id);
       load();
-    } catch (err) { addToast(err.message, 'error'); }
-    finally { setActionLoading(null); }
+    } catch (err) {
+      const code = err.errorCode || err.code;
+      addToast(code ? t(`errors.${code}`) : (err.message || t('common.error')), 'error');
+    } finally {
+      setActionLoading(null);
+    }
   }
 
   async function handleComplete(id) {
@@ -56,8 +60,12 @@ export default function DriverTrips() {
     try {
       await api.completeTrip(id);
       load();
-    } catch (err) { addToast(err.message, 'error'); }
-    finally { setActionLoading(null); }
+    } catch (err) {
+      const code = err.errorCode || err.code;
+      addToast(code ? t(`errors.${code}`) : (err.message || t('common.error')), 'error');
+    } finally {
+      setActionLoading(null);
+    }
   }
 
   if (loading) return <div className="loading-page"><div className="spinner"></div></div>;

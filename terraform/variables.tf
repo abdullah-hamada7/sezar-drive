@@ -24,3 +24,8 @@ variable "key_name" {
   description = "Name of the EC2 Key Pair for SSH access"
   type        = string
 }
+
+variable "domain_name" {
+  description = "The domain name for the application (e.g., example.com)"
+  type        = string
+}

@@ -21,8 +21,9 @@ function validateShiftTransition(from, to) {
 async function createShift(driverId, ipAddress) {
   // Check identity verified
   const driver = await prisma.user.findUnique({ where: { id: driverId } });
-    // Identity verification check removed as Admin-created drivers are implicitly verified.
-    // Biometric check happens at activateShift.
+  if (!driver.identityVerified) {
+    throw new ForbiddenError('IDENTITY_NOT_VERIFIED', 'Your identity must be verified by an administrator before you can start a shift.');
+  }
 
   // Check no active shift
   const existing = await prisma.shift.findFirst({
@@ -58,7 +59,7 @@ async function activateShift(shiftId, driverId, ipAddress) {
   const shift = await prisma.shift.findUnique({ where: { id: shiftId } });
   if (!shift) throw new NotFoundError('Shift');
   if (shift.driverId !== driverId) throw new ForbiddenError('FORBIDDEN', 'Not your shift');
-  
+
   validateShiftTransition(shift.status, 'Active');
 
   const { assignment } = await ShiftValidator.validateActivationPreconditions(shiftId, driverId);
@@ -106,7 +107,7 @@ async function closeShift(shiftId, driverId, ipAddress) {
   const shift = await prisma.shift.findUnique({ where: { id: shiftId } });
   if (!shift) throw new NotFoundError('Shift');
   if (shift.driverId !== driverId) throw new ForbiddenError('FORBIDDEN', 'Not your shift');
-  
+
   validateShiftTransition(shift.status, 'Closed');
 
   await ShiftValidator.validateClosurePreconditions(shiftId, driverId, shift.startedAt);
@@ -155,7 +156,7 @@ async function closeShift(shiftId, driverId, ipAddress) {
 async function adminCloseShift(shiftId, adminId, reason, ipAddress) {
   const shift = await prisma.shift.findUnique({ where: { id: shiftId } });
   if (!shift) throw new NotFoundError('Shift');
-  
+
   validateShiftTransition(shift.status, 'Closed');
 
   // Force-complete any active trips
@@ -171,7 +172,7 @@ async function adminCloseShift(shiftId, adminId, reason, ipAddress) {
         cancelledBy: adminId,
       },
     });
-    
+
     await AuditService.logOverride({
       actorId: adminId,
       actionType: 'trip.cancelled',

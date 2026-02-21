@@ -6,11 +6,11 @@ const prisma = require('../../config/database');
 async function getRevenueStats() {
   // In a real production app with massive data, we'd use raw SQL for aggregation or a dedicated analytics DB.
   // For this scale, Prisma groupBy or raw query is fine.
-  
+
   // For "Current Day Only":
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  
+
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
@@ -19,7 +19,7 @@ async function getRevenueStats() {
   // If we want "Daily Revenue" chart for *today*, maybe we show hourly breakdown?
   // Or if the requirement is just "the current day only", the existing chart might look weird if it expects 7 days.
   // BUT the PRD says: "Daily Revenue (Line chart) - Current Day View." => Implies hourly breakdown for today.
-  
+
   // Let's query hourly revenue for today.
   const rawRevenue = await prisma.$queryRaw`
     SELECT 
@@ -52,10 +52,10 @@ async function getRevenueStats() {
  */
 async function getActivityStats() {
   const totalDrivers = await prisma.user.count({ where: { role: 'driver', isActive: true } });
-  
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  
+
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
@@ -66,13 +66,13 @@ async function getActivityStats() {
       OR: [
         { createdAt: { gte: today, lt: tomorrow } },
         { closedAt: { gte: today, lt: tomorrow } },
-        { 
+        {
           createdAt: { lt: today },
           closedAt: null
         },
         {
-           createdAt: { lt: today },
-           closedAt: { gt: today }
+          createdAt: { lt: today },
+          closedAt: { gt: today }
         }
       ]
     },
@@ -126,15 +126,15 @@ async function getDriverWeeklyStats(driverId) {
 async function getSummaryStats() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  
+
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
   const [
-    totalDrivers, 
-    totalVehicles, 
-    totalTrips, 
-    activeShifts, 
+    totalDrivers,
+    totalVehicles,
+    totalTrips,
+    activeShifts,
     pendingExpenses,
     pendingVerifications,
     pendingDamagesTotal,
@@ -196,11 +196,90 @@ async function getSummaryStats() {
   };
 }
 
+/**
+ * Get shift performance breakdown for a specific driver.
+ */
+async function getDriverShiftStats(driverId) {
+  const shift = await prisma.shift.findFirst({
+    where: { driverId, status: 'Active' },
+    include: { trips: true }
+  });
+
+  if (!shift || !shift.startedAt) {
+    return [
+      { name: 'Active', value: 0, color: '#00E676' },
+      { name: 'Idle', value: 100, color: '#161B22' }
+    ];
+  }
+
+  const shiftDurationMinutes = (new Date() - new Date(shift.startedAt)) / (1000 * 60);
+
+  // Calculate active time from trips
+  let activeMinutes = 0;
+  for (const trip of shift.trips) {
+    if (trip.status === 'COMPLETED' && trip.actualStartTime && trip.actualEndTime) {
+      activeMinutes += (new Date(trip.actualEndTime) - new Date(trip.actualStartTime)) / (1000 * 60);
+    } else if (trip.status === 'IN_PROGRESS' && trip.actualStartTime) {
+      activeMinutes += (new Date() - new Date(trip.actualStartTime)) / (1000 * 60);
+    }
+  }
+
+  const activePercent = Math.min(100, Math.round((activeMinutes / shiftDurationMinutes) * 100));
+  const idlePercent = 100 - activePercent;
+
+  return [
+    { name: 'Active', value: activePercent, color: '#00E676' },
+    { name: 'Idle', value: idlePercent, color: '#161B22' },
+  ];
+}
+
+/**
+ * Get recent activity feed for a driver.
+ */
+async function getDriverActivity(driverId, limit = 10) {
+  const [trips, expenses] = await Promise.all([
+    prisma.trip.findMany({
+      where: { driverId },
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.expense.findMany({
+      where: { shift: { driverId } },
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+      include: { category: true }
+    })
+  ]);
+
+  const activity = [
+    ...trips.map(t => ({
+      id: `trip-${t.id}`,
+      type: 'trip',
+      title: `Trip to ${t.dropoffLocation}`,
+      amount: t.price,
+      status: t.status,
+      timestamp: t.createdAt
+    })),
+    ...expenses.map(e => ({
+      id: `exp-${e.id}`,
+      type: 'expense',
+      title: e.category?.name || 'Expense',
+      amount: -e.amount,
+      status: e.status,
+      timestamp: e.createdAt
+    }))
+  ];
+
+  return activity.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, limit);
+}
+
 module.exports = {
   getRevenueStats,
   getActivityStats,
   getDriverWeeklyStats,
-  getSummaryStats
+  getSummaryStats,
+  getDriverShiftStats,
+  getDriverActivity
 };
 
 

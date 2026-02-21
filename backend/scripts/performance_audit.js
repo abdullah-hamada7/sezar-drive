@@ -6,7 +6,7 @@ const { chromium } = require('playwright');
  */
 async function runAudit() {
   const browser = await chromium.launch({ headless: true });
-  const context = await browser.new_context();
+  const context = await browser.newContext();
   const page = await context.newPage();
 
   console.log('--- Performance Audit Started ---');
@@ -15,8 +15,13 @@ async function runAudit() {
   await page.goto('http://localhost:5173/login');
   
   // Simple login flow to reach dashboard
-  await page.fill('input[type="email"]', 'admin@trip.com');
-  await page.fill('input[type="password"]', 'Admin@123');
+  const adminEmail = process.env.PERF_ADMIN_EMAIL || process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.PERF_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD;
+  if (!adminEmail || !adminPassword) {
+    throw new Error('Missing PERF_ADMIN_EMAIL/PERF_ADMIN_PASSWORD (or ADMIN_EMAIL/ADMIN_PASSWORD)');
+  }
+  await page.fill('input[type="email"]', adminEmail);
+  await page.fill('input[type="password"]', adminPassword);
   await page.click('button[type="submit"]');
   
   await page.waitForURL('**/admin');
@@ -25,7 +30,7 @@ async function runAudit() {
   // Measure Dashboard Load
   const startTime = Date.now();
   await page.goto('http://localhost:5173/admin');
-  await page.wait_for_load_state('networkidle');
+  await page.waitForLoadState('networkidle');
   const loadTime = Date.now() - startTime;
 
   // Extract Web Vitals

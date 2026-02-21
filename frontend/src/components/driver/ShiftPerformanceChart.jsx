@@ -1,17 +1,33 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-
-const data = [
-  { name: 'Active', value: 35, color: '#00E676' }, // Emerald
-  { name: 'Idle', value: 15, color: '#161B22' },   // Slate (or darker)
-  { name: 'Break', value: 10, color: '#FF3D00' },  // Orange
-];
+import { statsService } from '../../services/stats.service';
 
 export default function ShiftPerformanceChart() {
+  const { t } = useTranslation();
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadStats() {
+      try {
+        const res = await statsService.getDriverShiftStats();
+        setData(res);
+      } catch (err) {
+        console.error('Failed to load shift performance:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadStats();
+  }, []);
+
+  if (loading) return <div className="card mb-md h-40 flex items-center justify-center text-muted">...</div>;
+
   return (
     <div className="card mb-md">
-       <h3 className="text-lg font-bold mb-sm" style={{ color: 'var(--color-primary)' }}>Shift Performance</h3>
-       <div style={{ height: 200, width: '100%' }}>
+      <h3 className="text-lg font-bold mb-sm" style={{ color: 'var(--color-primary)' }}>{t('driver_home.shift_performance')}</h3>
+      <div style={{ height: 200, width: '100%' }}>
         <ResponsiveContainer>
           <PieChart>
             <Pie
@@ -28,10 +44,10 @@ export default function ShiftPerformanceChart() {
               ))}
             </Pie>
             <Tooltip contentStyle={{ backgroundColor: '#161B22', borderColor: '#333', color: '#fff' }} />
-            <Legend verticalAlign="bottom" height={36}/>
+            <Legend verticalAlign="bottom" height={36} />
           </PieChart>
         </ResponsiveContainer>
-       </div>
+      </div>
     </div>
   );
 }

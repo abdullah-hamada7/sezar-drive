@@ -1,6 +1,10 @@
 require('dotenv').config();
 const { loadSecrets } = require('./config/secrets');
 
+function isTruthyEnv(name) {
+  return ['1', 'true', 'yes', 'y', 'on'].includes(String(process.env[name] || '').toLowerCase());
+}
+
 /**
  * Main application entry point
  */
@@ -10,15 +14,19 @@ async function startServer() {
     // This must happen BEFORE requiring app/config to ensure process.env is populated
     await loadSecrets();
 
-    // 2. Run database migrations automatically
     const { execSync } = require('child_process');
-    try {
-      console.log('Running database migrations...');
-      execSync('npx prisma migrate deploy', { stdio: 'inherit', cwd: '/app' });
-      console.log('✅ Migrations applied successfully');
-    } catch (err) {
-      console.error('❌ Migration failed:', err.message);
-      // Don't exit — the database schema may already be up to date
+    const appCwd = process.env.APP_CWD || process.cwd();
+
+    // 2. Optionally run database migrations (recommended: run in CI/CD, not at runtime)
+    if (isTruthyEnv('RUN_MIGRATIONS_ON_STARTUP')) {
+      try {
+        console.log('Running database migrations...');
+        execSync('npx prisma migrate deploy', { stdio: 'inherit', cwd: appCwd });
+        console.log('✅ Migrations applied successfully');
+      } catch (err) {
+        console.error('❌ Migration failed:', err.message);
+        // If you opt into runtime migrations, consider failing hard instead.
+      }
     }
 
     // 3. Load dependencies after env is ready
@@ -44,41 +52,15 @@ async function startServer() {
       }
     }
 
-    // 5. Auto-seed if no admin user exists (first deployment only)
-    try {
-      const adminCount = await prisma.user.count({ where: { role: 'admin' } });
-      if (adminCount === 0) {
-        console.log('No admin found — running seed...');
-        execSync('npm run seed', { stdio: 'inherit', cwd: '/app' });
+    // 5. Optionally run seed (recommended: run once, manually)
+    if (isTruthyEnv('RUN_SEED_ON_STARTUP')) {
+      try {
+        console.log('RUN_SEED_ON_STARTUP enabled — running seed...');
+        execSync('npm run seed', { stdio: 'inherit', cwd: appCwd });
         console.log('✅ Seed completed successfully');
-      } else {
-        console.log('✅ Admin user exists — skipping seed');
+      } catch (err) {
+        console.error('❌ Seed failed:', err.message);
       }
-    } catch (err) {
-      console.error('❌ Seed check/run failed:', err.message);
-    }
-
-    // 5b. Ensure expense categories exist (idempotent)
-    try {
-      const catCount = await prisma.expenseCategory.count();
-      if (catCount === 0) {
-        console.log('No expense categories found — seeding defaults...');
-        const defaultCategories = [
-          { name: 'Fuel', requiresApproval: false },
-          { name: 'Tolls', requiresApproval: false },
-          { name: 'Maintenance', requiresApproval: true },
-          { name: 'Car Wash', requiresApproval: false },
-          { name: 'Parking', requiresApproval: false },
-          { name: 'Meals', requiresApproval: true },
-          { name: 'Other', requiresApproval: true },
-        ];
-        for (const cat of defaultCategories) {
-          await prisma.expenseCategory.create({ data: cat });
-        }
-        console.log(`✅ ${defaultCategories.length} expense categories created`);
-      }
-    } catch (err) {
-      console.error('❌ Expense category seed failed:', err.message);
     }
 
     // 3. Create Server
@@ -101,7 +83,7 @@ async function startServer() {
     });
 
     // Handle graceful shutdown
-    setupGracefulShutdown(server);
+    setupGracefulShutdown(server, prisma);
 
   } catch (error) {
     console.error('FAILED TO START SERVER:', error);
@@ -112,18 +94,30 @@ async function startServer() {
 /**
  * Setup process signal handlers for graceful shutdown
  */
-function setupGracefulShutdown(server) {
+function setupGracefulShutdown(server, prisma) {
   const shutdown = (signal) => {
     console.log(`${signal} received. Shutting down gracefully...`);
     server.close(() => {
       console.log('Server closed.');
-      process.exit(0);
+      Promise.resolve()
+        .then(() => prisma?.$disconnect?.())
+        .catch(() => {})
+        .finally(() => process.exit(0));
     });
   };
 
   process.on('SIGTERM', () => shutdown('SIGTERM'));
   process.on('SIGINT', () => shutdown('SIGINT'));
 }
+
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled promise rejection:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught exception:', err);
+  process.exit(1);
+});
 
 // Kick off the server
 startServer();

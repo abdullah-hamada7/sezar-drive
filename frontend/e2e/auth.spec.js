@@ -1,11 +1,13 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Fleet Management E2E', () => {
-  const adminEmail = 'hossam@sezar.com';
-  const adminPassword = 'Hossam@2026';
+  const adminEmail = process.env.E2E_ADMIN_EMAIL;
+  const adminPassword = process.env.E2E_ADMIN_PASSWORD;
   const driverEmail = `e2e.driver.${Date.now()}@fleet.com`;
   const driverPassword = 'Password123!';
   const newDriverPassword = 'NewPass123!@';
+
+  test.skip(!adminEmail || !adminPassword, 'Set E2E_ADMIN_EMAIL and E2E_ADMIN_PASSWORD to run this test');
 
   test('Complete Admin & Driver Flow', async ({ page }) => {
     // 1. Admin Login

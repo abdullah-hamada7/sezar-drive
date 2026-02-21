@@ -50,8 +50,12 @@ export default function DriverInspection() {
       });
       setInspectionId(res.data.id);
       setStep('photos');
-    } catch (err) { addToast(err.message || t('common.error'), 'error'); }
-    finally { setLoading(false); }
+    } catch (err) {
+      const code = err.errorCode || err.code;
+      addToast(code ? t(`errors.${code}`) : (err.message || t('common.error')), 'error');
+    } finally {
+      setLoading(false);
+    }
   }
 
   function triggerPhotoCapture(direction) {
@@ -70,7 +74,10 @@ export default function DriverInspection() {
     try {
       await api.uploadInspectionPhoto(inspectionId, currentDirection, formData);
       setPhotos(prev => ({ ...prev, [currentDirection]: URL.createObjectURL(file) }));
-    } catch (err) { addToast(err.message || t('common.error'), 'error'); }
+    } catch (err) {
+      const code = err.errorCode || err.code;
+      addToast(code ? t(`errors.${code}`) : (err.message || t('common.error')), 'error');
+    }
 
     e.target.value = '';
   }
@@ -84,8 +91,12 @@ export default function DriverInspection() {
     try {
       await api.completeInspection(inspectionId, { checklistData: { checks, notes } });
       setStep('done');
-    } catch (err) { addToast(err.message || t('common.error'), 'error'); }
-    finally { setLoading(false); }
+    } catch (err) {
+      const code = err.errorCode || err.code;
+      addToast(code ? t(`errors.${code}`) : (err.message || t('common.error')), 'error');
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (!shift) {

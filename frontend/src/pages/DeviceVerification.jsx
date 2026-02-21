@@ -118,7 +118,8 @@ export default function DeviceVerificationPage() {
         setTimeout(() => navigate(res.data.role === 'admin' ? '/admin' : '/driver'), 1000);
         return;
       }
-      setError(err.message || t('common.error'));
+      const code = err.errorCode || err.code;
+      setError(code ? t(`errors.${code}`) : (err.message || t('common.error')));
     } finally {
       setLoading(false);
     }
@@ -133,12 +134,12 @@ export default function DeviceVerificationPage() {
 
       <div className="login-card glass-card">
         <div className="login-header">
-          <div className="login-logo glow-effect">
+          <div className="login-logo text-gradient shadow-glow">
             <ShieldAlert size={32} />
           </div>
-          <h1 className="login-title text-gradient">Device Security</h1>
+          <h1 className="login-title text-gradient">{t('auth.device_security_title')}</h1>
           <p className="login-subtitle">
-            First time logging in from this device? Let's verify it's you.
+            {t('auth.device_security_desc')}
           </p>
         </div>
 
@@ -154,9 +155,9 @@ export default function DeviceVerificationPage() {
               <CheckCircle2 size={48} />
             </div>
             <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--color-text)' }}>
-              Verified Successfully
+              {t('auth.verification_success_title')}
             </h2>
-            <p style={{ color: 'var(--color-text-muted)' }}>Redirecting you now...</p>
+            <p style={{ color: 'var(--color-text-muted)' }}>{t('auth.redirecting')}</p>
           </div>
         ) : (
           <div className="verification-camera-container" style={{ position: 'relative', borderRadius: '1rem', overflow: 'hidden', background: '#000', marginBottom: '1.5rem', aspectRatio: '3/4' }}>
@@ -164,7 +165,7 @@ export default function DeviceVerificationPage() {
               <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#fff', gap: '1rem' }}>
                 <Camera size={48} opacity={0.5} />
                 <button className="btn btn-primary" onClick={startCamera}>
-                  Start Camera
+                  {t('auth.start_camera')}
                 </button>
               </div>
             ) : (
@@ -184,7 +185,7 @@ export default function DeviceVerificationPage() {
                     style={{ borderRadius: '2rem', padding: '0.75rem 2rem' }}
                   >
                     {loading ? <RefreshCw size={20} className="animate-spin" /> : <Camera size={20} />}
-                    <span style={{ marginLeft: '0.5rem' }}>Verify Identity</span>
+                    <span style={{ marginLeft: '0.5rem' }}>{t('auth.verify_identity_btn')}</span>
                   </button>
                 </div>
               </>
@@ -198,7 +199,7 @@ export default function DeviceVerificationPage() {
             onClick={() => { stopCamera(); navigate('/login'); }}
             style={{ width: '100%' }}
           >
-            Cancel
+            {t('common.cancel')}
           </button>
         )}
       </div>

@@ -1,5 +1,5 @@
 output "public_ip" {
-  value = aws_instance.sezar_drive.public_ip
+  value = aws_eip.sezar_eip.public_ip
 }
 
 output "s3_bucket_name" {
@@ -7,5 +7,9 @@ output "s3_bucket_name" {
 }
 
 output "ssh_command" {
-  value = "ssh -i ${var.key_name}.pem ubuntu@${aws_instance.sezar_drive.public_ip}"
+  value = "ssh -i ${var.key_name}.pem ubuntu@${aws_eip.sezar_eip.public_ip}"
+}
+
+output "domain_endpoint" {
+  value = var.domain_name
 }

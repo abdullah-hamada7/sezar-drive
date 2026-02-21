@@ -6,6 +6,7 @@ const compression = require('compression');
 
 const rateLimit = require('express-rate-limit');
 const config = require('./config');
+const prisma = require('./config/database');
 const { attachIp } = require('./middleware/audit');
 const errorHandler = require('./middleware/errorHandler');
 const i18n = require('./middleware/i18n');
@@ -34,8 +35,9 @@ const auditRoutes = require('./modules/audit/audit.routes');
 
 const app = express();
 
-// Trust proxy for rate limiting behind Caddy
-app.set('trust proxy', 1);
+// Trust proxy only when behind a reverse proxy (e.g., Caddy)
+const trustProxy = config.isProduction || ['1', 'true', 'yes'].includes(String(process.env.TRUST_PROXY || '').toLowerCase());
+app.set('trust proxy', trustProxy ? 1 : false);
 
 app.use(
   helmet({
@@ -99,6 +101,16 @@ app.use(i18n);
 
 app.get('/api/v1/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Readiness: verifies basic DB connectivity.
+app.get('/api/v1/ready', async (req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({ status: 'ready', timestamp: new Date().toISOString() });
+  } catch (e) {
+    res.status(503).json({ status: 'not_ready', timestamp: new Date().toISOString() });
+  }
 });
 
 app.use('/api/v1/auth', authLimiter, authRoutes);

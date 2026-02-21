@@ -16,7 +16,6 @@ terraform {
     region       = "us-east-1"
     use_lockfile = true
     encrypt      = true
-    profile      = "abdullah"
   }
 
 }
@@ -30,8 +29,7 @@ locals {
 }
 
 provider "aws" {
-  region  = var.aws_region
-  profile = "abdullah"
+  region = var.aws_region
 }
 
 data "aws_caller_identity" "current" {}
@@ -192,5 +190,14 @@ resource "aws_instance" "sezar_drive" {
 
   tags = merge(local.common_tags, {
     Name = "${var.project_name}-server"
+  })
+}
+
+# --- DNS & Static IP ---
+resource "aws_eip" "sezar_eip" {
+  instance = aws_instance.sezar_drive.id
+  domain   = "vpc"
+  tags = merge(local.common_tags, {
+    Name = "${var.project_name}-eip"
   })
 }

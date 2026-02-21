@@ -44,5 +44,25 @@ router.get('/summary', authenticate, authorize('admin'), async (req, res, next) 
   }
 });
 
+// GET /api/v1/stats/my-shift
+router.get('/my-shift', authenticate, authorize('driver'), async (req, res, next) => {
+  try {
+    const data = await statsService.getDriverShiftStats(req.user.id);
+    res.json(data);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/v1/stats/my-activity
+router.get('/my-activity', authenticate, authorize('driver'), async (req, res, next) => {
+  try {
+    const data = await statsService.getDriverActivity(req.user.id);
+    res.json(data);
+  } catch (err) {
+    next(err);
+  }
+});
+
 module.exports = router;
 

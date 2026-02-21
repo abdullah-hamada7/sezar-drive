@@ -13,6 +13,7 @@
 **Decision:** Modular Monolith over Microservices
 
 **Justification:**
+
 | Factor | Monolith | Microservices |
 |--------|----------|---------------|
 | Domain coupling | High (fleet ops is cohesive) | Unnecessary isolation |
@@ -34,12 +35,16 @@ graph TB
     
     System["Fleet Management Platform<br/>(Modular Monolith)"]
     
+    DNS["External DNS<br/>(Manual/Cloudflare)"]
+    EIP["Elastic IP<br/>(Static IPv4)"]
     DB["PostgreSQL<br/>(Primary Database)"]
     S3["AWS S3<br/>(Object Storage)"]
     Rekognition["AWS Rekognition<br/>(Face Verification)"]
     
-    Admin -->|HTTPS REST API| System
-    Driver -->|HTTPS REST + WebSocket| System
+    Admin -->|HTTPS REST API| DNS
+    Driver -->|HTTPS REST + WebSocket| DNS
+    DNS --> EIP
+    EIP --> System
     System -->|SQL| DB
     System -->|AWS SDK| S3
     System -->|AWS SDK| Rekognition
@@ -48,6 +53,8 @@ graph TB
     style DB fill:#336791,color:#fff
     style S3 fill:#E8A838,color:#fff
     style Rekognition fill:#FF9900,color:#fff
+    style Route53 fill:#D6242D,color:#fff
+    style EIP fill:#D6242D,color:#fff
 ```
 
 ---
@@ -301,6 +308,7 @@ stateDiagram-v2
 ```
 
 **Standard Error Codes:**
+
 | HTTP | Code | Usage |
 |------|------|-------|
 | 400 | VALIDATION_ERROR | Input validation failure |
@@ -426,4 +434,5 @@ sequenceDiagram
 |---------|------|--------|--------|
 | 1.0 | 2026-02-14 | Initial architecture | Solutions Architect |
 | 1.1 | 2026-02-17 | Updated Shift/Trip states, Rekognition flow, and API mapping | Solutions Architect |
-| 1.1 | 2026-02-17 | Updated Shift/Trip states, Rekognition flow, and API mapping | Solutions Architect |
+| 1.2 | 2026-02-21 | Added Elastic IP for stable connectivity | Solutions Architect |
+| 1.3 | 2026-02-21 | Removed Route 53 to stay in Free Tier; shifted to External DNS | Solutions Architect |

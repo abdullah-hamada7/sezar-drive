@@ -64,31 +64,17 @@ export default defineConfig({
               }
             }
           },
-          {
-            urlPattern: ({ url }) => {
-              const isApi = url.pathname.startsWith('/api/');
-              const isAuth = url.pathname.includes('/auth/');
-              const isVerify = url.pathname.includes('/verify/');
-              return isApi && !isAuth && !isVerify;
-            },
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-cache',
-              networkTimeoutSeconds: 5,
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 // <== 24 hours
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
-          }
-        ],
+           {
+             urlPattern: ({ url }) => {
+              return url.pathname.startsWith('/api/');
+             },
+             // Security: do not cache API responses (they may be authenticated / sensitive)
+             handler: 'NetworkOnly',
+           }
+         ],
         // Safety: Unregister previous service workers
         cleanupOutdatedCaches: true,
-        // Fallback for offline (if using Workbox offline fallback plugin)
-        // For simplicity, we use NetworkFirst for all APIs which returns the last cached response.
+        // Note: API is NetworkOnly (no cached API responses).
       }
     })
   ],

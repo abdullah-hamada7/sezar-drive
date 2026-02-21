@@ -4,7 +4,6 @@ const crypto = require('crypto');
 const prisma = require('../../config/database');
 const config = require('../../config');
 const fileService = require('../../services/FileService');
-const emailService = require('../../services/EmailService');
 const faceVerificationService = require('../../services/FaceVerificationService');
 const { UnauthorizedError, ForbiddenError, ValidationError, ConflictError, NotFoundError } = require('../../errors');
 const AuditService = require('../../services/audit.service');
@@ -31,7 +30,7 @@ async function login(email, password, ipAddress, deviceFingerprint) {
   let requiresVerification = false;
   if (user.role === 'driver') {
     requiresVerification = true;
-    
+
     // Still track device used
     if (deviceFingerprint) {
       const device = await prisma.userDevice.findUnique({
@@ -96,7 +95,7 @@ async function verifyDevice(userId, deviceFingerprint, selfieBuffer, ipAddress) 
 
   // Face comparison using AWS Rekognition against Profile Photo
   const verification = await faceVerificationService.verify(user.avatarUrl, selfieBuffer);
-  
+
   if (verification.status !== 'VERIFIED') {
     throw new ForbiddenError('FACE_VERIFICATION_FAILED', 'Face verification failed. Please ensure your face is clearly visible and matches your profile photo.');
   }
@@ -229,19 +228,19 @@ async function uploadIdentityPhoto(driverId, { photoUrl, idCardFront, idCardBack
   });
 
   const verification = await prisma.identityVerification.create({
-    data: { 
-      driverId, 
-      photoUrl, 
-      idCardFront, 
+    data: {
+      driverId,
+      photoUrl,
+      idCardFront,
       idCardBack,
-      status: 'pending' 
+      status: 'pending'
     },
   });
 
   // Also update user profile photo reference and ID card references
   const updatedUser = await prisma.user.update({
     where: { id: driverId },
-    data: { 
+    data: {
       identityPhotoUrl: photoUrl,
       idCardFront,
       idCardBack
@@ -270,12 +269,12 @@ async function uploadIdentityPhoto(driverId, { photoUrl, idCardFront, idCardBack
  */
 async function reviewIdentity(id, adminId, action, rejectionReason, ipAddress) {
   let verification = await prisma.identityVerification.findFirst({
-    where: { 
+    where: {
       OR: [
         { id },
         { driverId: id }
       ],
-      status: 'pending' 
+      status: 'pending'
     },
   });
 
@@ -283,7 +282,7 @@ async function reviewIdentity(id, adminId, action, rejectionReason, ipAddress) {
   if (!verification && action === 'approve') {
     const driver = await prisma.user.findUnique({ where: { id: id } });
     if (!driver || driver.role !== 'driver') throw new NotFoundError('Driver');
-    
+
     verification = await prisma.identityVerification.create({
       data: {
         driverId: id,
@@ -347,7 +346,7 @@ async function reviewIdentity(id, adminId, action, rejectionReason, ipAddress) {
  */
 async function getPendingVerifications(query = {}) {
   const { sortBy = 'createdAt', sortOrder = 'asc', status, name } = query;
-  
+
   const validSortFields = ['createdAt', 'updatedAt'];
   const sortField = validSortFields.includes(sortBy) ? sortBy : 'createdAt';
   const order = sortOrder === 'desc' ? 'desc' : 'asc';
@@ -355,7 +354,7 @@ async function getPendingVerifications(query = {}) {
   const where = {};
   if (status && status !== 'all') where.status = status;
   if (!status) where.status = 'pending'; // Default to pending if not specified
-  
+
   if (name) {
     where.driver = {
       name: { contains: name, mode: 'insensitive' }
@@ -373,7 +372,7 @@ async function getPendingVerifications(query = {}) {
     if (v.driver) v.driver = await fileService.signDriverUrls(v.driver);
     return v;
   }));
-  
+
   return signed;
 }
 
@@ -437,7 +436,7 @@ function sanitizeUser(user) {
  */
 async function updatePreferences(userId, data, ipAddress) {
   const { languagePreference } = data;
-  
+
   const updatedUser = await prisma.user.update({
     where: { id: userId },
     data: { languagePreference },
@@ -452,45 +451,12 @@ async function updatePreferences(userId, data, ipAddress) {
     ipAddress,
   });
 
-  return { 
+  return {
     user: await fileService.signDriverUrls(sanitizeUser(updatedUser)),
     message: 'Preferences updated successfully'
   };
 }
 
-/**
- * Forgot Password - Send reset link.
- */
-async function forgotPassword(email, ipAddress) {
-  const user = await prisma.user.findUnique({ where: { email } });
-  
-  // Generic response even if user not found for security
-  if (!user || !user.isActive) {
-    console.log(`Password reset requested for ${email} (User not found or inactive)`);
-    return { message: 'If an account with that email exists, a reset link has been sent.' };
-  }
-
-  const resetToken = jwt.sign(
-    { id: user.id, email: user.email, type: 'password_reset' },
-    config.jwtSecret,
-    { expiresIn: '10m' }
-  );
-
-  const resetLink = `${config.frontendUrl}/reset-password?token=${resetToken}`;
-  
-  // Send email via service (Resend or Console Mock)
-  await emailService.sendPasswordReset(email, resetLink);
-
-  await AuditService.log({
-    actorId: user.id,
-    actionType: 'auth.forgot_password_requested',
-    entityType: 'auth',
-    entityId: user.id,
-    ipAddress,
-  });
-
-  return { message: 'If an account with that email exists, a reset link has been sent.' };
-}
 
 /**
  * Verify reset token.
@@ -499,7 +465,7 @@ async function verifyResetToken(token) {
   try {
     const decoded = jwt.verify(token, config.jwtSecret);
     if (decoded.type !== 'password_reset') throw new Error('Invalid token type');
-    
+
     const user = await prisma.user.findUnique({ where: { id: decoded.id } });
     if (!user || !user.isActive) throw new Error('User not found');
 
@@ -547,7 +513,6 @@ module.exports = {
   getPendingVerifications,
   getMe,
   updatePreferences,
-  forgotPassword,
   verifyResetToken,
   resetPassword,
 };

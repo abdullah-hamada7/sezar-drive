@@ -30,9 +30,9 @@ router.post(
     try {
       handleValidation(req);
       const result = await authService.login(
-        req.body.email, 
-        req.body.password, 
-        req.clientIp, 
+        req.body.email,
+        req.body.password,
+        req.clientIp,
         req.body.deviceFingerprint
       );
       res.json(result);
@@ -52,13 +52,13 @@ router.post(
   ],
   async (req, res, next) => {
     try {
-      console.log(`[VERIFY_LOG] Request Data: ${JSON.stringify({ 
-        body: req.body, 
-        file: req.file ? { name: req.file.originalname, size: req.file.size } : 'Missing' 
+      console.log(`[VERIFY_LOG] Request Data: ${JSON.stringify({
+        body: req.body,
+        file: req.file ? { name: req.file.originalname, size: req.file.size } : 'Missing'
       })}`);
       handleValidation(req);
       if (!req.file) throw new ValidationError('Selfie photo is required');
-      
+
       const result = await authService.verifyDevice(
         req.body.userId,
         req.body.deviceFingerprint,
@@ -223,22 +223,6 @@ router.put(
     }
   }
 );
-
-// ─── POST /api/v1/auth/forgot-password ───────────
-// ─── POST /api/v1/auth/forgot-password ───────────
-// router.post(
-//   '/forgot-password',
-//   [body('email').isEmail().normalizeEmail()],
-//   async (req, res, next) => {
-//     try {
-//       handleValidation(req);
-//       const result = await authService.forgotPassword(req.body.email, req.clientIp);
-//       res.json(result);
-//     } catch (err) {
-//       next(err);
-//     }
-//   }
-// );
 
 // ─── GET /api/v1/auth/verify-reset-token ───────────
 router.get(

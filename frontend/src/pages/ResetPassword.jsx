@@ -21,8 +21,8 @@ export default function ResetPasswordPage() {
   const [success, setSuccess] = useState(false);
 
   const getErrorMessage = useCallback((err) => {
-    if (err.code === 'INVALID_RESET_TOKEN') return t('auth.invalid_token');
-    if (err.code === 'VALIDATION_ERROR') return err.message; // Custom message usually localized in backend or generic enough
+    const code = err.errorCode || err.code;
+    if (code) return t(`errors.${code}`);
     return err.message || t('common.error');
   }, [t]);
 

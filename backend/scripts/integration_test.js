@@ -4,6 +4,14 @@ const path = require('path');
 
 const API_URL = 'http://localhost:3000/api/v1';
 
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@example.com';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
+if (!ADMIN_PASSWORD) {
+  console.error('Missing ADMIN_PASSWORD env var. Refusing to run.');
+  process.exit(1);
+}
+
 // Helpers
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -16,7 +24,7 @@ async function runTests() {
   let adminToken;
   try {
     const res = await agent.post('/auth/login')
-      .send({ email: 'hossam@sezar.com', password: 'Hossam@2026' }); // Correct from seed.js
+      .send({ email: ADMIN_EMAIL, password: ADMIN_PASSWORD });
       
     if (res.status !== 200) {
         // Try 'password123' if admin123 fails, checks seed.js content

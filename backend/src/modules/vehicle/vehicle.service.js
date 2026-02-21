@@ -9,26 +9,36 @@ async function createVehicle(data, adminId, ipAddress) {
   const plateNumber = data.plateNumber || data.plate;
   const qrCode = data.qrCode || data.qrIdentifier;
 
-  const vehicle = await prisma.vehicle.create({
-    data: {
-      plateNumber,
-      model: data.model,
-      year: data.year,
-      capacity: data.capacity || 4,
-      qrCode,
-    },
-  });
+  try {
+    const vehicle = await prisma.vehicle.create({
+      data: {
+        plateNumber,
+        model: data.model,
+        year: data.year,
+        capacity: data.capacity || 4,
+        qrCode,
+      },
+    });
 
-  await AuditService.log({
-    actorId: adminId,
-    actionType: 'vehicle.created',
-    entityType: 'vehicle',
-    entityId: vehicle.id,
-    newState: data,
-    ipAddress,
-  });
+    await AuditService.log({
+      actorId: adminId,
+      actionType: 'vehicle.created',
+      entityType: 'vehicle',
+      entityId: vehicle.id,
+      newState: data,
+      ipAddress,
+    });
 
-  return vehicle;
+    return vehicle;
+  } catch (err) {
+    if (err.code === 'P2002') {
+      const target = err.meta?.target || [];
+      if (target.includes('plateNumber')) throw new ConflictError('VEHICLE_PLATE_EXISTS', 'Vehicle with this plate number already exists');
+      if (target.includes('qrCode')) throw new ConflictError('VEHICLE_QR_EXISTS', 'Vehicle with this QR code already exists');
+      throw new ConflictError('VEHICLE_ALREADY_EXISTS', 'A vehicle with this plate or QR already exists');
+    }
+    throw err;
+  }
 }
 
 /**
@@ -78,27 +88,46 @@ async function updateVehicle(id, data, adminId, ipAddress) {
   const vehicle = await prisma.vehicle.findUnique({ where: { id } });
   if (!vehicle) throw new NotFoundError('Vehicle');
 
-  const previousState = { model: vehicle.model, year: vehicle.year, capacity: vehicle.capacity };
-  const updated = await prisma.vehicle.update({
-    where: { id },
-    data: {
-      ...(data.model && { model: data.model }),
-      ...(data.year && { year: data.year }),
-      ...(data.capacity && { capacity: data.capacity }),
-    },
-  });
+  const previousState = {
+    plateNumber: vehicle.plateNumber,
+    model: vehicle.model,
+    year: vehicle.year,
+    capacity: vehicle.capacity,
+    qrCode: vehicle.qrCode
+  };
 
-  await AuditService.log({
-    actorId: adminId,
-    actionType: 'vehicle.updated',
-    entityType: 'vehicle',
-    entityId: id,
-    previousState,
-    newState: data,
-    ipAddress,
-  });
+  try {
+    const updated = await prisma.vehicle.update({
+      where: { id },
+      data: {
+        ...(data.plateNumber && { plateNumber: data.plateNumber }),
+        ...(data.model && { model: data.model }),
+        ...(data.year && { year: data.year }),
+        ...(data.capacity && { capacity: data.capacity }),
+        ...(data.qrCode && { qrCode: data.qrCode }),
+      },
+    });
 
-  return updated;
+    await AuditService.log({
+      actorId: adminId,
+      actionType: 'vehicle.updated',
+      entityType: 'vehicle',
+      entityId: id,
+      previousState,
+      newState: data,
+      ipAddress,
+    });
+
+    return updated;
+  } catch (err) {
+    if (err.code === 'P2002') {
+      const target = err.meta?.target || [];
+      if (target.includes('plateNumber')) throw new ConflictError('VEHICLE_PLATE_EXISTS', 'Vehicle with this plate number already exists');
+      if (target.includes('qrCode')) throw new ConflictError('VEHICLE_QR_EXISTS', 'Vehicle with this QR code already exists');
+      throw new ConflictError('VEHICLE_ALREADY_EXISTS', 'A vehicle with this plate or QR already exists');
+    }
+    throw err;
+  }
 }
 
 /**
@@ -106,10 +135,10 @@ async function updateVehicle(id, data, adminId, ipAddress) {
  */
 async function validateQrCode(qrCode) {
   // Use findFirst with insensitive mode for better UX
-  const vehicle = await prisma.vehicle.findFirst({ 
-    where: { 
-      qrCode: { equals: qrCode, mode: 'insensitive' } 
-    } 
+  const vehicle = await prisma.vehicle.findFirst({
+    where: {
+      qrCode: { equals: qrCode, mode: 'insensitive' }
+    }
   });
   if (!vehicle || !vehicle.isActive) throw new NotFoundError('Vehicle with this QR code');
   if (['damaged', 'maintenance'].includes(vehicle.status)) {
@@ -167,7 +196,7 @@ async function assignVehicle(vehicleId, driverId, shiftId, adminId, ipAddress) {
       newState: { driverId, shiftId },
       ipAddress,
     }, tx);
-    
+
     return assignment;
   });
 }

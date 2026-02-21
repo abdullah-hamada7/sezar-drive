@@ -105,20 +105,21 @@ export default function DriversPage() {
     }
 
     try {
+      const formData = new FormData();
+      formData.append('name', form.name);
+      formData.append('phone', form.phone);
+      if (form.licenseNumber) formData.append('licenseNumber', form.licenseNumber);
+      if (form.password) formData.append('password', form.password);
+
+      if (files.avatar) formData.append('avatar', files.avatar);
+      if (files.idCardFront) formData.append('idCardFront', files.idCardFront);
+      if (files.idCardBack) formData.append('idCardBack', files.idCardBack);
+
       if (editDriver) {
-        const formData = new FormData();
-        formData.append('name', form.name);
-        formData.append('phone', form.phone);
-        if (form.licenseNumber) formData.append('licenseNumber', form.licenseNumber);
-        if (form.password) formData.append('password', form.password);
-
-        if (files.avatar) formData.append('avatar', files.avatar);
-        if (files.idCardFront) formData.append('idCardFront', files.idCardFront);
-        if (files.idCardBack) formData.append('idCardBack', files.idCardBack);
-
         await api.updateDriver(editDriver.id, formData);
       } else {
-        await api.createDriver(form);
+        formData.append('email', form.email);
+        await api.createDriver(formData);
       }
       setShowModal(false);
       load();
@@ -131,7 +132,8 @@ export default function DriversPage() {
         setFieldErrors(prev => ({ ...prev, ...backendErrs }));
         setError(t('common.errors.validation_failed'));
       } else {
-        addToast(err.message || t('drivers.messages.op_failed'), 'error');
+        const msg = err.errorCode ? t(`errors.${err.errorCode}`) : (err.message || t('drivers.messages.op_failed'));
+        setError(msg);
       }
     }
   }
@@ -154,7 +156,8 @@ export default function DriversPage() {
       }
       load();
     } catch (err) {
-      addToast(err.message || t('common.error'), 'error');
+      const msg = err.errorCode ? t(`errors.${err.errorCode}`) : (err.message || t('common.error'));
+      addToast(msg, 'error');
     }
   }
 

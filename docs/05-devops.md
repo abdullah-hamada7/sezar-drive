@@ -56,7 +56,7 @@ The production environment is managed via Terraform (`infrastructure/terraform/`
    # Run migrations
    docker-compose exec backend npx prisma migrate deploy
 
-   # Seed initial data (Admin user, demo driver, vehicles)
+   # Seed initial data (Admin user + default expense categories)
    docker-compose exec backend npm run seed
    ```
 
@@ -67,6 +67,7 @@ The production environment is managed via Terraform (`infrastructure/terraform/`
 
 ## Environment Variables
 
-Ensure `.env` files are present in `backend/` directory. See `.env.example` using key:
+Ensure your environment variables are set. For Compose-based dev/prod, place them in a root `.env`.
+For running the backend directly, you can use `backend/.env`.
 
-- `DATABASE_URL`: `postgresql://postgres:postgres@postgres:5432/sezar_drive?schema=public` (Note hostname `postgres` for internal docker network)
+- `DATABASE_URL`: `postgresql://postgres:postgres@postgres:5432/sezar_drive?schema=public&connection_limit=10&pool_timeout=10` (hostname `postgres` works on the internal docker network)

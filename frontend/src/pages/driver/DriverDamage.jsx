@@ -73,8 +73,11 @@ export default function DriverDamage() {
 
       setStep('success');
     } catch (err) {
-      // Handled by HttpService
-    } finally { setLoading(false); }
+      const code = err.errorCode || err.code;
+      if (code) addToast(t(`errors.${code}`), 'error');
+    } finally {
+      setLoading(false);
+    }
   }
 
   function addPhoto(e) {

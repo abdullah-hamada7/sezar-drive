@@ -56,6 +56,16 @@ function errorHandler(err, req, res, next) {
     });
   }
 
+  // CORS rejections from the cors origin callback
+  if (typeof err.message === 'string' && err.message.startsWith('CORS blocked for origin:')) {
+    return res.status(403).json({
+      error: {
+        code: 'CORS_BLOCKED',
+        message: 'Origin is not allowed',
+      },
+    });
+  }
+
   // Unknown errors — mask details in production
   const statusCode = err.statusCode || 500;
 

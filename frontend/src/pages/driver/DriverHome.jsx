@@ -27,7 +27,8 @@ export default function DriverHome() {
         addToast(t('driver_home.status_refreshed'), 'success');
       }
     } catch (err) {
-      addToast(err.message || t('common.error'), 'error');
+      const code = err.errorCode || err.code;
+      addToast(code ? t(`errors.${code}`) : (err.message || t('common.error')), 'error');
     }
   }, [t, updateUser, addToast]);
 
@@ -57,7 +58,6 @@ export default function DriverHome() {
 
   return (
     <div>
-      {/* Identity & Biometric Gate Removed - Admin Verification Assumed */}
 
       {/* Profile & Avatar */}
       <div className="card glass-card mb-md flex items-center justify-between">
