@@ -97,7 +97,7 @@ export default function TrackingPage() {
 
   async function loadInitialPositions() {
     try {
-      const { vehicleService: api } = await import('../../services/vehicle.service');
+      const { trackingService: api } = await import('../../services/tracking.service');
       const res = await api.getActiveDrivers();
       const formatted = (res.data || []).map(d => ({
         id: d.id,
