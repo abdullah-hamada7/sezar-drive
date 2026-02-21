@@ -163,10 +163,33 @@ Since we are staying in the **AWS Free Tier**, we manage DNS externally.
 
 ---
 
-## Phase 8: Teardown (Optional)
+---
+
+## Phase 8: Modifying Infrastructure (e.g., Change Instance Type)
+
+If you need to change the server's CPU/RAM (Instance Type), Terraform can handle this automatically.
+
+1. **Edit Configuration**: Open `terraform/terraform.tfvars` and update the `instance_type` (e.g., from `t3-micro` to `c7i-flex.large`).
+2. **Apply Changes**:
+
+    ```bash
+    cd terraform
+    terraform apply
+    ```
+
+    Terraform will show a plan to **replace** the instance.
+3. **Re-deploy Application**: Since the instance is new, you must follow **Phase 4, 5, and 6** again to install Docker, clone the code, and start the containers.
+
+> [!WARNING]
+> Replacing the instance will wipe any data stored *locally* on the server. Ensure your database is backed up or using an external volume if data persistence is critical.
+
+---
+
+## Phase 9: Teardown
 
 To delete everything and stop costs:
 
 ```bash
+cd terraform
 terraform destroy
 ```
