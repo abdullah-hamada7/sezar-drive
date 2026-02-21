@@ -1,9 +1,8 @@
 {
     email {$EMAIL_FOR_SSL}
-    auto_https off
 }
 
-:80 {
+{$DOMAIN_NAME} {
     # ─── Backend API ───
     handle /api/* {
         reverse_proxy backend:3000
