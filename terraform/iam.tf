@@ -91,7 +91,7 @@ resource "aws_iam_role_policy" "secrets_access" {
           "ssm:GetParameters",
           "ssm:GetParameterHistory"
         ]
-        Effect   = "Allow"
+        Effect = "Allow"
         Resource = [
           aws_secretsmanager_secret.app_secrets.arn,
           "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/${var.project_name}/prod/*"

@@ -13,7 +13,7 @@ resource "random_password" "db_password" {
 }
 
 resource "random_password" "jwt_secret" {
-  length = 64
+  length  = 64
   special = true
 }
 
@@ -27,8 +27,8 @@ resource "aws_secretsmanager_secret_version" "app_secrets_val" {
 
 # SSM Parameter Store for non-sensitive configuration
 resource "aws_ssm_parameter" "db_url" {
-  name  = "/${var.project_name}/prod/DATABASE_URL"
-  type  = "String"
+  name = "/${var.project_name}/prod/DATABASE_URL"
+  type = "String"
   # Host must be the Docker service name 'postgres' (NOT the EC2 IP)
   # because the backend runs inside Docker alongside the database container.
   value = "postgresql://postgres:${random_password.db_password.result}@postgres:5432/sezar_drive"
