@@ -78,7 +78,7 @@ export default function DriverHome() {
           </div>
         </div>
         <div style={{ position: 'relative' }}>
-          <button className="btn-icon" onClick={() => setShowDetails(true)} title={t('driver.view_details')}>
+          <button className="btn-icon" onClick={() => setShowDetails(true)} title={t('drivers.modal.details_title')}>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
           </button>
         </div>
