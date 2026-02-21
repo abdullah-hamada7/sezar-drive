@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useCallback, useContext } from 'react';
-import api from '../services/api';
+import { shiftService as api } from '../services/shift.service';
 import { useAuth } from '../hooks/useAuth';
 
 const ShiftContext = createContext();

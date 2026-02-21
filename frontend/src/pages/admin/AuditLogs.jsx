@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import api from '../../services/api';
+import { auditService as api } from '../../services/audit.service';
 import { Shield, Search, Filter, Eye, X, Calendar, User, Tag } from 'lucide-react';
 
 export default function AuditPage() {
@@ -61,7 +61,7 @@ export default function AuditPage() {
       const translatedKey = t(`audit.fields.${key}`, key);
       let translatedValue = value;
       if (key === 'status') {
-         translatedValue = t(`common.status.${String(value).toLowerCase()}`, String(value));
+        translatedValue = t(`common.status.${String(value).toLowerCase()}`, String(value));
       }
       translated[translatedKey] = translatedValue;
     }
@@ -105,14 +105,14 @@ export default function AuditPage() {
           </div>
         </div>
         <div className="flex gap-sm mt-md">
-           <div className="form-group" style={{ marginBottom: 0, flex: 1 }}>
-             <label className="form-label flex items-center gap-sm"><User size={14} /> {t('audit.filter.actor_search')}</label>
-             <input type="text" className="form-input" name="actorSearch" placeholder={t('audit.filter.actor_ph')} value={filters.actorSearch} onChange={handleFilterChange} />
-           </div>
-           <button className="btn btn-secondary" style={{ alignSelf: 'flex-end' }} onClick={() => {
-             setFilters({ entityType: '', actionType: '', startDate: '', endDate: '', actorSearch: '' });
-             setPage(1);
-           }}>{t('audit.filter.clear_btn')}</button>
+          <div className="form-group" style={{ marginBottom: 0, flex: 1 }}>
+            <label className="form-label flex items-center gap-sm"><User size={14} /> {t('audit.filter.actor_search')}</label>
+            <input type="text" className="form-input" name="actorSearch" placeholder={t('audit.filter.actor_ph')} value={filters.actorSearch} onChange={handleFilterChange} />
+          </div>
+          <button className="btn btn-secondary" style={{ alignSelf: 'flex-end' }} onClick={() => {
+            setFilters({ entityType: '', actionType: '', startDate: '', endDate: '', actorSearch: '' });
+            setPage(1);
+          }}>{t('audit.filter.clear_btn')}</button>
         </div>
       </div>
 
@@ -220,11 +220,11 @@ export default function AuditPage() {
             <div className="grid grid-2" style={{ gap: '1.5rem' }}>
               <div>
                 <label className="form-label" style={{ color: 'var(--color-danger)' }}>{t('audit.modal.prev_state')}</label>
-                <div dir={i18n.language === 'ar' ? 'rtl' : 'ltr'} style={{ 
-                  background: 'var(--color-bg)', 
-                  padding: '1rem', 
-                  borderRadius: 'var(--radius-md)', 
-                  fontSize: '0.85rem', 
+                <div dir={i18n.language === 'ar' ? 'rtl' : 'ltr'} style={{
+                  background: 'var(--color-bg)',
+                  padding: '1rem',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '0.85rem',
                   overflowX: 'auto',
                   border: '1px solid var(--color-border)',
                   color: 'var(--color-text)'
@@ -234,12 +234,12 @@ export default function AuditPage() {
               </div>
               <div>
                 <label className="form-label" style={{ color: 'var(--color-success)' }}>{t('audit.modal.new_state')}</label>
-                <div dir={i18n.language === 'ar' ? 'rtl' : 'ltr'} style={{ 
-                  background: 'var(--color-bg)', 
-                  padding: '1rem', 
-                  borderRadius: 'var(--radius-md)', 
-                  fontSize: '0.85rem', 
-                  overflowX: 'auto', 
+                <div dir={i18n.language === 'ar' ? 'rtl' : 'ltr'} style={{
+                  background: 'var(--color-bg)',
+                  padding: '1rem',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '0.85rem',
+                  overflowX: 'auto',
                   border: '1px solid var(--color-border)',
                   color: 'var(--color-text)'
                 }}>
@@ -251,11 +251,11 @@ export default function AuditPage() {
             {selected.metadata && (
               <div className="mt-lg">
                 <label className="form-label">{t('audit.modal.metadata')}</label>
-                <pre dir="ltr" style={{ 
-                  background: 'var(--color-bg-tertiary)', 
-                  padding: '1rem', 
-                  borderRadius: 'var(--radius-md)', 
-                  fontSize: '0.75rem', 
+                <pre dir="ltr" style={{
+                  background: 'var(--color-bg-tertiary)',
+                  padding: '1rem',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '0.75rem',
                   border: '1px solid var(--color-border)'
                 }}>
                   {JSON.stringify(selected.metadata, null, 2)}

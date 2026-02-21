@@ -97,7 +97,7 @@ export default function TrackingPage() {
 
   async function loadInitialPositions() {
     try {
-      const { default: api } = await import('../../services/api');
+      const { vehicleService: api } = await import('../../services/vehicle.service');
       const res = await api.getActiveDrivers();
       const formatted = (res.data || []).map(d => ({
         id: d.id,
@@ -114,8 +114,8 @@ export default function TrackingPage() {
   }
 
   function formatTime(d) {
-     if (!d) return '—';
-     return new Date(d).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' });
+    if (!d) return '—';
+    return new Date(d).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' });
   }
 
   const defaultCenter = [24.7136, 46.6753]; // Riyadh

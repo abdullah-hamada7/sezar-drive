@@ -1,16 +1,47 @@
 require('dotenv').config();
-const http = require('http');
-const app = require('./app');
-const config = require('./config');
-const { initWebSocketServer } = require('./modules/tracking/tracking.ws');
+const { loadSecrets } = require('./config/secrets');
 
-const server = http.createServer(app);
+/**
+ * Main application entry point
+ */
+async function startServer() {
+  try {
+    // 1. Load secrets from AWS if in production
+    // This must happen BEFORE requiring app/config to ensure process.env is populated
+    await loadSecrets();
 
-// Initialize WebSocket for real-time tracking
-initWebSocketServer(server);
+    // 2. Load dependencies after env is ready
+    const http = require('http');
+    const app = require('./app');
+    const config = require('./config');
+    const prisma = require('./config/database');
+    const { initWebSocketServer } = require('./modules/tracking/tracking.ws');
 
-server.listen(config.port, () => {
-  console.log(`
+    // 2.1 Explicitly connect to database with retries
+    let connected = false;
+    let retries = 5;
+    while (!connected && retries > 0) {
+      try {
+        await prisma.$connect();
+        console.log('✅ Database connected successfully');
+        connected = true;
+      } catch (err) {
+        retries -= 1;
+        console.error(`❌ Database connection failed (${err.message}). Retries left: ${retries}`);
+        if (retries === 0) throw err;
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+      }
+    }
+
+    // 3. Create Server
+    const server = http.createServer(app);
+
+    // 4. Initialize WebSocket
+    initWebSocketServer(server);
+
+    // 5. Start Listening
+    server.listen(config.port, () => {
+      console.log(`
 ╔══════════════════════════════════════════════════╗
 ║  Fleet Management API Server                     ║
 ║  Environment: ${config.nodeEnv.padEnd(35)}║
@@ -18,23 +49,33 @@ server.listen(config.port, () => {
 ║  API: http://localhost:${config.port}/api/v1${' '.repeat(17)}║
 ║  WebSocket: ws://localhost:${config.port}/ws/tracking${' '.repeat(8)}║
 ╚══════════════════════════════════════════════════╝
-  `);
-});
+      `);
+    });
 
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received. Shutting down gracefully...');
-  server.close(() => {
-    console.log('Server closed.');
-    process.exit(0);
-  });
-});
+    // Handle graceful shutdown
+    setupGracefulShutdown(server);
 
-process.on('SIGINT', () => {
-  console.log('SIGINT received. Shutting down...');
-  server.close(() => {
-    process.exit(0);
-  });
-});
+  } catch (error) {
+    console.error('FAILED TO START SERVER:', error);
+    process.exit(1);
+  }
+}
 
-module.exports = server;
+/**
+ * Setup process signal handlers for graceful shutdown
+ */
+function setupGracefulShutdown(server) {
+  const shutdown = (signal) => {
+    console.log(`${signal} received. Shutting down gracefully...`);
+    server.close(() => {
+      console.log('Server closed.');
+      process.exit(0);
+    });
+  };
+
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
+}
+
+// Kick off the server
+startServer();

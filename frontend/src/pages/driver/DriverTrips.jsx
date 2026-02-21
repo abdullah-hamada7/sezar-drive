@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import api from '../../services/api';
+import { tripService as api } from '../../services/trip.service';
 import { Route, Play, CheckCircle, MapPin, Clock, Phone, User, AlertTriangle } from 'lucide-react';
 import { ToastContext } from '../../contexts/toastContext';
 import { useShift } from '../../contexts/ShiftContext';
@@ -102,28 +102,28 @@ export default function DriverTrips() {
                     <span className="text-sm text-muted">{new Date(trip.scheduledTime).toLocaleString()}</span>
                   </div>
                 )}
-                
+
                 {/* Passenger Info */}
                 {trip.passengers && trip.passengers.length > 0 && (
-                   <div style={{ marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid #eee' }}>
-                      <div className="text-xs font-bold text-muted uppercase mb-xs">{t('trip.passenger')}</div>
-                      <div className="flex items-center justify-between">
-                         <div className="flex items-center gap-sm">
-                            <User size={14} />
-                            <span className="text-sm">{trip.passengers[0].name || t('trip.passenger')}</span>
-                         </div>
-                         <div className="flex items-center gap-sm text-primary">
-                            <Phone size={14} />
-                            <a href={`tel:${trip.passengers[0].phone}`} className="text-sm font-medium" style={{ textDecoration: 'none', color: 'inherit' }}>
-                                {trip.passengers[0].phone || t('trip.no_phone')}
-                            </a>
-                         </div>
-                         <div className="flex items-center gap-sm text-muted">
-                            <span className="text-sm font-medium">{t('trip.bags')}: {trip.passengers[0].bags || 0}</span>
-                         </div>
+                  <div style={{ marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid #eee' }}>
+                    <div className="text-xs font-bold text-muted uppercase mb-xs">{t('trip.passenger')}</div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-sm">
+                        <User size={14} />
+                        <span className="text-sm">{trip.passengers[0].name || t('trip.passenger')}</span>
                       </div>
-                   </div>
-                 )}
+                      <div className="flex items-center gap-sm text-primary">
+                        <Phone size={14} />
+                        <a href={`tel:${trip.passengers[0].phone}`} className="text-sm font-medium" style={{ textDecoration: 'none', color: 'inherit' }}>
+                          {trip.passengers[0].phone || t('trip.no_phone')}
+                        </a>
+                      </div>
+                      <div className="flex items-center gap-sm text-muted">
+                        <span className="text-sm font-medium">{t('trip.bags')}: {trip.passengers[0].bags || 0}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {trip.status === 'ASSIGNED' && (

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './useAuth';
-import api from '../services/api';
+import { driverService as api } from '../services/driver.service';
 
 /**
  * Custom hook to handle language switching logic across the application.
@@ -12,13 +12,13 @@ export function useLanguage() {
 
   const toggleLanguage = async () => {
     const nextLang = i18n.language === 'ar' ? 'en' : 'ar';
-    
+
     // 1. Update i18next local state
     i18n.changeLanguage(nextLang);
-    
+
     // 2. Update Auth Context (UI responsiveness)
     updateUser({ languagePreference: nextLang });
-    
+
     // 3. Persist to Backend
     try {
       await api.updatePreferences({ languagePreference: nextLang });

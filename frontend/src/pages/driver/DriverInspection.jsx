@@ -1,6 +1,6 @@
 import { useState, useRef, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import api from '../../services/api';
+import { inspectionService as api } from '../../services/inspection.service';
 import { Camera, CheckCircle, Upload, ChevronRight, AlertCircle } from 'lucide-react';
 import { ToastContext } from '../../contexts/toastContext';
 import { useShift } from '../../contexts/ShiftContext';
@@ -190,9 +190,9 @@ export default function DriverInspection() {
             ))}
           </div>
 
-          <button 
-            className="btn btn-primary" 
-            onClick={() => setStep('review')} 
+          <button
+            className="btn btn-primary"
+            onClick={() => setStep('review')}
             disabled={Object.keys(photos).length < 4}
             style={{ width: '100%' }}
           >

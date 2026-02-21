@@ -48,7 +48,7 @@ describeIntegration('API Integration Tests (E2E)', () => {
     const res = await request(app)
       .post('/api/v1/auth/login')
       .send({ email: 'hossam@sezar.com', password: 'Hossam@2026' });
-    
+
     expect(res.status).toBe(200);
     adminToken = res.body.accessToken;
     log('Admin Login Success');
@@ -56,8 +56,8 @@ describeIntegration('API Integration Tests (E2E)', () => {
     // Clean start: Delete all test data with try-catch to handle missing models or constraints
     const cleanup = async () => {
       const models = [
-        'locationLog', 'trip', 'vehicleAssignment', 'expense', 
-        'damagePhoto', 'damageReport', 'inspectionPhoto', 'inspection', 
+        'locationLog', 'trip', 'vehicleAssignment', 'expense',
+        'damagePhoto', 'damageReport', 'inspectionPhoto', 'inspection',
         'userDevice', 'refreshToken', 'identityVerification', 'shift'
       ];
       for (const model of models) {
@@ -67,8 +67,8 @@ describeIntegration('API Integration Tests (E2E)', () => {
           log(`Cleanup Warning for ${model}: ${e.message}`);
         }
       }
-      try { await prisma.user.deleteMany({ where: { role: 'driver' } }); } catch (e) {}
-      try { await prisma.vehicle.deleteMany({}); } catch (e) {}
+      try { await prisma.user.deleteMany({ where: { role: 'driver' } }); } catch (e) { log(e.message); }
+      try { await prisma.vehicle.deleteMany({}); } catch (e) { log(e.message); }
     };
 
     await cleanup();
@@ -80,7 +80,7 @@ describeIntegration('API Integration Tests (E2E)', () => {
       if (driverId) await prisma.vehicleAssignment.deleteMany({ where: { driverId } });
       if (shiftId) await prisma.shift.deleteMany({ where: { id: shiftId } });
       if (vehicleId) await prisma.vehicle.deleteMany({ where: { id: vehicleId } });
-      
+
       if (driverId) {
         try { await prisma.refreshToken.deleteMany({ where: { userId: driverId } }); } catch (e) { log(`Refresh Token Cleanup Error: ${e.message}`); }
         try { await prisma.auditLog.deleteMany({ where: { actorId: driverId } }); } catch (e) { log(`Audit Log Cleanup Error: ${e.message}`); }
@@ -103,7 +103,7 @@ describeIntegration('API Integration Tests (E2E)', () => {
         phone: `555${Math.floor(Math.random() * 1000000)}`,
         licenseNumber: `LIC${Date.now()}`
       });
-    
+
     expect(driverRes.status).toBe(201);
     driverId = driverRes.body.id;
 
@@ -125,7 +125,7 @@ describeIntegration('API Integration Tests (E2E)', () => {
         capacity: 4,
         qrCode: `QR${Date.now()}`
       });
-    
+
     expect(vehicleRes.status).toBe(201);
     vehicleId = vehicleRes.body.id;
   });
@@ -139,7 +139,7 @@ describeIntegration('API Integration Tests (E2E)', () => {
     const loginRes = await request(app)
       .post('/api/v1/auth/login')
       .send({ email: driverEmail, password: 'Password123!' });
-    
+
     expect(loginRes.status).toBe(200);
     driverToken = loginRes.body.accessToken;
 
@@ -148,7 +148,7 @@ describeIntegration('API Integration Tests (E2E)', () => {
       .post('/api/v1/shifts')
       .set('Authorization', `Bearer ${driverToken}`)
       .send({ vehicleId });
-    
+
     if (shiftRes.status !== 201) {
       log(`Create Shift Failed: ${shiftRes.status} - ${JSON.stringify(shiftRes.body)}`);
     }
@@ -188,10 +188,10 @@ describeIntegration('API Integration Tests (E2E)', () => {
     } else {
       log('Debug: shiftId is undefined in Create Trip test');
     }
-    
+
     // Explicitly verify the condition expected by trip.service
     const activeShiftCheck = await prisma.shift.findFirst({
-        where: { driverId, status: 'Active' }
+      where: { driverId, status: 'Active' }
     });
     log(`Debug: activeShiftCheck result: ${JSON.stringify(activeShiftCheck)}`);
 
@@ -207,7 +207,7 @@ describeIntegration('API Integration Tests (E2E)', () => {
         price: 100,
         scheduledTime: new Date().toISOString()
       });
-    
+
     if (tripRes.status !== 201) log(`Create Trip Failed: ${JSON.stringify(tripRes.body)}`);
     expect(tripRes.status).toBe(201);
     tripId = tripRes.body.id;
@@ -220,7 +220,7 @@ describeIntegration('API Integration Tests (E2E)', () => {
     const startRes = await request(app)
       .put(`/api/v1/trips/${tripId}/start`)
       .set('Authorization', `Bearer ${driverToken}`);
-    
+
     if (startRes.status !== 200) log(`Start Trip Body: ${JSON.stringify(startRes.body)}`);
     expect(startRes.status).toBe(200);
     expect(startRes.body.status).toBe('IN_PROGRESS');
@@ -228,7 +228,7 @@ describeIntegration('API Integration Tests (E2E)', () => {
     const completeRes = await request(app)
       .put(`/api/v1/trips/${tripId}/complete`)
       .set('Authorization', `Bearer ${driverToken}`);
-    
+
     expect(completeRes.status).toBe(200);
     expect(completeRes.body.status).toBe('COMPLETED');
   });

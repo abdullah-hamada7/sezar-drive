@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import { authService } from '../services/auth.service';
+import { http } from '../services/http.service';
 import { AuthContext } from './authContext';
 
 export function AuthProvider({ children }) {
@@ -35,15 +36,15 @@ export function AuthProvider({ children }) {
     setLoading(true);
     try {
       const deviceFingerprint = getDeviceFingerprint();
-      const res = await api.login({ email, password, deviceFingerprint });
-      
+      const res = await authService.login({ email, password, deviceFingerprint });
+
       if (res.data.requiresVerification) {
         // Return this so the Login page can navigate or show UI
         return { requiresVerification: true, userId: res.data.userId, deviceFingerprint };
       }
 
       const { user: userData, accessToken, refreshToken } = res.data;
-      api.setTokens(accessToken, refreshToken);
+      http.setTokens(accessToken, refreshToken);
       setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData));
 
@@ -61,7 +62,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = useCallback(() => {
-    api.clearTokens();
+    http.clearTokens();
     setUser(null);
     navigate('/login');
   }, [navigate]);

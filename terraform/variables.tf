@@ -13,10 +13,6 @@ variable "instance_type" {
   default     = "c7i-flex.large"
 }
 
-variable "ami_id" {
-  description = "Canonical, Ubuntu, 24.04, amd64 noble image"
-  default     = "ami-0b6c6ebed2801a5cb" # Replace with latest if needed
-}
 
 variable "ssh_cidr_blocks" {
   description = "Allowed CIDR blocks for SSH access (e.g., ['203.0.113.10/32']). Do NOT use 0.0.0.0/0."

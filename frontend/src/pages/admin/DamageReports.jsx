@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import api from '../../services/api';
+import { damageService as api } from '../../services/damage.service';
 import { AlertTriangle, Eye, CheckCircle, Wrench, X } from 'lucide-react';
 import { useContext } from 'react';
 import { ToastContext } from '../../contexts/toastContext';
@@ -134,11 +134,11 @@ export default function DamageReportsPage() {
                 { label: t('admin_damage.table.vehicle'), value: selected.vehicle?.plateNumber },
                 { label: t('admin_damage.table.driver'), value: selected.driver?.name },
                 { label: t('admin_damage.table.reported'), value: formatDate(selected.createdAt) },
-                { 
-                  label: t('admin_damage.table.status'), 
-                  value: t(`admin_damage.status.${selected.status.toLowerCase()}`), 
-                  type: 'badge', 
-                  badgeClass: STATUS_BADGES[selected.status] 
+                {
+                  label: t('admin_damage.table.status'),
+                  value: t(`admin_damage.status.${selected.status.toLowerCase()}`),
+                  type: 'badge',
+                  badgeClass: STATUS_BADGES[selected.status]
                 },
               ]
             },

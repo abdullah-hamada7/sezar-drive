@@ -5,7 +5,7 @@ import { ToastContext } from '../contexts/toastContext';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { Car, Eye, EyeOff, LogIn, Sun, Moon } from 'lucide-react';
-import api from '../services/api';
+import { authService as api } from '../services/auth.service';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import './Login.css';
 
@@ -38,11 +38,11 @@ export default function LoginPage() {
     try {
       const result = await login(email, password);
       if (result?.requiresVerification) {
-        navigate('/verify-device', { 
-          state: { 
-            userId: result.userId, 
-            deviceFingerprint: result.deviceFingerprint 
-          } 
+        navigate('/verify-device', {
+          state: {
+            userId: result.userId,
+            deviceFingerprint: result.deviceFingerprint
+          }
         });
       }
     } catch (err) {
@@ -99,10 +99,10 @@ export default function LoginPage() {
         <div className="login-bg-shape shape-1"></div>
         <div className="login-bg-shape shape-2"></div>
       </div>
-      
+
       <div style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 10, display: 'flex', gap: '0.5rem' }}>
-        <button 
-          className="btn-icon" 
+        <button
+          className="btn-icon"
           onClick={toggleTheme}
           style={{ background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(4px)', color: 'var(--color-text)' }}
           title={theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
@@ -148,9 +148,9 @@ export default function LoginPage() {
             <div className="form-group">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <label className="form-label">{t('auth.password')}</label>
-                <button 
-                  type="button" 
-                  className="forgot-password-trigger" 
+                <button
+                  type="button"
+                  className="forgot-password-trigger"
                   onClick={() => {
                     setView('rescue-request');
                     setError('');
@@ -187,12 +187,12 @@ export default function LoginPage() {
         ) : (
           <div className="forgot-password-view">
             <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.5rem' }}>
-              {view === 'rescue-request' ? t('auth.rescue_request_title', 'Admin Help') : 
-               t('auth.rescue_verify_title', 'Enter Rescue Code')}
+              {view === 'rescue-request' ? t('auth.rescue_request_title', 'Admin Help') :
+                t('auth.rescue_verify_title', 'Enter Rescue Code')}
             </h2>
             <p className="login-subtitle" style={{ marginBottom: '1.5rem', textAlign: 'left' }}>
-              {view === 'rescue-request' ? t('auth.rescue_request_desc', 'Please enter your email to request a rescue code from your supervisor.') : 
-               t('auth.rescue_verify_desc', 'Enter the 6-digit code provided by your admin.')}
+              {view === 'rescue-request' ? t('auth.rescue_request_desc', 'Please enter your email to request a rescue code from your supervisor.') :
+                t('auth.rescue_verify_desc', 'Enter the 6-digit code provided by your admin.')}
             </p>
 
 

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import api from '../../services/api';
+import { vehicleService as api } from '../../services/vehicle.service';
 import { ToastContext } from '../../contexts/toastContext';
 import { Car, Plus, Search, Edit, Trash2, X, QrCode } from 'lucide-react';
 import ConfirmModal from '../../components/common/ConfirmModal';
@@ -123,11 +123,11 @@ export default function VehiclesPage() {
             style={{ flex: 1, border: 'none', background: 'transparent', padding: '0.25rem' }}
           />
           <div className="flex items-center gap-sm" style={{ borderLeft: '1px solid var(--color-border)', paddingLeft: '1rem', marginLeft: 'auto' }}>
-            <input 
-              type="checkbox" 
-              id="availableOnly" 
-              checked={availableOnly} 
-              onChange={e => { setAvailableOnly(e.target.checked); setPage(1); }} 
+            <input
+              type="checkbox"
+              id="availableOnly"
+              checked={availableOnly}
+              onChange={e => { setAvailableOnly(e.target.checked); setPage(1); }}
             />
             <label htmlFor="availableOnly" className="text-sm font-medium cursor-pointer" style={{ whiteSpace: 'nowrap' }}>{t('vehicles.available_only')}</label>
           </div>
@@ -197,31 +197,31 @@ export default function VehiclesPage() {
               <h2 className="modal-title">{editVehicle ? t('vehicles.modal.edit_title') : t('vehicles.modal.add_title')}</h2>
               <button className="btn-icon" onClick={() => setShowModal(false)}><X size={18} /></button>
             </div>
-            
+
             {error && <div className="alert alert-error">{error}</div>}
-            
+
             <form onSubmit={handleSubmit} className="modal-body">
               <div className="form-section mb-md">
                 <div className="grid grid-2 gap-md">
                   <div className="form-group">
                     <label className="form-label">{t('vehicles.modal.plate_label')}</label>
-                    <input className="form-input" name="plateNumber" value={form.plateNumber} onChange={e => setForm({...form, plateNumber: e.target.value})} required placeholder={t('vehicles.modal.plate_placeholder')} />
+                    <input className="form-input" name="plateNumber" value={form.plateNumber} onChange={e => setForm({ ...form, plateNumber: e.target.value })} required placeholder={t('vehicles.modal.plate_placeholder')} />
                   </div>
                   <div className="form-group">
                     <label className="form-label">{t('vehicles.modal.model_label')}</label>
-                    <input className="form-input" name="model" value={form.model} onChange={e => setForm({...form, model: e.target.value})} required placeholder={t('vehicles.modal.model_placeholder')} />
+                    <input className="form-input" name="model" value={form.model} onChange={e => setForm({ ...form, model: e.target.value })} required placeholder={t('vehicles.modal.model_placeholder')} />
                   </div>
                   <div className="form-group">
                     <label className="form-label">{t('vehicles.modal.year_label')}</label>
-                    <input type="number" className="form-input" name="year" value={form.year} onChange={e => setForm({...form, year: e.target.value})} required min={2000} max={2030} />
+                    <input type="number" className="form-input" name="year" value={form.year} onChange={e => setForm({ ...form, year: e.target.value })} required min={2000} max={2030} />
                   </div>
                   <div className="form-group">
                     <label className="form-label">{t('vehicles.modal.capacity_label')}</label>
-                    <input type="number" className="form-input" name="capacity" value={form.capacity} onChange={e => setForm({...form, capacity: e.target.value})} required min={1} max={50} />
+                    <input type="number" className="form-input" name="capacity" value={form.capacity} onChange={e => setForm({ ...form, capacity: e.target.value })} required min={1} max={50} />
                   </div>
                   <div className="form-group col-span-2">
                     <label className="form-label">{t('vehicles.modal.qr_label')}</label>
-                    <input className="form-input" name="qrCode" value={form.qrCode} onChange={e => setForm({...form, qrCode: e.target.value})} required placeholder={t('vehicles.modal.qr_placeholder')} />
+                    <input className="form-input" name="qrCode" value={form.qrCode} onChange={e => setForm({ ...form, qrCode: e.target.value })} required placeholder={t('vehicles.modal.qr_placeholder')} />
                   </div>
                 </div>
               </div>
@@ -235,7 +235,7 @@ export default function VehiclesPage() {
         </div>
       )}
 
-      <ConfirmModal 
+      <ConfirmModal
         isOpen={confirmData.isOpen}
         onClose={() => setConfirmData({ isOpen: false, vehicleId: null })}
         onConfirm={onConfirmDelete}

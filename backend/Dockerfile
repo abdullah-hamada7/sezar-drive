@@ -1,32 +1,43 @@
-# Backend Dockerfile — Hardened for Production
-FROM node:22-alpine AS base
+# Backend Dockerfile — Multi-stage Production Build
 
-# Create app directory and set ownership
+# --- Stage 1: Builder ---
+FROM node:22-alpine AS builder
+
 WORKDIR /app
-RUN chown -R node:node /app
 
-# Install system dependencies
+# Install system dependencies needed for Prisma
 RUN apk add --no-cache openssl
 
-# Install dependencies with non-root ownership
-COPY --chown=node:node package.json package-lock.json* ./
-COPY --chown=node:node prisma ./prisma/
-COPY --chown=node:node prisma.config.ts* ./
-COPY --chown=node:node tsconfig.json* ./
+# Copy package manifests and Prisma schema
+COPY package.json package-lock.json* ./
+COPY prisma ./prisma/
 
-# Change user BEFORE running npm ci to ensure cache/node_modules ownership
-USER node
-
+# Install production dependencies only
 RUN npm ci --omit=dev
 
 # Generate Prisma client
 RUN DATABASE_URL="postgresql://dummy:5432/mydb" npx prisma generate
 
-# Copy application source
-COPY --chown=node:node src ./src/
-COPY --chown=node:node scripts ./scripts/
+# --- Stage 2: Runtime ---
+FROM node:22-alpine AS runtime
 
-# Local uploads decommissioned per S3-only policy
+WORKDIR /app
+
+# Install runtime system dependencies
+RUN apk add --no-cache openssl
+
+# Copy artifacts from builder
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+
+# Copy application source & schema
+COPY src ./src/
+COPY scripts ./scripts/
+COPY prisma ./prisma/
+
+# Security: Set ownership and run as non-root user
+RUN chown -R node:node /app
+USER node
 
 EXPOSE 3000
 

@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import api from '../../services/api';
+import { expenseService as api } from '../../services/expense.service';
 import { Receipt, Plus, X, Upload, CheckCircle } from 'lucide-react';
 import { useShift } from '../../contexts/ShiftContext';
 import { ToastContext } from '../../contexts/toastContext';
@@ -113,7 +113,7 @@ export default function DriverExpenses() {
             <form onSubmit={handleSubmit}>
               <div className="form-group mb-md">
                 <label className="form-label">{t('expenses.category_label')}</label>
-                <select className="form-select" value={form.categoryId} onChange={e => setForm({...form, categoryId: e.target.value})} required>
+                <select className="form-select" value={form.categoryId} onChange={e => setForm({ ...form, categoryId: e.target.value })} required>
                   <option value="">{t('expenses.select_category')}</option>
                   {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
@@ -121,21 +121,21 @@ export default function DriverExpenses() {
               <div className="row">
                 <div className="col form-group mb-md">
                   <label className="form-label">{t('expenses.amount_label')}</label>
-                  <input type="number" step="0.01" className="form-input" value={form.amount} onChange={e => setForm({...form, amount: e.target.value})} required placeholder="0.00" />
+                  <input type="number" step="0.01" className="form-input" value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} required placeholder="0.00" />
                 </div>
               </div>
               <div className="form-group mb-md">
                 <label className="form-label">{t('expenses.description_label')}</label>
-                <textarea className="form-textarea" rows="2" value={form.description} onChange={e => setForm({...form, description: e.target.value})} placeholder={t('expenses.placeholder_desc')} />
+                <textarea className="form-textarea" rows="2" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder={t('expenses.placeholder_desc')} />
               </div>
               <div className="form-group mb-lg">
                 <label className="form-label">{t('expenses.receipt_label')}</label>
                 <div className="flex items-center gap-md">
                   <label className="file-upload-zone" style={{ flex: 1 }}>
-                    <input type="file" style={{ display: 'none' }} onChange={e => setForm({...form, receipt: e.target.files[0]})} accept="image/*" />
+                    <input type="file" style={{ display: 'none' }} onChange={e => setForm({ ...form, receipt: e.target.files[0] })} accept="image/*" />
                     <div className="flex flex-col items-center gap-xs">
-                        {form.receipt ? <CheckCircle className="text-success" size={24} /> : <Upload size={24} className="text-muted" />}
-                        <span className="text-xs">{form.receipt ? form.receipt.name : t('driver_home.tap_select')}</span>
+                      {form.receipt ? <CheckCircle className="text-success" size={24} /> : <Upload size={24} className="text-muted" />}
+                      <span className="text-xs">{form.receipt ? form.receipt.name : t('driver_home.tap_select')}</span>
                     </div>
                   </label>
                 </div>

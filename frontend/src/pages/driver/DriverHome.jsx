@@ -2,7 +2,8 @@ import { useState, useEffect, useContext, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import { useShift } from '../../contexts/ShiftContext';
-import api from '../../services/api';
+import { authService } from '../../services/auth.service';
+import { http } from '../../services/http.service';
 import { ClipboardCheck, User } from 'lucide-react';
 import { ToastContext } from '../../contexts/toastContext';
 
@@ -17,11 +18,11 @@ export default function DriverHome() {
 
   const refreshStatus = useCallback(async () => {
     try {
-      const res = await api.getMe();
+      const res = await authService.getMe();
       if (res.data?.user) {
         updateUser(res.data.user);
         if (res.data.accessToken) {
-          api.setTokens(res.data.accessToken, undefined);
+          http.setTokens(res.data.accessToken, undefined);
         }
         addToast(t('driver_home.status_refreshed'), 'success');
       }
@@ -29,7 +30,7 @@ export default function DriverHome() {
       addToast(err.message || t('common.error'), 'error');
     }
   }, [t, updateUser, addToast]);
- 
+
   useEffect(() => {
     const handleIdentityUpdate = (e) => {
       const { status, reason } = e.detail;
@@ -60,33 +61,33 @@ export default function DriverHome() {
 
       {/* Profile & Avatar */}
       <div className="card glass-card mb-md flex items-center justify-between">
-         <div className="flex items-center gap-md">
-            <div className="glow-effect" style={{ width: 64, height: 64, borderRadius: 'var(--radius-full)', background: 'var(--color-bg-tertiary)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--color-primary)', boxShadow: 'var(--shadow-glow)' }}>
-                {user?.avatarUrl || user?.profilePhotoUrl
-                  ? <img src={user.avatarUrl || user.profilePhotoUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  : <User size={32} className="text-primary" />}
+        <div className="flex items-center gap-md">
+          <div className="glow-effect" style={{ width: 64, height: 64, borderRadius: 'var(--radius-full)', background: 'var(--color-bg-tertiary)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--color-primary)', boxShadow: 'var(--shadow-glow)' }}>
+            {user?.avatarUrl || user?.profilePhotoUrl
+              ? <img src={user.avatarUrl || user.profilePhotoUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              : <User size={32} className="text-primary" />}
+          </div>
+          <div>
+            <div className="text-xl font-bold text-gradient leading-tight">{user?.name}</div>
+            <div className="text-sm text-muted opacity-80">{user?.email}</div>
+            <div className="mt-xs">
+              <span className={`badge ${user?.identityVerified ? 'badge-success' : 'badge-warning'} text-[10px] px-sm py-0`}>
+                {user?.identityVerified ? t('common.status.verified') : t('common.status.pending')}
+              </span>
             </div>
-            <div>
-                <div className="text-xl font-bold text-gradient leading-tight">{user?.name}</div>
-                <div className="text-sm text-muted opacity-80">{user?.email}</div>
-                <div className="mt-xs">
-                   <span className={`badge ${user?.identityVerified ? 'badge-success' : 'badge-warning'} text-[10px] px-sm py-0`}>
-                      {user?.identityVerified ? t('common.status.verified') : t('common.status.pending')}
-                   </span>
-                </div>
-            </div>
-         </div>
-         <div style={{ position: 'relative' }}>
-             <button className="btn-icon" onClick={() => setShowDetails(true)} title={t('driver.view_details')}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-             </button>
-         </div>
+          </div>
+        </div>
+        <div style={{ position: 'relative' }}>
+          <button className="btn-icon" onClick={() => setShowDetails(true)} title={t('driver.view_details')}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
+          </button>
+        </div>
       </div>
 
-      <DriverDetailsModal 
-        driver={user} 
-        isOpen={showDetails} 
-        onClose={() => setShowDetails(false)} 
+      <DriverDetailsModal
+        driver={user}
+        isOpen={showDetails}
+        onClose={() => setShowDetails(false)}
       />
 
       {/* Shift Status */}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import api from '../../services/api';
+import { expenseService as api } from '../../services/expense.service';
 import { Receipt, CheckCircle, XCircle, Eye, X } from 'lucide-react';
 import { useContext } from 'react';
 import { ToastContext } from '../../contexts/toastContext';
@@ -145,11 +145,11 @@ export default function ExpensesPage() {
                 { label: t('admin_expenses.table.category'), value: selected.category?.name },
                 { label: t('admin_expenses.table.amount'), value: `${parseFloat(selected.amount).toFixed(2)} EGP` },
                 { label: t('admin_expenses.table.date'), value: formatDate(selected.createdAt) },
-                { 
-                  label: t('admin_expenses.table.status'), 
-                  value: t(`common.status.${selected.status.toLowerCase()}`), 
-                  type: 'badge', 
-                  badgeClass: STATUS_BADGES[selected.status] 
+                {
+                  label: t('admin_expenses.table.status'),
+                  value: t(`common.status.${selected.status.toLowerCase()}`),
+                  type: 'badge',
+                  badgeClass: STATUS_BADGES[selected.status]
                 },
               ]
             },
@@ -177,7 +177,7 @@ export default function ExpensesPage() {
         />
       )}
 
-      <PromptModal 
+      <PromptModal
         isOpen={promptData.isOpen}
         onClose={() => setPromptData({ isOpen: false, expenseId: null })}
         onConfirm={(reason) => handleReview(promptData.expenseId, 'rejected', reason)}

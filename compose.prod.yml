@@ -20,6 +20,12 @@ services:
     depends_on:
       - frontend
       - backend
+    networks:
+      - app-net
+    deploy:
+      resources:
+        limits:
+          memory: 256M
 
   # ─── PostgreSQL Database ────────────────────────
   postgres:
@@ -33,9 +39,15 @@ services:
     volumes:
       - pgdata_prod:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
       retries: 5
+    networks:
+      - db-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
 
   # ─── Backend API ────────────────────────────────
   backend:
@@ -47,17 +59,24 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/v1/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     environment:
-      DATABASE_URL: ${DATABASE_URL}
-      JWT_SECRET: ${JWT_SECRET}
+      # These are now loaded from AWS Secrets Manager & SSM Parameter Store
       PORT: 3000
       NODE_ENV: production
       CORS_ORIGIN: http://${DOMAIN_NAME}
       FRONTEND_URL: ${FRONTEND_URL}
-      S3_BUCKET: ${S3_BUCKET}
-      S3_REGION: ${S3_REGION}
-      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+    networks:
+      - db-net
+      - app-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
 
   # ─── Frontend ───────────────────────────────────
   frontend:
@@ -68,6 +87,18 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
+    networks:
+      - app-net
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+networks:
+  db-net:
+    internal: true # No internet access for the database
+  app-net:
+    # Default bridge network with internet access for backend/frontend
 
 volumes:
   pgdata_prod:

@@ -17,7 +17,7 @@ let adminToken = '';
 let driverToken = '';
 let driverId = '';
 let verificationId = '';
-let testVehicleQr = 'QR-1771101653513'; 
+let testVehicleQr = 'QR-1771101653513';
 
 // Utils
 function request(method, path, body = null, token = null) {
@@ -80,69 +80,69 @@ async function verifyFeatures() {
     log('Logging in Driver (initial)...', 'STEP');
     let driverLogin;
     try {
-        driverLogin = await request('POST', '/auth/login', { email: DRIVER_EMAIL, password: DRIVER_PASSWORD });
+      driverLogin = await request('POST', '/auth/login', { email: DRIVER_EMAIL, password: DRIVER_PASSWORD });
     } catch (e) {
-        log('Initial login failed, trying with new password...', 'INFO');
-        driverLogin = await request('POST', '/auth/login', { email: DRIVER_EMAIL, password: NEW_DRIVER_PASSWORD });
+      log('Initial login failed, trying with new password...', 'INFO');
+      driverLogin = await request('POST', '/auth/login', { email: DRIVER_EMAIL, password: NEW_DRIVER_PASSWORD });
     }
-    
+
     driverToken = driverLogin.accessToken;
     driverId = driverLogin.user.id;
     log('Driver Logged In', 'SUCCESS');
 
     // 3. Password Change (if required)
     if (driverLogin.user.mustChangePassword) {
-        log('Driver must change password. Changing now...', 'STEP');
-        const changeRes = await request('POST', '/auth/change-password', {
-            currentPassword: DRIVER_PASSWORD,
-            newPassword: NEW_DRIVER_PASSWORD
-        }, driverToken);
-        // Refresh token
-        driverToken = changeRes.accessToken;
-        log('Password Changed Successfully', 'SUCCESS');
+      log('Driver must change password. Changing now...', 'STEP');
+      const changeRes = await request('POST', '/auth/change-password', {
+        currentPassword: DRIVER_PASSWORD,
+        newPassword: NEW_DRIVER_PASSWORD
+      }, driverToken);
+      // Refresh token
+      driverToken = changeRes.accessToken;
+      log('Password Changed Successfully', 'SUCCESS');
     }
 
     // 4. Admin: Check Pending Verifications
     log('Checking Pending Verifications...', 'STEP');
     const pending = await request('GET', '/auth/identity/pending', null, adminToken);
-    
-    let targetVerification = pending.find(v => v.driverId === driverId);
-    
-    if (!targetVerification) {
-        log('No pending verification found. This is expected if identity verify not yet called.', 'INFO');
-    } else {
-        verificationId = targetVerification.id;
-        log(`Found pending verification: ${verificationId}`, 'SUCCESS');
 
-        // 5. Admin: Approve Verification
-        log('Approving Verification...', 'STEP');
-        await request('PUT', `/auth/identity/${verificationId}/review`, { action: 'approve' }, adminToken);
-        log('Verification Approved', 'SUCCESS');
+    let targetVerification = pending.find(v => v.driverId === driverId);
+
+    if (!targetVerification) {
+      log('No pending verification found. This is expected if identity verify not yet called.', 'INFO');
+    } else {
+      verificationId = targetVerification.id;
+      log(`Found pending verification: ${verificationId}`, 'SUCCESS');
+
+      // 5. Admin: Approve Verification
+      log('Approving Verification...', 'STEP');
+      await request('PUT', `/auth/identity/${verificationId}/review`, { action: 'approve' }, adminToken);
+      log('Verification Approved', 'SUCCESS');
     }
 
     // 6. QR Matchmaking
     log(`Attempting QR Matchmaking with code '${testVehicleQr}'...`, 'STEP');
     try {
-        const assignment = await request('POST', '/vehicles/scan-qr', { qrCode: testVehicleQr }, driverToken);
-        log(`Vehicle Assigned: ${assignment.vehicle?.plateNumber}`, 'SUCCESS');
+      const assignment = await request('POST', '/vehicles/scan-qr', { qrCode: testVehicleQr }, driverToken);
+      log(`Vehicle Assigned: ${assignment.vehicle?.plateNumber}`, 'SUCCESS');
     } catch (e) {
-        if (e.status === 400 && e.error?.error?.message?.includes('already assigned')) {
-             log('Vehicle already assigned (Clean pass)', 'SUCCESS');
-        } else if (e.status === 404) {
-             log('Vehicle QR not found (Fail)', 'FAIL');
-             throw new Error('Vehicle not found');
-        } else {
-            throw e;
-        }
+      if (e.status === 400 && e.error?.error?.message?.includes('already assigned')) {
+        log('Vehicle already assigned (Clean pass)', 'SUCCESS');
+      } else if (e.status === 404) {
+        log('Vehicle QR not found (Fail)', 'FAIL');
+        throw new Error('Vehicle not found', { cause: e });
+      } else {
+        throw e;
+      }
     }
-    
+
     // 7. Stats Check (Admin)
     log('Checking Activity Stats endpoint...', 'STEP');
     const activity = await request('GET', '/stats/activity', null, adminToken);
     if (Array.isArray(activity)) {
-        log('Activity Stats returned array', 'SUCCESS');
+      log('Activity Stats returned array', 'SUCCESS');
     } else {
-        log('Activity Stats failed format', 'FAIL');
+      log('Activity Stats failed format', 'FAIL');
     }
 
     log('ALL VERIFICATION STEPS COMPLETED', 'DONE');

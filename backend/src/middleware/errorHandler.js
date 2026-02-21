@@ -58,11 +58,16 @@ function errorHandler(err, req, res, next) {
 
   // Unknown errors — mask details in production
   const statusCode = err.statusCode || 500;
+
+  // Log all unhandled errors server-side for debugging
+  console.error(`[${new Date().toISOString()}] Unhandled Error:`, err.message, err.stack);
+
   return res.status(statusCode).json({
     error: {
       code: 'INTERNAL_ERROR',
-      // For debugging: showing real error even if not strict dev, or if env is misconfigured
-      message: err.message || 'An unexpected error occurred',
+      message: config.isProduction
+        ? 'An unexpected error occurred'
+        : (err.message || 'An unexpected error occurred'),
     },
   });
 }

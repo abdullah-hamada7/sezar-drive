@@ -10,7 +10,7 @@ import {
   Sun, Moon
 } from 'lucide-react';
 import './AdminLayout.css';
-import api from '../../services/api';
+import { statsService } from '../../services/stats.service';
 
 export default function AdminLayout() {
   const { language, toggleLanguage, t } = useLanguage();
@@ -40,7 +40,7 @@ export default function AdminLayout() {
 
   const addNotification = useCallback((notif) => {
     setNotifications(prev => [notif, ...prev].slice(0, 5));
-    
+
     // Update local pending counts based on notification type
     // Only increment if not currently on that page
     if (notif.type === 'expense_pending' && window.location.pathname !== '/admin/expenses') {
@@ -72,7 +72,7 @@ export default function AdminLayout() {
     // Initial counts fetch
     async function fetchCounts() {
       try {
-        const res = await api.getSummaryStats();
+        const res = await statsService.getSummaryStats();
         setPendingCounts({
           expenses: res.data.pendingExpenses || 0,
           damage: res.data.pendingDamages || 0
@@ -84,7 +84,7 @@ export default function AdminLayout() {
     function connectWS() {
       const token = localStorage.getItem('accessToken');
       if (!token) return;
-      
+
       const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
       const ws = new WebSocket(`${protocol}://${window.location.host}/ws/tracking?token=${token}`);
       wsRef.current = ws;
@@ -136,9 +136,9 @@ export default function AdminLayout() {
         ))}
       </div>
 
-      <button 
-        className={`sidebar-overlay ${sidebarOpen ? 'show' : ''}`} 
-        onClick={() => setSidebarOpen(false)} 
+      <button
+        className={`sidebar-overlay ${sidebarOpen ? 'show' : ''}`}
+        onClick={() => setSidebarOpen(false)}
       />
 
       <header className="mobile-header">
@@ -211,15 +211,15 @@ export default function AdminLayout() {
             )}
           </div>
           <div className="footer-actions flex gap-sm">
-            <button 
-              className="btn-icon" 
+            <button
+              className="btn-icon"
               onClick={toggleTheme}
               title={theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
             >
               {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             </button>
-            <button 
-              className="btn-icon" 
+            <button
+              className="btn-icon"
               onClick={toggleLanguage}
               title={language === 'ar' ? 'English' : 'العربية'}
             >

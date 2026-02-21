@@ -1,7 +1,4 @@
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-const crypto = require('crypto');
 const config = require('../config');
 
 // Local upload directory creation logic removed.

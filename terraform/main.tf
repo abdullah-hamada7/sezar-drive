@@ -1,5 +1,10 @@
 terraform {
+  required_version = ">= 1.0.0"
   required_providers {
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
     aws = {
       source  = "hashicorp/aws"
       version = "~> 6.0"
@@ -19,6 +24,8 @@ provider "aws" {
   region  = var.aws_region
   profile = "abdullah"
 }
+
+data "aws_caller_identity" "current" {}
 
 # --- Networking ---
 resource "aws_vpc" "main" {
@@ -91,8 +98,15 @@ resource "aws_security_group" "sezar_sg" {
 # --- S3 Bucket & Security ---
 resource "aws_s3_bucket" "photos" {
   bucket        = "${var.project_name}-photos-${random_id.bucket_id.hex}"
-  force_destroy = true
+  force_destroy = false # Best Practice: Protect production data
   tags          = local.common_tags
+}
+
+resource "aws_s3_bucket_versioning" "photos" {
+  bucket = aws_s3_bucket.photos.id
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
 
 resource "random_id" "bucket_id" {
@@ -125,9 +139,24 @@ resource "aws_s3_bucket_ownership_controls" "photos" {
   }
 }
 
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  owners      = ["099720109477"] # Canonical
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
 # --- EC2 Instance ---
 resource "aws_instance" "sezar_drive" {
-  ami                    = var.ami_id
+  ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.instance_type
   subnet_id              = aws_subnet.public.id
   vpc_security_group_ids = [aws_security_group.sezar_sg.id]
@@ -148,7 +177,9 @@ resource "aws_instance" "sezar_drive" {
     volume_size = 20
   }
 
-  user_data = file("${path.module}/scripts/install_docker.sh")
+  user_data = templatefile("${path.module}/scripts/install_docker.sh", {
+    s3_bucket = aws_s3_bucket.photos.id
+  })
 
   tags = merge(local.common_tags, {
     Name = "${var.project_name}-server"

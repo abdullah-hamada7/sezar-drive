@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import api from '../../services/api';
+import { statsService as api } from '../../services/stats.service';
 import {
   Users, Car, Route, ClipboardCheck, Receipt,
   Clock, Info, TrendingUp, AlertTriangle, Shield
@@ -148,7 +148,7 @@ export default function DashboardPage() {
                   <div className="text-xs text-muted">{req.user?.email}</div>
                   <div className="text-[10px] opacity-60 mt-xs">{formatActivityDate(req.createdAt)}</div>
                 </div>
-                <button 
+                <button
                   className="btn btn-primary btn-sm"
                   onClick={() => handleGenerateRescueCode(req.id)}
                 >
@@ -176,20 +176,20 @@ export default function DashboardPage() {
               {recentActivity.map(activity => (
                 <div key={activity.id} className="flex items-center gap-md p-sm" style={{ borderBottom: '1px solid var(--color-border)' }}>
                   <div className="flex-shrink-0">
-                      <span className="badge badge-neutral" style={{ background: 'var(--color-bg-tertiary)' }}>
+                    <span className="badge badge-neutral" style={{ background: 'var(--color-bg-tertiary)' }}>
+                      {t(`actions.${activity.actionType?.split('.').pop()?.toLowerCase()}`, activity.actionType)}
+                    </span>
+                  </div>
+                  <div className="flex-grow">
+                    <div className="text-sm font-medium">{activity.actor?.name || t('dashboard.activity.system')}</div>
+                    <div className="text-xs text-muted flex items-center gap-xs">
+                      <span className="opacity-70">{t(`entities.${activity.entityType?.toLowerCase()}`, activity.entityType)}</span>
+                      <span className="font-mono bg-neutral-soft px-xs rounded text-[10px]">{activity.entityId?.slice(0, 8)}</span>
+                      <span className="font-semibold text-primary">
                         {t(`actions.${activity.actionType?.split('.').pop()?.toLowerCase()}`, activity.actionType)}
                       </span>
                     </div>
-                    <div className="flex-grow">
-                      <div className="text-sm font-medium">{activity.actor?.name || t('dashboard.activity.system')}</div>
-                      <div className="text-xs text-muted flex items-center gap-xs">
-                        <span className="opacity-70">{t(`entities.${activity.entityType?.toLowerCase()}`, activity.entityType)}</span>
-                        <span className="font-mono bg-neutral-soft px-xs rounded text-[10px]">{activity.entityId?.slice(0, 8)}</span>
-                        <span className="font-semibold text-primary">
-                          {t(`actions.${activity.actionType?.split('.').pop()?.toLowerCase()}`, activity.actionType)}
-                        </span>
-                      </div>
-                    </div>
+                  </div>
                   <div className="text-xs text-muted flex-shrink-0">
                     {formatActivityDate(activity.createdAt)}
                   </div>

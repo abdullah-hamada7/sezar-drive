@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import api from '../services/api';
+import { authService as api } from '../services/auth.service';
+import { http } from '../services/http.service';
 import { Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
 
 export default function ChangePasswordPage() {
@@ -30,14 +31,14 @@ export default function ChangePasswordPage() {
     try {
       const res = await api.changePassword({ currentPassword, newPassword });
       const { user: updatedUser, accessToken, refreshToken } = res.data;
-      
+
       if (accessToken) {
-        api.setTokens(accessToken, refreshToken);
+        http.setTokens(accessToken, refreshToken);
         updateUser(updatedUser);
       } else {
         updateUser({ ...user, mustChangePassword: false });
       }
-      
+
       setSuccess(true);
       setTimeout(() => {
         const role = updatedUser?.role || user?.role;

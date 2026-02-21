@@ -92,8 +92,7 @@ describe('RBAC Enforcement', () => {
     ];
 
     test.each(endpoints)('%s %s should return 401 with bad token', async (method, path) => {
-      const res = await request(app)
-        [method.toLowerCase()](path)
+      const res = await request(app)[method.toLowerCase()](path)
         .set('Authorization', 'Bearer fake-token-123');
 
       expect(res.status).toBe(401);

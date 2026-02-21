@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import api from '../../services/api';
+import { driverService as api } from '../../services/driver.service';
 import { ToastContext } from '../../contexts/toastContext';
 import { Users, Plus, Search, Edit, Trash2, X, UserCheck, UserX } from 'lucide-react';
 import ConfirmModal from '../../components/common/ConfirmModal';
@@ -80,9 +80,9 @@ export default function DriversPage() {
     setForm({ name: driver.name, email: driver.email, phone: driver.phone, licenseNumber: driver.licenseNumber || '' });
     setFiles({});
     setPreviews({
-        avatar: driver.avatarUrl || driver.profilePhotoUrl,
-        idCardFront: driver.idCardFront,
-        idCardBack: driver.idCardBack
+      avatar: driver.avatarUrl || driver.profilePhotoUrl,
+      idCardFront: driver.idCardFront,
+      idCardBack: driver.idCardBack
     });
     setError('');
     setShowModal(true);
@@ -91,7 +91,7 @@ export default function DriversPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
-    
+
     // Final check
     const isNameValid = validateField('name', form.name);
     const isEmailValid = validateField('email', form.email);
@@ -111,7 +111,7 @@ export default function DriversPage() {
         formData.append('phone', form.phone);
         if (form.licenseNumber) formData.append('licenseNumber', form.licenseNumber);
         if (form.password) formData.append('password', form.password);
-        
+
         if (files.avatar) formData.append('avatar', files.avatar);
         if (files.idCardFront) formData.append('idCardFront', files.idCardFront);
         if (files.idCardBack) formData.append('idCardBack', files.idCardBack);
@@ -226,10 +226,10 @@ export default function DriversPage() {
                         <Edit size={16} />
                       </button>
                       {!d.identityVerified && (
-                        <button 
-                          className="btn-icon" 
-                          onClick={() => handleApprove(d)} 
-                          title={t('nav.verification')} 
+                        <button
+                          className="btn-icon"
+                          onClick={() => handleApprove(d)}
+                          title={t('nav.verification')}
                           style={{ color: 'var(--color-success)' }}
                         >
                           <UserCheck size={16} />
@@ -272,40 +272,40 @@ export default function DriversPage() {
                 <label className="form-label mb-sm" style={{ display: 'block' }}>{t('drivers.modal.photos_section')}</label>
                 <div className="grid grid-3 gap-md">
                   {['avatar', 'idCardFront', 'idCardBack'].map(key => (
-                     <div key={key} className="text-center">
-                       <label className="block text-xs font-semibold mb-xs uppercase opacity-70">{t(`drivers.modal.${key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`)}`)}</label>
-                       <div 
-                         onClick={() => document.getElementById(`file-${key}`).click()}
-                         style={{
-                           width: '100%', aspectRatio: '4/3', 
-                           background: 'var(--color-bg-tertiary)', borderRadius: 8, 
-                           display: 'flex', alignItems: 'center', justifyContent: 'center',
-                           cursor: 'pointer', overflow: 'hidden', border: '1px dashed var(--color-border-light)'
-                         }}
-                       >
-                         {previews[key] ? (
-                           <img src={previews[key]} alt={key} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                         ) : (
-                           <div className="flex flex-col items-center gap-xs">
-                             <Plus size={20} className="text-muted" />
-                             <span className="text-xs text-muted">{t('drivers.modal.tap_upload')}</span>
-                           </div>
-                         )}
-                       </div>
-                       <input 
-                         type="file" 
-                         id={`file-${key}`}
-                         hidden 
-                         accept="image/*"
-                         onChange={e => {
-                           const file = e.target.files[0];
-                           if (file) {
-                             setFiles(prev => ({ ...prev, [key]: file }));
-                             setPreviews(prev => ({ ...prev, [key]: URL.createObjectURL(file) }));
-                           }
-                         }}
-                       />
-                     </div>
+                    <div key={key} className="text-center">
+                      <label className="block text-xs font-semibold mb-xs uppercase opacity-70">{t(`drivers.modal.${key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`)}`)}</label>
+                      <div
+                        onClick={() => document.getElementById(`file-${key}`).click()}
+                        style={{
+                          width: '100%', aspectRatio: '4/3',
+                          background: 'var(--color-bg-tertiary)', borderRadius: 8,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          cursor: 'pointer', overflow: 'hidden', border: '1px dashed var(--color-border-light)'
+                        }}
+                      >
+                        {previews[key] ? (
+                          <img src={previews[key]} alt={key} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                          <div className="flex flex-col items-center gap-xs">
+                            <Plus size={20} className="text-muted" />
+                            <span className="text-xs text-muted">{t('drivers.modal.tap_upload')}</span>
+                          </div>
+                        )}
+                      </div>
+                      <input
+                        type="file"
+                        id={`file-${key}`}
+                        hidden
+                        accept="image/*"
+                        onChange={e => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            setFiles(prev => ({ ...prev, [key]: file }));
+                            setPreviews(prev => ({ ...prev, [key]: URL.createObjectURL(file) }));
+                          }
+                        }}
+                      />
+                    </div>
                   ))}
                 </div>
               </div>
@@ -313,56 +313,56 @@ export default function DriversPage() {
               <div className="grid grid-2 gap-md">
                 <div className="form-group">
                   <label className="form-label">{t('drivers.modal.name_label')}</label>
-                  <input 
-                    className={`form-input ${fieldErrors.name ? 'border-danger' : ''}`} 
-                    name="name" 
-                    value={form.name} 
-                    onChange={e => { setForm({...form, name: e.target.value}); validateField('name', e.target.value); }} 
-                    required 
+                  <input
+                    className={`form-input ${fieldErrors.name ? 'border-danger' : ''}`}
+                    name="name"
+                    value={form.name}
+                    onChange={e => { setForm({ ...form, name: e.target.value }); validateField('name', e.target.value); }}
+                    required
                   />
                   {fieldErrors.name && <span className="text-xs text-danger">{fieldErrors.name}</span>}
                 </div>
                 <div className="form-group">
                   <label className="form-label">{t('drivers.modal.email_label')}</label>
-                  <input 
-                    type="email" 
-                    className={`form-input ${fieldErrors.email ? 'border-danger' : ''}`} 
-                    name="email" 
-                    value={form.email} 
-                    onChange={e => { setForm({...form, email: e.target.value}); validateField('email', e.target.value); }} 
-                    required 
-                    disabled={!!editDriver} 
+                  <input
+                    type="email"
+                    className={`form-input ${fieldErrors.email ? 'border-danger' : ''}`}
+                    name="email"
+                    value={form.email}
+                    onChange={e => { setForm({ ...form, email: e.target.value }); validateField('email', e.target.value); }}
+                    required
+                    disabled={!!editDriver}
                   />
                   {fieldErrors.email && <span className="text-xs text-danger">{fieldErrors.email}</span>}
                 </div>
                 <div className="form-group">
                   <label className="form-label">{t('drivers.modal.phone_label')}</label>
-                  <input 
-                    className={`form-input ${fieldErrors.phone ? 'border-danger' : ''}`} 
-                    name="phone" 
-                    value={form.phone} 
-                    onChange={e => { 
+                  <input
+                    className={`form-input ${fieldErrors.phone ? 'border-danger' : ''}`}
+                    name="phone"
+                    value={form.phone}
+                    onChange={e => {
                       const val = e.target.value.replace(/[^\d+]/g, ''); // Restrict to digits and +
-                      setForm({...form, phone: val}); 
-                      validateField('phone', val); 
-                    }} 
-                    required 
-                    placeholder={t('drivers.modal.phone_placeholder')} 
+                      setForm({ ...form, phone: val });
+                      validateField('phone', val);
+                    }}
+                    required
+                    placeholder={t('drivers.modal.phone_placeholder')}
                   />
                   {fieldErrors.phone && <span className="text-xs text-danger">{fieldErrors.phone}</span>}
                 </div>
                 <div className="form-group">
                   <label className="form-label">{t('drivers.modal.license_label')}</label>
-                  <input 
-                    className={`form-input ${fieldErrors.licenseNumber ? 'border-danger' : ''}`} 
-                    name="licenseNumber" 
-                    value={form.licenseNumber} 
-                    onChange={e => { 
+                  <input
+                    className={`form-input ${fieldErrors.licenseNumber ? 'border-danger' : ''}`}
+                    name="licenseNumber"
+                    value={form.licenseNumber}
+                    onChange={e => {
                       const val = e.target.value.toUpperCase(); // Preach uppercase
-                      setForm({...form, licenseNumber: val}); 
-                      validateField('licenseNumber', val); 
-                    }} 
-                    placeholder={t('drivers.modal.license_placeholder')} 
+                      setForm({ ...form, licenseNumber: val });
+                      validateField('licenseNumber', val);
+                    }}
+                    placeholder={t('drivers.modal.license_placeholder')}
                   />
                   {fieldErrors.licenseNumber && <span className="text-xs text-danger">{fieldErrors.licenseNumber}</span>}
                 </div>
@@ -370,14 +370,14 @@ export default function DriversPage() {
                   <label className="form-label">
                     {t('drivers.modal.password_label')} {editDriver && t('drivers.modal.password_keep')} {!editDriver && '*'}
                   </label>
-                  <input 
-                    className={`form-input ${fieldErrors.password ? 'border-danger' : ''}`} 
-                    name="password" 
-                    type="password" 
-                    value={form.password} 
-                    onChange={e => { setForm({...form, password: e.target.value}); validateField('password', e.target.value); }} 
-                    required={!editDriver} 
-                    placeholder={t('drivers.modal.password_hint')} 
+                  <input
+                    className={`form-input ${fieldErrors.password ? 'border-danger' : ''}`}
+                    name="password"
+                    type="password"
+                    value={form.password}
+                    onChange={e => { setForm({ ...form, password: e.target.value }); validateField('password', e.target.value); }}
+                    required={!editDriver}
+                    placeholder={t('drivers.modal.password_hint')}
                   />
                   {fieldErrors.password && <span className="text-xs text-danger">{fieldErrors.password}</span>}
                 </div>
@@ -398,13 +398,13 @@ export default function DriversPage() {
         </div>
       )}
 
-      <ConfirmModal 
+      <ConfirmModal
         isOpen={confirmData.isOpen}
         onClose={() => setConfirmData({ isOpen: false, type: '', data: null })}
         onConfirm={onConfirmAction}
         title={confirmData.type === 'delete' ? t('common.delete') : t('drivers.table.verified')}
-        message={confirmData.type === 'delete' 
-          ? t('drivers.messages.delete_confirm') 
+        message={confirmData.type === 'delete'
+          ? t('drivers.messages.delete_confirm')
           : t('drivers.messages.approve_confirm', { name: confirmData.data?.name })}
         variant={confirmData.type === 'delete' ? 'danger' : 'success'}
       />

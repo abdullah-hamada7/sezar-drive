@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import api from '../../services/api';
+import { tripService } from '../../services/trip.service';
+import { damageService } from '../../services/damage.service';
 import { AlertTriangle, Camera, CheckCircle, X } from 'lucide-react';
 import { useShift } from '../../contexts/ShiftContext';
 import { ToastContext } from '../../contexts/toastContext';
@@ -34,7 +35,7 @@ export default function DriverDamage() {
 
   async function loadContext() {
     try {
-      const tripRes = await api.getTrips('limit=1&status=IN_PROGRESS');
+      const tripRes = await tripService.getTrips('limit=1&status=IN_PROGRESS');
       setActiveTrip(tripRes.data.trips?.[0]);
     } catch { /* ignore */ }
   }
@@ -45,7 +46,7 @@ export default function DriverDamage() {
       addToast(t('damage.error_shift'), 'error');
       return;
     }
-    
+
     const vehicleId = activeShift.vehicleId || activeShift.assignments?.[0]?.vehicleId;
 
     if (!vehicleId) {
@@ -55,7 +56,7 @@ export default function DriverDamage() {
 
     setLoading(true);
     try {
-      const res = await api.createDamageReport({
+      const res = await damageService.createDamageReport({
         description,
         shiftId: activeShift.id,
         vehicleId,
@@ -67,7 +68,7 @@ export default function DriverDamage() {
       for (const photo of photos) {
         const formData = new FormData();
         formData.append('photo', photo.file);
-        await api.uploadDamagePhoto(reportId, formData);
+        await damageService.uploadDamagePhoto(reportId, formData);
       }
 
       setStep('success');
@@ -129,12 +130,12 @@ export default function DriverDamage() {
           </div>
 
           {photos.length === 0 ? (
-            <div 
-              className="empty-state" 
+            <div
+              className="empty-state"
               onClick={() => fileRef.current?.click()}
-              style={{ 
-                padding: 'var(--space-xl)', 
-                border: '2px dashed var(--color-border)', 
+              style={{
+                padding: 'var(--space-xl)',
+                border: '2px dashed var(--color-border)',
                 borderRadius: 'var(--radius-md)',
                 backgroundColor: 'var(--color-bg-secondary)',
                 cursor: 'pointer',
@@ -145,9 +146,9 @@ export default function DriverDamage() {
                 justifyContent: 'center'
               }}
             >
-              <div style={{ 
-                padding: 'var(--space-md)', 
-                borderRadius: '50%', 
+              <div style={{
+                padding: 'var(--space-md)',
+                borderRadius: '50%',
                 background: 'var(--color-bg-tertiary)',
                 marginBottom: 'var(--space-md)'
               }}>

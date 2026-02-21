@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import api from '../../services/api';
+import { reportService as api } from '../../services/report.service';
 import { FileBarChart, Download, Calendar } from 'lucide-react';
 import { useContext } from 'react';
 import { ToastContext } from '../../contexts/toastContext';
@@ -37,7 +37,7 @@ export default function ReportsPage() {
       const params = new URLSearchParams();
       params.set('startDate', startDate);
       params.set('endDate', endDate);
-      
+
       const endpoint = type === 'pdf' ? `/reports/revenue/pdf?${params}` : `/reports/revenue/excel?${params}`;
       const response = await fetch(`/api/v1${endpoint}`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
@@ -58,8 +58,8 @@ export default function ReportsPage() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } catch (err) { 
-      addToast(err.message || t('common.error'), 'error'); 
+    } catch (err) {
+      addToast(err.message || t('common.error'), 'error');
     }
   }
 

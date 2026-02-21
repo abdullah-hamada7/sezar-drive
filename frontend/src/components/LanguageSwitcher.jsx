@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import api from '../services/api'; // Optional: if we want to sync with backend
+import { authService as api } from '../services/auth.service'; // Sync with backend
 import { useAuth } from '../hooks/useAuth'; // To check if logged in
 
 export default function LanguageSwitcher({ className = '', style = {} }) {

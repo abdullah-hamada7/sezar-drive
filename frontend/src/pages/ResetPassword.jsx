@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import api from '../services/api';
+import { authService as api } from '../services/auth.service';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import { Car, Lock, Key, AlertCircle, CheckCircle } from 'lucide-react';
 import './Login.css';
@@ -53,7 +53,7 @@ export default function ResetPasswordPage() {
     if (newPassword !== confirmPassword) {
       return setError(t('auth.passwords_dont_match'));
     }
-    
+
     setError('');
     setLoading(true);
     try {

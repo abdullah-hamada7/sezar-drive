@@ -3,7 +3,8 @@ import { useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Camera, ShieldAlert, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
-import api from '../services/api';
+import { authService as api } from '../services/auth.service';
+import { http } from '../services/http.service';
 import './Login.css'; // Reuse login styles for consistency
 
 export default function DeviceVerificationPage() {
@@ -18,7 +19,7 @@ export default function DeviceVerificationPage() {
   const videoRef = useRef(null);
 
   const { userId, deviceFingerprint } = location.state || {};
-  
+
   // Debug logging to catch why validation might fail
   useEffect(() => {
     console.log('Verification State:', { userId, deviceFingerprint });
@@ -43,12 +44,12 @@ export default function DeviceVerificationPage() {
 
   const startCamera = async () => {
     try {
-      const s = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
+      const s = await navigator.mediaDevices.getUserMedia({
+        video: {
           facingMode: 'user',
           width: { ideal: 1280 },
           height: { ideal: 720 }
-        } 
+        }
       });
       setStream(s);
       setError('');
@@ -73,7 +74,7 @@ export default function DeviceVerificationPage() {
 
     try {
       const video = videoRef.current;
-      
+
       // Safety check for video readiness
       if (video.readyState < 2 || video.videoWidth === 0) {
         throw new Error('Video is not ready. Please wait a moment.');
@@ -98,13 +99,13 @@ export default function DeviceVerificationPage() {
 
       const res = await api.verifyDevice(formData);
       const { user: userData, accessToken, refreshToken } = res.data;
-      
-      api.setTokens(accessToken, refreshToken);
+
+      http.setTokens(accessToken, refreshToken);
       updateUser(userData);
-      
+
       setSuccess(true);
       stopCamera();
-      
+
       setTimeout(() => {
         navigate(userData.role === 'admin' ? '/admin' : '/driver');
       }, 2000);
@@ -168,17 +169,17 @@ export default function DeviceVerificationPage() {
               </div>
             ) : (
               <>
-                <video 
-                  ref={videoRef} 
-                  autoPlay 
-                  playsInline 
-                  muted 
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
                 <div style={{ position: 'absolute', bottom: '1rem', left: 0, right: 0, display: 'flex', justifyContent: 'center' }}>
-                  <button 
-                    className="btn btn-primary" 
-                    onClick={captureAndVerify} 
+                  <button
+                    className="btn btn-primary"
+                    onClick={captureAndVerify}
                     disabled={loading}
                     style={{ borderRadius: '2rem', padding: '0.75rem 2rem' }}
                   >
@@ -192,8 +193,8 @@ export default function DeviceVerificationPage() {
         )}
 
         {!success && (
-          <button 
-            className="btn-ghost" 
+          <button
+            className="btn-ghost"
             onClick={() => { stopCamera(); navigate('/login'); }}
             style={{ width: '100%' }}
           >

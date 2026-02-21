@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import api from '../../services/api';
+import { authService as api } from '../../services/auth.service';
 import { Check, X, User, Image } from 'lucide-react';
 import { ToastContext } from '../../contexts/toastContext';
 import ConfirmModal from '../../components/common/ConfirmModal';
@@ -15,7 +15,7 @@ export default function VerificationQueue() {
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState('desc');
   const [status, setStatus] = useState('pending');
-  
+
   const [confirmData, setConfirmData] = useState({ isOpen: false, item: null, action: null });
   const [promptData, setPromptData] = useState({ isOpen: false, item: null });
 
@@ -101,7 +101,7 @@ export default function VerificationQueue() {
               <button
                 key={s}
                 className={`btn btn-sm ${status === s ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ 
+                style={{
                   borderRadius: 'var(--radius-sm)',
                   border: status === s ? 'none' : '1px solid rgba(255,255,255,0.05)',
                   minWidth: '80px',
@@ -194,7 +194,7 @@ export default function VerificationQueue() {
         </div>
       )}
 
-      <ConfirmModal 
+      <ConfirmModal
         isOpen={confirmData.isOpen}
         onClose={() => setConfirmData({ isOpen: false, item: null, action: null })}
         onConfirm={() => handleReview(confirmData.item.id, confirmData.action)}
@@ -203,7 +203,7 @@ export default function VerificationQueue() {
         variant="success"
       />
 
-      <PromptModal 
+      <PromptModal
         isOpen={promptData.isOpen}
         onClose={() => setPromptData({ isOpen: false, item: null })}
         onConfirm={(reason) => handleReview(promptData.item.id, 'REJECT', reason)}

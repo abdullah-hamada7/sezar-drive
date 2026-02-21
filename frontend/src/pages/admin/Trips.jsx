@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import api from '../../services/api';
+import { tripService as api } from '../../services/trip.service';
 import { ToastContext } from '../../contexts/toastContext';
 import { Route, Search, Eye, XCircle, MapPin, Clock, DollarSign } from 'lucide-react';
 import PromptModal from '../../components/common/PromptModal';
@@ -21,16 +21,16 @@ export default function TripsPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [loading, setLoading] = useState(true);
   const [selectedTrip, setSelectedTrip] = useState(null);
-  
+
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [drivers, setDrivers] = useState([]);
-  const [form, setForm] = useState({ 
-    driverId: '', 
-    pickupLocation: '', 
-    dropoffLocation: '', 
-    price: '', 
+  const [form, setForm] = useState({
+    driverId: '',
+    pickupLocation: '',
+    dropoffLocation: '',
+    price: '',
     scheduledTime: '',
-    passengers: [] 
+    passengers: []
   });
   const [error, setError] = useState('');
   const [refresh, setRefresh] = useState(0);
@@ -82,7 +82,7 @@ export default function TripsPage() {
       setShowCreateModal(false);
       setForm({ driverId: '', pickupLocation: '', dropoffLocation: '', price: '', scheduledTime: '', passengers: [] });
       setRefresh(r => r + 1);
-    } catch (err) { 
+    } catch (err) {
       const driverName = drivers.find(d => d.id === form.driverId)?.name || '';
       setError(err.code ? t(`errors.${err.code}`, { name: driverName }) : err.message);
     }
@@ -197,14 +197,14 @@ export default function TripsPage() {
               <h2 className="modal-title">{t('trips.modal.assign_title')}</h2>
               <button className="btn-icon" onClick={() => setShowCreateModal(false)}><XCircle size={18} /></button>
             </div>
-            
+
             {error && <div className="alert alert-error">{error}</div>}
-            
+
             <form onSubmit={handleCreate} className="modal-body">
               <div className="form-section mb-md">
                 <div className="form-group mb-md">
                   <label className="form-label">{t('trips.modal.driver_label')}</label>
-                  <select className="form-input" value={form.driverId} onChange={e => setForm({...form, driverId: e.target.value})} required>
+                  <select className="form-input" value={form.driverId} onChange={e => setForm({ ...form, driverId: e.target.value })} required>
                     <option value="">{t('trips.modal.select_driver')}</option>
                     {drivers.map(d => (
                       <option key={d.id} value={d.id}>{d.name} ({d.identityVerified ? t('drivers.table.verified') : t('drivers.table.pending')})</option>
@@ -215,26 +215,26 @@ export default function TripsPage() {
                 <div className="grid grid-2 gap-md mb-md">
                   <div className="form-group">
                     <label className="form-label">{t('trips.modal.pickup_label')}</label>
-                    <input className="form-input" value={form.pickupLocation} onChange={e => setForm({...form, pickupLocation: e.target.value})} required placeholder={t('trips.modal.pickup_placeholder')} />
+                    <input className="form-input" value={form.pickupLocation} onChange={e => setForm({ ...form, pickupLocation: e.target.value })} required placeholder={t('trips.modal.pickup_placeholder')} />
                   </div>
                   <div className="form-group">
                     <label className="form-label">{t('trips.modal.dropoff_label')}</label>
-                    <input className="form-input" value={form.dropoffLocation} onChange={e => setForm({...form, dropoffLocation: e.target.value})} required placeholder={t('trips.modal.dropoff_placeholder')} />
+                    <input className="form-input" value={form.dropoffLocation} onChange={e => setForm({ ...form, dropoffLocation: e.target.value })} required placeholder={t('trips.modal.dropoff_placeholder')} />
                   </div>
                 </div>
 
                 <div className="grid grid-2 gap-md">
                   <div className="form-group">
                     <label className="form-label">{t('trips.modal.price_label', { unit: t('common.currency') })}</label>
-                    <input type="number" step="0.01" className="form-input" value={form.price} onChange={e => setForm({...form, price: e.target.value})} required placeholder="0.00" />
+                    <input type="number" step="0.01" className="form-input" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} required placeholder="0.00" />
                   </div>
                   <div className="form-group">
                     <label className="form-label">{t('trips.modal.time_label')}</label>
-                    <input 
-                      type="datetime-local" 
-                      className="form-input" 
-                      value={form.scheduledTime} 
-                      onChange={e => setForm({...form, scheduledTime: e.target.value})} 
+                    <input
+                      type="datetime-local"
+                      className="form-input"
+                      value={form.scheduledTime}
+                      onChange={e => setForm({ ...form, scheduledTime: e.target.value })}
                       min={new Date().toISOString().slice(0, 16)}
                     />
                   </div>
@@ -245,18 +245,18 @@ export default function TripsPage() {
               <div className="form-section mb-md">
                 <div className="flex justify-between items-center mb-md">
                   <h3 className="text-sm font-semibold uppercase tracking-wider opacity-70">{t('trips.modal.passengers_label')}</h3>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="btn btn-sm btn-secondary"
                     onClick={() => setForm({
-                      ...form, 
+                      ...form,
                       passengers: [...form.passengers, { name: '', phone: '', pickup: '', bags: 0 }]
                     })}
                   >
                     {t('trips.modal.add_passenger')}
                   </button>
                 </div>
-                
+
                 <div className="grid grid-1 gap-sm">
                   {form.passengers.length === 0 ? (
                     <p className="text-sm text-center text-muted py-md border-dashed border-2 rounded-lg">{t('trips.modal.no_passengers')}</p>
@@ -264,8 +264,8 @@ export default function TripsPage() {
                     <div key={idx} className="card p-md" style={{ background: 'var(--color-bg-subtle)', border: '1px solid var(--color-border)' }}>
                       <div className="flex justify-between items-center mb-sm">
                         <span className="text-xs font-bold uppercase tracking-tight text-primary">{t('trips.modal.passenger_num', { count: idx + 1 })}</span>
-                        <button 
-                          type="button" 
+                        <button
+                          type="button"
                           className="btn-icon text-danger"
                           onClick={() => {
                             const newPassengers = [...form.passengers];
@@ -278,54 +278,54 @@ export default function TripsPage() {
                       </div>
                       <div className="grid grid-2 gap-sm">
                         <div className="form-group">
-                          <input 
-                            className="form-input text-sm" 
-                            placeholder={t('trips.modal.name_ph')} 
-                            value={p.name} 
+                          <input
+                            className="form-input text-sm"
+                            placeholder={t('trips.modal.name_ph')}
+                            value={p.name}
                             onChange={e => {
                               const newPassengers = [...form.passengers];
                               newPassengers[idx].name = e.target.value;
                               setForm({ ...form, passengers: newPassengers });
-                            }} 
+                            }}
                             required
                           />
                         </div>
                         <div className="form-group">
-                          <input 
-                            className="form-input text-sm" 
-                            placeholder={t('trips.modal.phone_ph')} 
-                            value={p.phone} 
+                          <input
+                            className="form-input text-sm"
+                            placeholder={t('trips.modal.phone_ph')}
+                            value={p.phone}
                             onChange={e => {
                               const newPassengers = [...form.passengers];
                               newPassengers[idx].phone = e.target.value;
                               setForm({ ...form, passengers: newPassengers });
-                            }} 
+                            }}
                           />
                         </div>
                         <div className="form-group">
-                          <input 
-                            className="form-input text-sm" 
-                            placeholder={t('trips.modal.pickup_ph')} 
-                            value={p.pickup} 
+                          <input
+                            className="form-input text-sm"
+                            placeholder={t('trips.modal.pickup_ph')}
+                            value={p.pickup}
                             onChange={e => {
                               const newPassengers = [...form.passengers];
                               newPassengers[idx].pickup = e.target.value;
                               setForm({ ...form, passengers: newPassengers });
-                            }} 
+                            }}
                           />
                         </div>
                         <div className="form-group">
-                          <input 
+                          <input
                             type="number"
-                            className="form-input text-sm" 
-                            placeholder={t('trips.modal.bags_ph')} 
+                            className="form-input text-sm"
+                            placeholder={t('trips.modal.bags_ph')}
                             min="0"
-                            value={p.bags || ''} 
+                            value={p.bags || ''}
                             onChange={e => {
                               const newPassengers = [...form.passengers];
                               newPassengers[idx].bags = parseInt(e.target.value) || 0;
                               setForm({ ...form, passengers: newPassengers });
-                            }} 
+                            }}
                           />
                         </div>
                       </div>
@@ -352,7 +352,7 @@ export default function TripsPage() {
                 <XCircle size={18} />
               </button>
             </div>
-            
+
             <div className="modal-body">
               <div className="grid grid-2 gap-xl">
                 <div className="form-section">
@@ -442,7 +442,7 @@ export default function TripsPage() {
         </div>
       )}
 
-      <PromptModal 
+      <PromptModal
         isOpen={promptData.isOpen}
         onClose={() => setPromptData({ isOpen: false, tripId: null })}
         onConfirm={onConfirmCancel}

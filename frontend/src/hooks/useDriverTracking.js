@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useAuth } from './useAuth';
-import api from '../services/api';
+import { shiftService as api } from '../services/shift.service';
 import { buildTrackingWsUrl } from '../utils/trackingWs';
 
 export function useDriverTracking() {

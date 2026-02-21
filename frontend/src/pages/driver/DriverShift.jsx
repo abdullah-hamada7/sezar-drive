@@ -1,6 +1,8 @@
 import { useState, useEffect, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import api from '../../services/api';
+import { authService } from '../../services/auth.service';
+import { shiftService } from '../../services/shift.service';
+import { vehicleService } from '../../services/vehicle.service';
 import { useShift } from '../../contexts/ShiftContext';
 import FaceCapture from '../../components/FaceCapture';
 import QRScanner from '../../components/QRScanner';
@@ -18,13 +20,13 @@ export default function DriverShift() {
   const [activeStep, setActiveStep] = useState(null); // 'face' | 'qr'
   const [showConfirm, setShowConfirm] = useState(false);
 
-  useEffect(() => { 
+  useEffect(() => {
     loadUser();
   }, []);
 
   async function loadUser() {
     try {
-      const res = await api.getMe();
+      const res = await authService.getMe();
       setUser(res.data.user);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
@@ -37,17 +39,17 @@ export default function DriverShift() {
     }
     setActionLoading(true);
     try {
-        const res = await api.createShift();
-        await refreshShift();
-        // Automatically start with biometric if not verified recently
-        const verifiedToday = user.lastBiometricVerifiedAt && (new Date() - new Date(user.lastBiometricVerifiedAt)) < 24 * 60 * 60 * 1000;
-        if (!verifiedToday) {
-            setActiveStep('face');
-        }
+      const res = await shiftService.createShift();
+      await refreshShift();
+      // Automatically start with biometric if not verified recently
+      const verifiedToday = user.lastBiometricVerifiedAt && (new Date() - new Date(user.lastBiometricVerifiedAt)) < 24 * 60 * 60 * 1000;
+      if (!verifiedToday) {
+        setActiveStep('face');
+      }
     } catch (err) {
-        // Handled by HttpService
+      // Handled by HttpService
     } finally {
-        setActionLoading(false);
+      setActionLoading(false);
     }
   }
 
@@ -57,8 +59,8 @@ export default function DriverShift() {
     try {
       const formData = new FormData();
       formData.append('selfie', file);
-      
-      const result = await api.verifyShift(shift.id, formData);
+
+      const result = await shiftService.verifyShift(shift.id, formData);
 
       if (result.data.status === 'VERIFIED') {
         addToast(t('common.success'), 'success');
@@ -81,7 +83,7 @@ export default function DriverShift() {
   async function handleQRScan(qrCode) {
     setActionLoading(true);
     try {
-      await api.assignSelfVehicle(qrCode);
+      await vehicleService.assignSelfVehicle(qrCode);
       addToast(t('common.success'), 'success');
       setActiveStep(null);
       await refreshShift();
@@ -95,7 +97,7 @@ export default function DriverShift() {
   async function activateShift() {
     setActionLoading(true);
     try {
-      await api.activateShift(shift.id);
+      await shiftService.activateShift(shift.id);
       addToast(t('common.success'), 'success');
       await refreshShift();
     } catch (err) {
@@ -107,7 +109,7 @@ export default function DriverShift() {
     setShowConfirm(false);
     setActionLoading(true);
     try {
-      await api.closeShift(shift.id);
+      await shiftService.closeShift(shift.id);
       addToast(t('common.success'), 'success');
       await refreshShift();
     } catch (err) {
@@ -160,84 +162,84 @@ export default function DriverShift() {
         </div>
       ) : shift.status === 'PendingVerification' ? (
         <div className="security-gate-container">
-           <div className="card glass-card" style={{ marginBottom: 'var(--space-lg)', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
-              <div className="flex items-center gap-md mb-lg">
-                <div className="stat-icon" style={{ background: 'rgba(245, 158, 11, 0.12)', color: '#f59e0b' }}>
-                  <ShieldCheck size={24} />
+          <div className="card glass-card" style={{ marginBottom: 'var(--space-lg)', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
+            <div className="flex items-center gap-md mb-lg">
+              <div className="stat-icon" style={{ background: 'rgba(245, 158, 11, 0.12)', color: '#f59e0b' }}>
+                <ShieldCheck size={24} />
+              </div>
+              <div>
+                <h3 style={{ margin: 0 }}>The Gate</h3>
+                <p className="text-sm text-muted">Complete verification to start driving</p>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {/* Step 1: Face */}
+              <div
+                className={`gate-step card ${isVerified ? 'gate-step-done' : ''}`}
+                onClick={() => !isVerified && setActiveStep('face')}
+                style={{
+                  cursor: isVerified ? 'default' : 'pointer',
+                  display: 'flex', alignItems: 'center', gap: '1rem',
+                  padding: '1rem', background: isVerified ? 'rgba(34, 197, 94, 0.05)' : 'var(--color-bg-secondary)'
+                }}
+              >
+                <div style={{ color: isVerified ? 'var(--color-success)' : 'var(--color-text-muted)' }}>
+                  {isVerified ? <CheckCircle2 size={24} /> : <Camera size={24} />}
                 </div>
-                <div>
-                  <h3 style={{ margin: 0 }}>The Gate</h3>
-                  <p className="text-sm text-muted">Complete verification to start driving</p>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 600 }}>Face Verification</div>
+                  <div className="text-xs text-muted">{isVerified ? 'Identity Confirmed' : 'Action Required'}</div>
                 </div>
+                {!isVerified && <Play size={16} className="text-muted mirror-rtl" />}
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {/* Step 1: Face */}
-                <div 
-                  className={`gate-step card ${isVerified ? 'gate-step-done' : ''}`}
-                  onClick={() => !isVerified && setActiveStep('face')}
-                  style={{ 
-                    cursor: isVerified ? 'default' : 'pointer',
-                    display: 'flex', alignItems: 'center', gap: '1rem',
-                    padding: '1rem', background: isVerified ? 'rgba(34, 197, 94, 0.05)' : 'var(--color-bg-secondary)'
-                  }}
-                >
-                  <div style={{ color: isVerified ? 'var(--color-success)' : 'var(--color-text-muted)' }}>
-                    {isVerified ? <CheckCircle2 size={24} /> : <Camera size={24} />}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600 }}>Face Verification</div>
-                    <div className="text-xs text-muted">{isVerified ? 'Identity Confirmed' : 'Action Required'}</div>
-                  </div>
-                  {!isVerified && <Play size={16} className="text-muted mirror-rtl" />}
+              {/* Step 2: QR */}
+              <div
+                className={`gate-step card ${hasVehicle ? 'gate-step-done' : ''}`}
+                onClick={() => !hasVehicle && setActiveStep('qr')}
+                style={{
+                  cursor: hasVehicle ? 'default' : 'pointer',
+                  display: 'flex', alignItems: 'center', gap: '1rem',
+                  padding: '1rem', background: hasVehicle ? 'rgba(34, 197, 94, 0.05)' : 'var(--color-bg-secondary)'
+                }}
+              >
+                <div style={{ color: hasVehicle ? 'var(--color-success)' : 'var(--color-text-muted)' }}>
+                  {hasVehicle ? <CheckCircle2 size={24} /> : <QrCode size={24} />}
                 </div>
-
-                {/* Step 2: QR */}
-                <div 
-                  className={`gate-step card ${hasVehicle ? 'gate-step-done' : ''}`}
-                  onClick={() => !hasVehicle && setActiveStep('qr')}
-                  style={{ 
-                    cursor: hasVehicle ? 'default' : 'pointer',
-                    display: 'flex', alignItems: 'center', gap: '1rem',
-                    padding: '1rem', background: hasVehicle ? 'rgba(34, 197, 94, 0.05)' : 'var(--color-bg-secondary)'
-                  }}
-                >
-                  <div style={{ color: hasVehicle ? 'var(--color-success)' : 'var(--color-text-muted)' }}>
-                    {hasVehicle ? <CheckCircle2 size={24} /> : <QrCode size={24} />}
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 600 }}>Vehicle Check-in</div>
+                  <div className="text-xs text-muted">
+                    {hasVehicle ? `Assigned: ${shift.vehicle?.plateNumber || 'VH-101'}` : 'Scan Vehicle QR'}
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600 }}>Vehicle Check-in</div>
-                    <div className="text-xs text-muted">
-                        {hasVehicle ? `Assigned: ${shift.vehicle?.plateNumber || 'VH-101'}` : 'Scan Vehicle QR'}
-                    </div>
-                  </div>
-                  {!hasVehicle && <Play size={16} className="text-muted mirror-rtl" />}
                 </div>
+                {!hasVehicle && <Play size={16} className="text-muted mirror-rtl" />}
               </div>
+            </div>
 
-              <div style={{ marginTop: '2rem' }}>
-                <button 
-                    className="btn btn-primary" 
-                    onClick={activateShift} 
-                    disabled={!isVerified || !hasVehicle || actionLoading} 
-                    style={{ width: '100%', padding: '1rem' }}
-                >
-                  {actionLoading ? <Loader size={20} className="spinning" /> : <Play size={20} className="mirror-rtl" />}
-                  <span style={{ marginLeft: '0.5rem' }}>Activate Shift & Start Driving</span>
-                </button>
-              </div>
-           </div>
+            <div style={{ marginTop: '2rem' }}>
+              <button
+                className="btn btn-primary"
+                onClick={activateShift}
+                disabled={!isVerified || !hasVehicle || actionLoading}
+                style={{ width: '100%', padding: '1rem' }}
+              >
+                {actionLoading ? <Loader size={20} className="spinning" /> : <Play size={20} className="mirror-rtl" />}
+                <span style={{ marginLeft: '0.5rem' }}>Activate Shift & Start Driving</span>
+              </button>
+            </div>
+          </div>
 
-           <button className="btn btn-ghost" onClick={() => setShowConfirm(true)} style={{ width: '100%' }}>
-              Cancel Shift Request
-           </button>
+          <button className="btn btn-ghost" onClick={() => setShowConfirm(true)} style={{ width: '100%' }}>
+            Cancel Shift Request
+          </button>
         </div>
       ) : (
         <div className="card">
           <div className="flex items-center gap-md" style={{ marginBottom: 'var(--space-lg)' }}>
-            <div className="stat-icon" style={{ 
-              background: 'rgba(16, 185, 129, 0.12)', 
-              color: '#10b981' 
+            <div className="stat-icon" style={{
+              background: 'rgba(16, 185, 129, 0.12)',
+              color: '#10b981'
             }}>
               <ShieldCheck size={24} />
             </div>
@@ -271,7 +273,7 @@ export default function DriverShift() {
           </div>
         </div>
       )}
-      <ConfirmModal 
+      <ConfirmModal
         isOpen={showConfirm}
         onClose={() => setShowConfirm(false)}
         onConfirm={onConfirmClose}

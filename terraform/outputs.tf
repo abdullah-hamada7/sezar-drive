@@ -7,5 +7,5 @@ output "s3_bucket_name" {
 }
 
 output "ssh_command" {
-  value = "ssh -i key.pem ubuntu@${aws_instance.sezar_drive.public_ip}"
+  value = "ssh -i ${var.key_name}.pem ubuntu@${aws_instance.sezar_drive.public_ip}"
 }

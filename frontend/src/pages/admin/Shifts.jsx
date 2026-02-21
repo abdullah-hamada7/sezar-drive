@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import api from '../../services/api';
+import { shiftService as api } from '../../services/shift.service';
 import { ClipboardCheck, X, XCircle, Check, AlertCircle, Calendar, Gauge, Info } from 'lucide-react';
 import { useContext } from 'react';
 import { ToastContext } from '../../contexts/toastContext';
@@ -68,9 +68,9 @@ export default function ShiftsPage() {
 
   function formatDate(d) {
     if (!d) return '—';
-    return new Date(d).toLocaleString(i18n.language, { 
-      dateStyle: 'medium', 
-      timeStyle: 'short' 
+    return new Date(d).toLocaleString(i18n.language, {
+      dateStyle: 'medium',
+      timeStyle: 'short'
     });
   }
 
@@ -79,7 +79,7 @@ export default function ShiftsPage() {
 
   async function handleViewInspections(shiftId) {
     try {
-      const res = await api.getInspections(`shiftId=${shiftId}`); 
+      const res = await api.getInspections(`shiftId=${shiftId}`);
       setSelectedShiftInspections(res.data || []);
       setShowInspections(true);
     } catch (err) {
@@ -185,20 +185,20 @@ export default function ShiftsPage() {
                       </div>
 
                       <div className="grid grid-3 gap-md mb-lg p-sm rounded bg-bg-tertiary">
-                         <div className="flex flex-col">
-                            <span className="text-xs text-muted flex items-center gap-xs"><Calendar size={12} /> {t('admin_expenses.table.date')}</span>
-                            <span className="text-sm font-medium">{formatDate(insp.createdAt)}</span>
-                         </div>
-                         <div className="flex flex-col">
-                            <span className="text-xs text-muted flex items-center gap-xs"><Gauge size={12} /> {t('inspection.mileage')}</span>
-                            <span className="text-sm font-medium">{insp.mileage ? `${insp.mileage} KM` : '—'}</span>
-                         </div>
-                         <div className="flex flex-col">
-                            <span className="text-xs text-muted flex items-center gap-xs"><Info size={12} /> ID</span>
-                            <span className="text-xs text-mono font-medium">{insp.id.substring(0, 8)}...</span>
-                         </div>
+                        <div className="flex flex-col">
+                          <span className="text-xs text-muted flex items-center gap-xs"><Calendar size={12} /> {t('admin_expenses.table.date')}</span>
+                          <span className="text-sm font-medium">{formatDate(insp.createdAt)}</span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-xs text-muted flex items-center gap-xs"><Gauge size={12} /> {t('inspection.mileage')}</span>
+                          <span className="text-sm font-medium">{insp.mileage ? `${insp.mileage} KM` : '—'}</span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-xs text-muted flex items-center gap-xs"><Info size={12} /> ID</span>
+                          <span className="text-xs text-mono font-medium">{insp.id.substring(0, 8)}...</span>
+                        </div>
                       </div>
-                      
+
                       {insp.checklistData && (
                         <div className="mb-lg">
                           <h4 className="text-xs uppercase text-muted font-bold mb-sm tracking-wider">{t('shifts.modal.checklist')}</h4>
@@ -227,10 +227,10 @@ export default function ShiftsPage() {
                             {insp.photos.map(p => (
                               <div key={p.id} className="text-center group">
                                 <a href={p.photoUrl} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-md border border-border group-hover:border-primary transition-all">
-                                  <img 
-                                    src={p.photoUrl} 
-                                    alt={t(`inspection.directions.${p.direction}`)} 
-                                    className="w-full aspect-square object-cover group-hover:scale-105 transition-transform" 
+                                  <img
+                                    src={p.photoUrl}
+                                    alt={t(`inspection.directions.${p.direction}`)}
+                                    className="w-full aspect-square object-cover group-hover:scale-105 transition-transform"
                                   />
                                 </a>
                                 <span className="text-xs text-muted capitalize mt-xs block italic">{t(`inspection.directions.${p.direction}`)}</span>
@@ -248,7 +248,7 @@ export default function ShiftsPage() {
         </div>
       )}
 
-      <PromptModal 
+      <PromptModal
         isOpen={promptData.isOpen}
         onClose={() => setPromptData({ isOpen: false, shiftId: null })}
         onConfirm={onConfirmClose}
@@ -256,7 +256,7 @@ export default function ShiftsPage() {
         message={t('shifts.modal.close_prompt')}
         placeholder={t('shifts.modal.reason_placeholder') || 'Reason for closing shift'}
       />
-      
+
       <style>{`
         .bg-surface-dark { background: rgba(0, 0, 0, 0.1); }
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); }
