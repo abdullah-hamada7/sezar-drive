@@ -69,4 +69,4 @@ The production environment is managed via Terraform (`infrastructure/terraform/`
 
 Ensure `.env` files are present in `backend/` directory. See `.env.example` using key:
 
-- `DATABASE_URL`: `postgresql://postgres:postgres@postgres:5432/fleet_management?schema=public` (Note hostname `postgres` for internal docker network)
+- `DATABASE_URL`: `postgresql://postgres:postgres@postgres:5432/sezar_drive?schema=public` (Note hostname `postgres` for internal docker network)

@@ -6,7 +6,7 @@ S3_BUCKET="${s3_bucket}"
 
 # Update and install dependencies
 sudo apt-get update
-sudo apt-get install -y ca-certificates curl gnupg lsb-release unzip
+sudo apt-get install -y ca-certificates curl gnupg lsb-release unzip libcurl4-openssl-dev
 
 # Install AWS CLI v2 (required for S3 backups)
 if ! command -v aws &> /dev/null; then

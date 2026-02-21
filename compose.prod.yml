@@ -70,6 +70,9 @@ services:
       NODE_ENV: production
       CORS_ORIGIN: http://${DOMAIN_NAME}
       FRONTEND_URL: ${FRONTEND_URL}
+      PROJECT_NAME: ${PROJECT_NAME}
+      S3_REGION: ${S3_REGION:-us-east-1}
+      AWS_DEFAULT_REGION: ${aws_region:-us-east-1}
     networks:
       - db-net
       - app-net
