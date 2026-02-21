@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { tripService as api } from '../../services/trip.service';
+import { driverService } from '../../services/driver.service';
 import { ToastContext } from '../../contexts/toastContext';
 import { Route, Search, Eye, XCircle, MapPin, Clock, DollarSign } from 'lucide-react';
 import PromptModal from '../../components/common/PromptModal';
@@ -69,7 +70,7 @@ export default function TripsPage() {
     setError('');
     setShowCreateModal(true);
     try {
-      const res = await api.getDrivers('limit=100');
+      const res = await driverService.getDrivers('limit=100');
       setDrivers(res.data.drivers || []);
     } catch (err) { console.error(err); }
   }
