@@ -144,15 +144,15 @@ export default function AuditPage() {
                   </td>
                   <td className="text-sm">
                     <span className={`badge ${l.actor?.role === 'admin' ? 'badge-info' : 'badge-neutral'}`}>
-                      {t(`roles.${l.actor?.role || 'system'}`, l.actor?.role || 'system')}
+                      {t(`common.role.${l.actor?.role || 'system'}`, l.actor?.role || 'system')}
                     </span>
                   </td>
                   <td>
                     <span className="badge badge-neutral" style={{ background: 'var(--color-bg-tertiary)' }}>
-                      {t(`actions.${l.actionType?.split('.').pop()?.toLowerCase()}`, l.actionType)}
+                      {t(`audit.action.${l.actionType?.split('.').pop()?.toLowerCase()}`, l.actionType)}
                     </span>
                   </td>
-                  <td className="text-sm">{t(`entities.${l.entityType?.toLowerCase()}`, l.entityType)}</td>
+                  <td className="text-sm">{t(`audit.entity.${l.entityType?.toLowerCase()}`, l.entityType)}</td>
                   <td className="text-sm text-muted" style={{ fontFamily: 'monospace' }} dir="ltr">{l.entityId?.slice(0, 8)}...</td>
                   <td>
                     <button className="btn-icon" title={t('audit.table.details')} onClick={() => setSelected(l)}>
@@ -199,13 +199,13 @@ export default function AuditPage() {
               <div>
                 <label className="form-label">{t('audit.modal.action')}</label>
                 <div className="text-sm" style={{ fontWeight: 600 }}>
-                  {t(`actions.${selected.actionType?.split('.').pop()?.toLowerCase()}`, selected.actionType)}
+                  {t(`audit.action.${selected.actionType?.split('.').pop()?.toLowerCase()}`, selected.actionType)}
                 </div>
               </div>
 
               <div>
                 <label className="form-label">{t('audit.modal.entity')}</label>
-                <div className="text-sm">{t(`entities.${selected.entityType?.toLowerCase()}`, selected.entityType)} ({selected.entityId})</div>
+                <div className="text-sm">{t(`audit.entity.${selected.entityType?.toLowerCase()}`, selected.entityType)} ({selected.entityId})</div>
               </div>
               <div>
                 <label className="form-label">{t('audit.modal.timestamp')}</label>

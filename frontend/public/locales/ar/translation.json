@@ -63,7 +63,10 @@
     "redirecting": "جاري توجيهك الآن...",
     "start_camera": "بدء الكاميرا",
     "verify_identity_btn": "التحقق من الهوية",
-    "verifying": "جاري التحقق..."
+    "verifying": "جاري التحقق...",
+    "passwords_dont_match": "كلمات المرور غير متطابقة",
+    "change_password_failed": "فشل تغيير كلمة المرور",
+    "invalid_token": "رمز غير صالح"
   },
   "trip": {
     "title": "تفاصيل الرحلة",
@@ -116,7 +119,10 @@
     "scan_vehicle_desc": "امسح رمز QR للمركبة",
     "activate_and_drive_btn": "تفعيل المناوبة وبدء القيادة",
     "cancel_request_btn": "إلغاء طلب المناوبة",
-    "cancel_request_confirm": "هل أنت متأكد من رغبتك في إلغاء طلب المناوبة هذا؟"
+    "cancel_request_confirm": "هل أنت متأكد من إلغاء طلب المناوبة؟",
+    "camera_error": "تعذر الوصول إلى الكاميرا",
+    "camera_denied": "تم رفض الكاميرا. يرجى تفعيل الأذونات.",
+    "no_camera": "لم يتم العثour على كاميرا في هذا الجهاز."
   },
   "inspection": {
     "title": "فحص المركبة",
@@ -157,9 +163,10 @@
     "done_desc": "تم إرسال فحصك بنجاح.",
     "no_shift_title": "لا توجد مناوبة نشطة",
     "no_shift_desc": "يجب أن تبدأ مناوبة قبل أن تتمكن من إجراء فحص للمركبة.",
-    "go_shifts": "الانتقال للمناوبات",
-    "photos_missing_error": "يرجى التقاط الصور من جميع الجهات الأربعة قبل الإكمال.",
-    "camera_error": "تعذر الوصول إلى الكاميرا"
+    "go_shifts": "الذهاب للمناوبات",
+    "photos_missing_error": "يرجى التقاط الصور من الجهات الأربع قبل الإكمال.",
+    "camera_error": "تعذر الوصول إلى الكاميرا",
+    "mileage": "قراءة العداد (كم)"
   },
   "driver_home": {
     "identity_pending": "التحقق من الهوية قيد المراجعة",
@@ -177,8 +184,10 @@
     "assign_btn": "تعيين",
     "daily_earnings": "أرباح اليوم",
     "selfie_label": "الصورة الشخصية",
-    "id_front": "الوجه الأمامي للبطاقة",
-    "id_back": "الوجه الخلفي للبطاقة",
+    "id_card_front": "البطاقة الوطنية (أمام)",
+    "id_card_back": "البطاقة الوطنية (خلف)",
+    "id_front": "البطاقة الوطنية (أمام)",
+    "id_back": "البطاقة الوطنية (خلف)",
     "selected": "مختار",
     "tap_select": "اضغط للاختيار",
     "upload_success": "تم رفع المستندات. بانتظار مراجعة المسؤول.",
@@ -214,8 +223,15 @@
     "back": "عودة",
     "not_provided": "غير متوفر",
     "not_uploaded": "لم يتم الرفع",
-    "email": "البريد",
+    "email": "البريد الإلكتروني",
     "phone": "الهاتف",
+    "now": "الآن",
+    "no_data": "لا يوجد بيانات متاحة",
+    "role": {
+      "admin": "مسؤول",
+      "driver": "سائق",
+      "system": "النظام"
+    },
     "status": {
       "verified": "متـحـقق",
       "pending": "قيد المراجعة",
@@ -391,6 +407,7 @@
       "photos_section": "الصور",
       "add_title": "إضافة سائق جديد",
       "edit_title": "تعديل السائق",
+      "avatar": "الصورة الشخصية",
       "selfie_label": "الصورة الشخصية",
       "id_card_front": "البطاقة الوطنية (أمام)",
       "id_card_back": "البطاقة الوطنية (خلف)",
@@ -415,7 +432,7 @@
       "name_required": "الاسم مطلوب",
       "password_invalid": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
       "create_btn": "إنشاء السائق",
-      "phone_placeholder": "+966500000000",
+      "phone_placeholder": "+201",
       "license_placeholder": "DL-XXXX-XXX"
     },
     "messages": {
@@ -535,6 +552,18 @@
       "category": "الفئة",
       "description": "الوصف",
       "plateNumber": "رقم اللوحة"
+    },
+    "action": {
+      "activated": "تفعيل",
+      "created": "إنشاء",
+      "updated": "تحديث",
+      "deleted": "حذف",
+      "started": "بدء",
+      "completed": "اكتمال",
+      "cancelled": "إلغاء",
+      "logged_in": "تسجيل دخول",
+      "identity_uploaded": "رفع الهوية",
+      "identity_reviewed": "مراجعة الهوية"
     }
   },
   "admin_damage": {
@@ -680,7 +709,17 @@
       "generate": "إنشاء"
     },
     "messages": {
-      "select_dates": "اختر تاريحي البدء والانتهاء"
+      "select_dates": "يرجى اختيار تاريخ البدء والانتهاء"
+    },
+    "card": {
+      "title": "ملخص أداء السائقين"
+    },
+    "table": {
+      "driver": "السائق",
+      "trips": "الرحلات",
+      "revenue": "الإيرادات",
+      "expenses": "المصاريف",
+      "net": "الصافي"
     },
     "stats": {
       "revenue": "إجمالي الإيرادات",

@@ -63,7 +63,10 @@
     "redirecting": "Redirecting you now...",
     "start_camera": "Start Camera",
     "verify_identity_btn": "Verify Identity",
-    "verifying": "Verifying..."
+    "verifying": "Verifying...",
+    "passwords_dont_match": "Passwords do not match",
+    "change_password_failed": "Change password failed",
+    "invalid_token": "Invalid token"
   },
   "trip": {
     "title": "Trip Details",
@@ -116,7 +119,10 @@
     "scan_vehicle_desc": "Scan Vehicle QR",
     "activate_and_drive_btn": "Activate Shift & Start Driving",
     "cancel_request_btn": "Cancel Shift Request",
-    "cancel_request_confirm": "Are you sure you want to cancel this shift request?"
+    "cancel_request_confirm": "Are you sure you want to cancel this shift request?",
+    "camera_error": "Could not access camera",
+    "camera_denied": "Camera access denied. Please allow camera permissions.",
+    "no_camera": "No camera found on this device."
   },
   "inspection": {
     "title": "Vehicle Inspection",
@@ -159,7 +165,8 @@
     "no_shift_desc": "You must start a shift before you can perform a vehicle inspection.",
     "go_shifts": "Go to Shifts",
     "photos_missing_error": "Please take photos of all 4 sides before completing.",
-    "camera_error": "Could not access camera"
+    "camera_error": "Could not access camera",
+    "mileage": "Current Mileage (KM)"
   },
   "driver_home": {
     "identity_pending": "Identity verification pending",
@@ -218,6 +225,13 @@
     "not_uploaded": "Not Uploaded",
     "email": "Email",
     "phone": "Phone",
+    "now": "Just now",
+    "no_data": "No data available",
+    "role": {
+      "admin": "Admin",
+      "driver": "Driver",
+      "system": "System"
+    },
     "status": {
       "verified": "Verified",
       "pending": "Pending",
@@ -417,7 +431,7 @@
       "name_required": "Name is required",
       "password_invalid": "Password must be at least 8 characters",
       "create_btn": "Create Driver",
-      "phone_placeholder": "+966500000000",
+      "phone_placeholder": "+201",
       "license_placeholder": "DL-XXXX-XXX"
     },
     "messages": {
@@ -537,6 +551,18 @@
       "category": "Category",
       "description": "Description",
       "plateNumber": "Plate Number"
+    },
+    "action": {
+      "activated": "Activated",
+      "created": "Created",
+      "updated": "Updated",
+      "deleted": "Deleted",
+      "started": "Started",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "logged_in": "Logged In",
+      "identity_uploaded": "Identity Uploaded",
+      "identity_reviewed": "Identity Reviewed"
     }
   },
   "admin_damage": {
@@ -683,6 +709,16 @@
     },
     "messages": {
       "select_dates": "Select start and end dates"
+    },
+    "card": {
+      "title": "Driver Performance Summary"
+    },
+    "table": {
+      "driver": "Driver",
+      "trips": "Trips",
+      "revenue": "Revenue",
+      "expenses": "Expenses",
+      "net": "Net"
     },
     "stats": {
       "revenue": "Total Revenue",
