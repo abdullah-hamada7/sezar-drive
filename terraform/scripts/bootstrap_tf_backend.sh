@@ -12,7 +12,11 @@ echo "🚀 Bootstrapping Terraform Remote Backend..."
 
 # 1. Create S3 Bucket
 echo "Creating S3 bucket: $BUCKET_NAME..."
-aws s3api create-bucket --bucket $BUCKET_NAME --region $REGION --create-bucket-configuration LocationConstraint=$REGION
+if [ "$REGION" = "us-east-1" ]; then
+    aws s3api create-bucket --bucket $BUCKET_NAME --region $REGION
+else
+    aws s3api create-bucket --bucket $BUCKET_NAME --region $REGION --create-bucket-configuration LocationConstraint=$REGION
+fi
 
 # 2. Enable Versioning
 echo "Enabling bucket versioning..."
@@ -32,7 +36,7 @@ aws s3api put-bucket-encryption --bucket $BUCKET_NAME --server-side-encryption-c
 
 # 4. Block Public Access
 echo "Blocking public access..."
-aws s3api put-public-access-block --bucket $BUCKET_NAME --public-access-block-configuration "BlockPublicAcl=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"
+aws s3api put-public-access-block --bucket $BUCKET_NAME --public-access-block-configuration "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"
 
 # 5. Enforce SSL for all requests
 echo "Enforcing SSL-only access..."
@@ -74,7 +78,7 @@ echo "backend \"s3\" {"
 echo "  bucket         = \"$BUCKET_NAME\""
 echo "  key            = \"state/terraform.tfstate\""
 echo "  region         = \"$REGION\""
-echo "  dynamodb_table = \"$TABLE_NAME\""
+echo "  use_lockfile   = true"
 echo "  encrypt        = true"
 echo "}"
 echo "------------------------------------------------"

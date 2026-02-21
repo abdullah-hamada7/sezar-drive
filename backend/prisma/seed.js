@@ -1,98 +1,64 @@
+require('dotenv').config();
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 
-const prisma = new PrismaClient({ 
-  log: ['query', 'info', 'warn', 'error'],
-});
+const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Seeding database...');
+  console.log('🌱 Starting database seeding (Admin Only)...');
 
-  // Create admin user
-  const adminPassword = await bcrypt.hash('Hossam@2026', 12);
-  const admin = await prisma.user.upsert({
-    where: { email: 'hossam@sezar.com' },
-    update: {},
-    create: {
-      email: 'hossam@sezar.com',
-      phone: '+966500000001',
-      name: 'System Admin',
-      passwordHash: adminPassword,
-      role: 'admin',
-      mustChangePassword: false,
-      identityVerified: true,
-      isActive: true,
-    },
-  });
-  console.log(`  ✅ Admin: ${admin.email}`);
+  try {
+    // 1. Clean existing data (respecting foreign keys)
+    console.log('  🗑️ Cleaning existing data...');
 
-  // Create demo driver
-  const driverPassword = await bcrypt.hash('Driver123!', 12);
-  const driver = await prisma.user.upsert({
-    where: { email: 'driver1@fleet.com' },
-    update: {
-      passwordHash: driverPassword,
-    },
-    create: {
-      email: 'driver1@fleet.com',
-      phone: '+966500000002',
-      name: 'Sezar Drive',
-      passwordHash: driverPassword,
-      role: 'driver',
-      licenseNumber: 'DL-2024-001',
-      mustChangePassword: true,
-      identityVerified: false,
-      isActive: true,
-    },
-  });
-  console.log(`  ✅ Driver: ${driver.email}`);
+    // Deleting in reverse order of dependencies
+    await prisma.locationLog.deleteMany();
+    await prisma.damagePhoto.deleteMany();
+    await prisma.damageReport.deleteMany();
+    await prisma.inspectionPhoto.deleteMany();
+    await prisma.inspection.deleteMany();
+    await prisma.trip.deleteMany();
+    await prisma.expense.deleteMany();
+    await prisma.shift.deleteMany();
+    await prisma.vehicleAssignment.deleteMany();
+    await prisma.identityVerification.deleteMany();
+    await prisma.auditLog.deleteMany();
+    await prisma.refreshToken.deleteMany();
+    await prisma.userDevice.deleteMany();
+    await prisma.rescueRequest.deleteMany();
+    await prisma.adminConfig.deleteMany();
+    await prisma.user.deleteMany();
+    await prisma.vehicle.deleteMany();
+    await prisma.expenseCategory.deleteMany();
 
-  // Create vehicles
-  const vehicles = [
-    { plateNumber: 'ABC-1234', model: 'Toyota Camry', year: 2023, capacity: 4, qrCode: 'VH-QR-001' },
-    { plateNumber: 'DEF-5678', model: 'Toyota Hiace', year: 2022, capacity: 12, qrCode: 'VH-QR-002' },
-    { plateNumber: 'GHI-9012', model: 'Hyundai Sonata', year: 2024, capacity: 4, qrCode: 'VH-QR-003' },
-  ];
+    console.log('  ✅ Database cleaned.');
 
-  for (const v of vehicles) {
-    await prisma.vehicle.upsert({
-      where: { plateNumber: v.plateNumber },
-      update: {},
-      create: v,
+    // 2. Create admin user
+    const adminPassword = await bcrypt.hash('Hossam@2026', 12);
+    const admin = await prisma.user.create({
+      data: {
+        email: 'hossam@sezar.com',
+        phone: '1234567890',
+        name: 'System Admin',
+        passwordHash: adminPassword,
+        role: 'admin',
+        mustChangePassword: false,
+        identityVerified: true,
+        isActive: true,
+      },
     });
-    console.log(`  ✅ Vehicle: ${v.plateNumber} (${v.model})`);
+    console.log(`  ✅ Admin created: ${admin.email}`);
+
+    console.log('\n🎉 Seed completed successfully!');
+    console.log('\n📋 Login credentials:');
+    console.log('  Admin:  hossam@sezar.com / Hossam@2026');
+
+  } catch (error) {
+    console.error('\n❌ Seeding Error:', error);
+    process.exit(1);
+  } finally {
+    await prisma.$disconnect();
   }
-
-  // Create expense categories
-  const categories = [
-    { name: 'Fuel', requiresApproval: false },
-    { name: 'Toll', requiresApproval: false },
-    { name: 'Parking', requiresApproval: false },
-    { name: 'Maintenance', requiresApproval: true },
-    { name: 'Cleaning', requiresApproval: true },
-    { name: 'Other', requiresApproval: true },
-  ];
-
-  for (const c of categories) {
-    await prisma.expenseCategory.upsert({
-      where: { name: c.name },
-      update: {},
-      create: c,
-    });
-    console.log(`  ✅ Category: ${c.name}`);
-  }
-
-  console.log('\n🎉 Seed completed successfully!');
-  console.log('\n📋 Login credentials:');
-  console.log('  Admin:  hossam@sezar.com / Hossam@2026');
-  console.log('  Driver: driver1@fleet.com / Driver123! (must change password on first login)');
 }
 
-main()
-  .catch((e) => {
-    console.error('❌ Seed failed:', e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+main();

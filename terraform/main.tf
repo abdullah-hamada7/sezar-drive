@@ -10,6 +10,15 @@ terraform {
       version = "~> 6.0"
     }
   }
+  backend "s3" {
+    bucket       = "sezar-drive-tf-state-1771682944"
+    key          = "state/terraform.tfstate"
+    region       = "us-east-1"
+    use_lockfile = true
+    encrypt      = true
+    profile      = "abdullah"
+  }
+
 }
 
 locals {
