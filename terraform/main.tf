@@ -11,7 +11,7 @@ terraform {
     }
   }
   backend "s3" {
-    bucket       = "sezar-drive-tf-state-1771682944"
+    bucket       = "sezar-drive-tf-state-1771710967"
     key          = "state/terraform.tfstate"
     region       = "us-east-1"
     use_lockfile = true
