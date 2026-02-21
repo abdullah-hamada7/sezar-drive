@@ -56,11 +56,12 @@ services:
       dockerfile: Dockerfile
     container_name: fleet-backend-prod
     restart: unless-stopped
+
     depends_on:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/v1/ready', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1));"]
+      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3000/api/v1/ready', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1));" ]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -73,6 +74,7 @@ services:
       PROJECT_NAME: ${PROJECT_NAME}
       S3_REGION: ${S3_REGION:-us-east-1}
       AWS_DEFAULT_REGION: ${aws_region:-us-east-1}
+      RUN_MIGRATIONS_ON_STARTUP: "true"
     networks:
       - db-net
       - app-net

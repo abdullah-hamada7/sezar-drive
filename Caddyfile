@@ -1,7 +1,6 @@
 {
     email {$EMAIL_FOR_SSL}
-    # To enable automatic HTTPS, comment out the line below and ensure your domain points to this server's IP.
-    auto_https off # Set to off for IP-based testing. Remove for production domain.
+    auto_https off
 }
 
 :80 {
