@@ -49,6 +49,22 @@ async function main() {
     });
     console.log(`  ✅ Admin created: ${admin.email}`);
 
+    // 3. Create default expense categories
+    const defaultCategories = [
+      { name: 'Fuel', requiresApproval: false },
+      { name: 'Tolls', requiresApproval: false },
+      { name: 'Maintenance', requiresApproval: true },
+      { name: 'Car Wash', requiresApproval: false },
+      { name: 'Parking', requiresApproval: false },
+      { name: 'Meals', requiresApproval: true },
+      { name: 'Other', requiresApproval: true },
+    ];
+
+    for (const cat of defaultCategories) {
+      await prisma.expenseCategory.create({ data: cat });
+    }
+    console.log(`  ✅ ${defaultCategories.length} expense categories created.`);
+
     console.log('\n🎉 Seed completed successfully!');
     console.log('\n📋 Login credentials:');
     console.log('  Admin:  hossam@sezar.com / Hossam@2026');

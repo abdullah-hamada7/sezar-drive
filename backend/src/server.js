@@ -58,6 +58,29 @@ async function startServer() {
       console.error('❌ Seed check/run failed:', err.message);
     }
 
+    // 5b. Ensure expense categories exist (idempotent)
+    try {
+      const catCount = await prisma.expenseCategory.count();
+      if (catCount === 0) {
+        console.log('No expense categories found — seeding defaults...');
+        const defaultCategories = [
+          { name: 'Fuel', requiresApproval: false },
+          { name: 'Tolls', requiresApproval: false },
+          { name: 'Maintenance', requiresApproval: true },
+          { name: 'Car Wash', requiresApproval: false },
+          { name: 'Parking', requiresApproval: false },
+          { name: 'Meals', requiresApproval: true },
+          { name: 'Other', requiresApproval: true },
+        ];
+        for (const cat of defaultCategories) {
+          await prisma.expenseCategory.create({ data: cat });
+        }
+        console.log(`✅ ${defaultCategories.length} expense categories created`);
+      }
+    } catch (err) {
+      console.error('❌ Expense category seed failed:', err.message);
+    }
+
     // 3. Create Server
     const server = http.createServer(app);
 
