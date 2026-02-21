@@ -233,6 +233,16 @@ img {
   margin-bottom: var(--space-md);
 }
 
+.bg-bg-secondary {
+  background: var(--color-bg-secondary);
+}
+.bg-bg-tertiary {
+  background: var(--color-bg-tertiary);
+}
+.bg-secondary {
+  background: var(--color-bg-secondary);
+}
+
 /* ── Buttons (Tactile & Refined) ── */
 .btn {
   display: inline-flex;

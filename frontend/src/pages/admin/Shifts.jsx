@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { shiftService as api } from '../../services/shift.service';
+import { inspectionService as inspApi } from '../../services/inspection.service';
 import { ClipboardCheck, X, XCircle, Check, AlertCircle, Calendar, Gauge, Info } from 'lucide-react';
 import { useContext } from 'react';
 import { ToastContext } from '../../contexts/toastContext';
@@ -79,7 +80,7 @@ export default function ShiftsPage() {
 
   async function handleViewInspections(shiftId) {
     try {
-      const res = await api.getInspections(`shiftId=${shiftId}`);
+      const res = await inspApi.getInspections(`shiftId=${shiftId}`);
       setSelectedShiftInspections(res.data || []);
       setShowInspections(true);
     } catch (err) {

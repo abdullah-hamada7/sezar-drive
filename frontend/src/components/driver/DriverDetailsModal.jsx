@@ -16,15 +16,15 @@ export default function DriverDetailsModal({ driver, isOpen, onClose }) {
             <X size={20} />
           </button>
         </div>
-        
+
         <div className="modal-body">
           {/* Header Section */}
           <div className="flex items-center gap-md mb-lg" style={{ padding: 'var(--space-md)', background: 'var(--color-bg-tertiary)', borderRadius: 'var(--radius-md)' }}>
-            <div style={{ 
-              width: 80, height: 80, 
-              borderRadius: 'var(--radius-full)', 
-              overflow: 'hidden', 
-              border: '3px solid var(--color-bg-primary)',
+            <div style={{
+              width: 80, height: 80,
+              borderRadius: 'var(--radius-full)',
+              overflow: 'hidden',
+              border: '3px solid var(--color-bg)',
               boxShadow: 'var(--shadow-md)',
               background: '#eee',
               display: 'flex', alignItems: 'center', justifyContent: 'center'
@@ -48,11 +48,11 @@ export default function DriverDetailsModal({ driver, isOpen, onClose }) {
           <div className="grid grid-2 gap-md mb-lg">
             <div className="form-group">
               <label className="text-xs text-muted uppercase tracking-wider font-bold">{t('common.email')}</label>
-              <div className="p-sm bg-secondary rounded border border-border">{driver.email}</div>
+              <div className="p-sm bg-bg-tertiary rounded border border-border">{driver.email}</div>
             </div>
             <div className="form-group">
               <label className="text-xs text-muted uppercase tracking-wider font-bold">{t('common.phone')}</label>
-              <div className="p-sm bg-secondary rounded border border-border">{driver.phone || '—'}</div>
+              <div className="p-sm bg-bg-tertiary rounded border border-border">{driver.phone || '—'}</div>
             </div>
           </div>
 
@@ -65,7 +65,7 @@ export default function DriverDetailsModal({ driver, isOpen, onClose }) {
                 {driver.idCardFront ? (
                   <img src={driver.idCardFront} alt="ID Front" className="rounded border border-border" style={{ height: '120px', objectFit: 'cover' }} />
                 ) : (
-                  <div className="p-md bg-secondary rounded border border-border flex items-center justify-center h-[120px] text-muted text-xs">Not Uploaded</div>
+                  <div className="p-md bg-bg-tertiary rounded border border-border flex items-center justify-center h-[120px] text-muted text-xs">Not Uploaded</div>
                 )}
               </div>
               <div className="flex flex-col gap-xs">
@@ -73,7 +73,7 @@ export default function DriverDetailsModal({ driver, isOpen, onClose }) {
                 {driver.idCardBack ? (
                   <img src={driver.idCardBack} alt="ID Back" className="rounded border border-border" style={{ height: '120px', objectFit: 'cover' }} />
                 ) : (
-                  <div className="p-md bg-secondary rounded border border-border flex items-center justify-center h-[120px] text-muted text-xs">Not Uploaded</div>
+                  <div className="p-md bg-bg-tertiary rounded border border-border flex items-center justify-center h-[120px] text-muted text-xs">Not Uploaded</div>
                 )}
               </div>
             </div>
