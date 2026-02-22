@@ -71,6 +71,7 @@ services:
       NODE_ENV: production
       # These overrides are for container-to-container networking
       RUN_MIGRATIONS_ON_STARTUP: "true"
+      RUN_SEED_ON_STARTUP: "true"
     networks:
       - db-net
       - app-net
