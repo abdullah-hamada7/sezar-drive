@@ -1,8 +1,9 @@
 # AWS Secrets Manager for sensitive credentials
 resource "aws_secretsmanager_secret" "app_secrets" {
-  name        = "${var.project_name}-prod-secrets"
-  description = "Production secrets for Sezar Drive"
-  tags        = local.common_tags
+  name                    = "${var.project_name}-prod-secrets"
+  description             = "Production secrets for Sezar Drive"
+  recovery_window_in_days = 0
+  tags                    = local.common_tags
 }
 
 resource "random_password" "db_password" {
