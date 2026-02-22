@@ -1,5 +1,4 @@
 require('dotenv').config();
-const { loadSecrets } = require('./config/secrets');
 
 function isTruthyEnv(name) {
   return ['1', 'true', 'yes', 'y', 'on'].includes(String(process.env[name] || '').toLowerCase());
@@ -10,10 +9,6 @@ function isTruthyEnv(name) {
  */
 async function startServer() {
   try {
-    // 1. Load secrets from AWS if in production
-    // This must happen BEFORE requiring app/config to ensure process.env is populated
-    await loadSecrets();
-
     const { execSync } = require('child_process');
     const appCwd = process.env.APP_CWD || process.cwd();
 
