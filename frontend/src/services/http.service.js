@@ -93,6 +93,26 @@ class HttpService {
     return response;
   }
 
+  async get(endpoint, options = {}) {
+    return this.request(endpoint, { ...options, method: 'GET' });
+  }
+
+  async post(endpoint, body, options = {}) {
+    return this.request(endpoint, { ...options, method: 'POST', body });
+  }
+
+  async put(endpoint, body, options = {}) {
+    return this.request(endpoint, { ...options, method: 'PUT', body });
+  }
+
+  async patch(endpoint, body, options = {}) {
+    return this.request(endpoint, { ...options, method: 'PATCH', body });
+  }
+
+  async delete(endpoint, options = {}) {
+    return this.request(endpoint, { ...options, method: 'DELETE' });
+  }
+
   async tryRefresh() {
     try {
       const res = await fetch(`${API_BASE}/auth/refresh`, {
