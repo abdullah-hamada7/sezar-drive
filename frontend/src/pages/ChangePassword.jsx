@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { authService as api } from '../services/auth.service';
 import { http } from '../services/http.service';
 import { Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
 
 export default function ChangePasswordPage() {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const { user, updateUser } = useAuth();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -43,9 +46,9 @@ export default function ChangePasswordPage() {
       setTimeout(() => {
         const role = updatedUser?.role || user?.role;
         if (role === 'admin') {
-          window.location.href = '/admin';
+          navigate('/admin');
         } else {
-          window.location.href = '/driver';
+          navigate('/driver');
         }
       }, 1500);
     } catch (err) {
