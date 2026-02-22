@@ -15,7 +15,6 @@ export default function ResetPasswordPage() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [validating, setValidating] = useState(true);
   const [isValid, setIsValid] = useState(false);
@@ -155,21 +154,13 @@ export default function ResetPasswordPage() {
                 <label className="form-label">{t('auth.confirm_password')}</label>
                 <div className="password-field">
                   <input
-                    type={showConfirmPassword ? 'text' : 'password'}
+                    type={showNewPassword ? 'text' : 'password'}
                     className="form-input"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
                     minLength={8}
                   />
-                  <button
-                    type="button"
-                    className="password-toggle"
-                    onClick={() => setShowConfirmPassword(prev => !prev)}
-                    aria-label={showConfirmPassword ? t('auth.hide_password') : t('auth.show_password')}
-                  >
-                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
                 </div>
               </div>
 
