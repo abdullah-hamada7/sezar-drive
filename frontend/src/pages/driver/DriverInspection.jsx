@@ -7,6 +7,7 @@ import { useShift } from '../../contexts/ShiftContext';
 
 const DIRECTIONS = ['front', 'back', 'left', 'right'];
 const CHECKLIST_KEYS = ['tires', 'lights', 'brakes', 'mirrors', 'fluids', 'seatbelts', 'horn', 'wipers'];
+const STEPS = ['checklist', 'photos', 'review'];
 
 export default function DriverInspection() {
   const { t } = useTranslation();
@@ -57,7 +58,13 @@ export default function DriverInspection() {
     return null;
   }
 
-  const inspectionType = shift?.status === 'PendingVerification' ? 'pre' : 'post';
+   const inspectionType = shift?.status === 'PendingVerification' ? 'pre' : 'post';
+   const stepIndex = STEPS.indexOf(step);
+   const stepLabels = {
+     checklist: t('inspection.step_checklist') || 'Checklist',
+     photos: t('inspection.step_photos') || 'Photos',
+     review: t('inspection.step_review') || 'Review'
+   };
   function isCompletedInspection(insp) {
     const photoCount = Array.isArray(insp.photos) ? insp.photos.length : 0;
     return insp.status === 'completed' && photoCount >= 4;
@@ -187,7 +194,7 @@ export default function DriverInspection() {
       <input type="file" ref={fileRef} accept="image/*" capture="environment" onChange={handlePhotoUpload} style={{ display: 'none' }} />
 
       <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between" style={{ gap: 'var(--space-md)' }}>
           <div>
             <div style={{ fontWeight: 700 }}>
               {inspectionType === 'pre' ? t('inspection.before_shift') : t('inspection.after_shift')}
@@ -196,9 +203,12 @@ export default function DriverInspection() {
               {inspectionType === 'pre' ? t('inspection.pre_shift_desc') : t('inspection.post_shift_desc')}
             </div>
           </div>
-          <span className={`badge ${inspectionType === 'pre' ? 'badge-info' : 'badge-warning'}`}>
-            {inspectionType === 'pre' ? t('inspection.before_shift') : t('inspection.after_shift')}
-          </span>
+          <div className="flex items-center gap-sm">
+            <span className={`badge ${inspectionType === 'pre' ? 'badge-info' : 'badge-warning'}`}>
+              {inspectionType === 'pre' ? t('inspection.before_shift') : t('inspection.after_shift')}
+            </span>
+            <span className="badge badge-neutral">{stepLabels[step] || step}</span>
+          </div>
         </div>
         {loadingExisting && <div className="text-xs text-muted mt-sm">{t('common.loading')}</div>}
         {isInspectionLocked && (
@@ -208,31 +218,47 @@ export default function DriverInspection() {
         )}
       </div>
 
-      <div style={{ display: 'flex', gap: '0.25rem', marginBottom: 'var(--space-lg)' }}>
-        {['checklist', 'photos', 'review'].map((s, i) => (
-          <div key={s} style={{
-            flex: 1, height: '4px', borderRadius: '2px',
-            background: ['checklist', 'photos', 'review'].indexOf(step) >= i ? 'var(--color-primary)' : 'var(--color-bg-tertiary)',
-            transition: 'background var(--transition-base)'
-          }} />
-        ))}
+      <div className="card" style={{ marginBottom: 'var(--space-lg)', padding: 'var(--space-md)' }}>
+        <div className="flex items-center justify-between mb-sm">
+          <span className="text-xs uppercase text-muted" style={{ letterSpacing: '0.08em' }}>{t('inspection.progress') || 'Progress'}</span>
+          <span className="text-xs text-muted">{stepIndex + 1}/{STEPS.length}</span>
+        </div>
+        <div style={{ display: 'flex', gap: '0.25rem', marginBottom: 'var(--space-sm)' }}>
+          {STEPS.map((s, i) => (
+            <div key={s} style={{
+              flex: 1, height: '6px', borderRadius: '999px',
+              background: stepIndex >= i ? 'var(--color-primary)' : 'var(--color-bg-tertiary)',
+              transition: 'background var(--transition-base)'
+            }} />
+          ))}
+        </div>
+        <div className="grid grid-3 gap-sm">
+          {STEPS.map((s, i) => (
+            <div key={s} className="text-xs" style={{ color: stepIndex >= i ? 'var(--color-primary)' : 'var(--color-text-muted)', fontWeight: stepIndex === i ? 600 : 500 }}>
+              {stepLabels[s] || s}
+            </div>
+          ))}
+        </div>
       </div>
 
       {step === 'checklist' && (
         <div>
           <p className="text-muted text-sm mb-md">{t('inspection.checklist_desc')}</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: 'var(--space-lg)' }}>
+          <div className="grid grid-2 gap-sm" style={{ marginBottom: 'var(--space-lg)' }}>
             {CHECKLIST_KEYS.map(key => (
-              <div
+              <button
+                type="button"
                 key={key}
                 className="card"
                 onClick={() => !isInspectionLocked && toggleCheck(key)}
+                disabled={isInspectionLocked}
                 style={{
                   padding: 'var(--space-md)',
                   cursor: isInspectionLocked ? 'not-allowed' : 'pointer',
-                  borderColor: checks[key] ? 'var(--color-success)' : undefined,
-                  background: checks[key] ? 'var(--color-success-bg)' : undefined,
-                  opacity: isInspectionLocked ? 0.6 : 1
+                  borderColor: checks[key] ? 'var(--color-success)' : 'var(--color-border)',
+                  background: checks[key] ? 'var(--color-success-bg)' : 'var(--color-bg-secondary)',
+                  opacity: isInspectionLocked ? 0.6 : 1,
+                  textAlign: 'left'
                 }}
               >
                 <div className="flex items-center gap-sm">
@@ -247,7 +273,7 @@ export default function DriverInspection() {
                   </div>
                   <span className="text-sm">{t(`inspection.checklist.${key}`)}</span>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
 
@@ -268,20 +294,24 @@ export default function DriverInspection() {
           <p className="text-muted text-sm mb-md">{t('inspection.photos_desc')}</p>
           <div className="grid grid-2" style={{ gap: 'var(--space-md)', marginBottom: 'var(--space-lg)' }}>
             {DIRECTIONS.map(dir => (
-              <div
+              <button
                 key={dir}
+                type="button"
                 className="card"
                 onClick={() => !isInspectionLocked && triggerPhotoCapture(dir)}
-                style={{ textAlign: 'center', padding: 'var(--space-md)', cursor: 'pointer', borderColor: photos[dir] ? 'var(--color-success)' : undefined }}
+                disabled={isInspectionLocked}
+                style={{ textAlign: 'center', padding: 'var(--space-md)', cursor: isInspectionLocked ? 'not-allowed' : 'pointer', borderColor: photos[dir] ? 'var(--color-success)' : 'var(--color-border)' }}
               >
                 {photos[dir] ? (
-                  <img src={photos[dir]} alt={dir} style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-sm)' }} />
+                  <img src={photos[dir]} alt={t(`inspection.directions.${dir}`)} style={{ width: '100%', height: '120px', objectFit: 'cover', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-sm)' }} />
                 ) : (
-                  <Camera size={32} style={{ color: 'var(--color-text-muted)', margin: '0 auto var(--space-sm)' }} />
+                  <div style={{ height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 'var(--radius-md)', background: 'var(--color-bg-tertiary)', marginBottom: 'var(--space-sm)' }}>
+                    <Camera size={32} style={{ color: 'var(--color-text-muted)' }} />
+                  </div>
                 )}
-                <div className="text-sm" style={{ fontWeight: 500 }}>{t(`inspection.directions.${dir}`)}</div>
-                <div className="text-sm text-muted">{photos[dir] ? t('inspection.captured') : t('inspection.tap_capture')}</div>
-              </div>
+                <div className="text-sm" style={{ fontWeight: 600 }}>{t(`inspection.directions.${dir}`)}</div>
+                <div className="text-xs text-muted">{photos[dir] ? t('inspection.captured') : t('inspection.tap_capture')}</div>
+              </button>
             ))}
           </div>
 

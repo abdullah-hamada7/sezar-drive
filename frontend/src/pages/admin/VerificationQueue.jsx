@@ -128,13 +128,16 @@ export default function VerificationQueue() {
       ) : (
         <div className="grid gap-md">
           {pending.map(item => (
-            <div key={item.id} className="card" style={{ padding: 'var(--space-md)' }}>
-              <div className="flex gap-md items-start">
+            <div key={item.id} className="card" style={{ padding: 'var(--space-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg-secondary)' }}>
+              <div className="flex gap-md items-start" style={{ marginBottom: 'var(--space-sm)' }}>
                 <div style={{ flex: 1 }}>
                   <h3 className="font-bold">{item.driver?.name || t('verification.card.unknown')}</h3>
                   <p className="text-muted text-sm">{item.driver?.email} | {item.driver?.phone}</p>
                   <p className="text-xs text-muted">{t('verification.card.submitted', { date: new Date(item.createdAt).toLocaleString() })}</p>
                 </div>
+                <span className={`badge ${item.status === 'approved' ? 'badge-success' : item.status === 'rejected' ? 'badge-danger' : 'badge-warning'}`}>
+                  {t(`common.status.${(item.status || 'pending').toLowerCase()}`)}
+                </span>
               </div>
 
               {/* Photos Grid */}
@@ -173,7 +176,7 @@ export default function VerificationQueue() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-sm">
+              <div className="flex gap-sm" style={{ borderTop: '1px solid var(--color-border)', paddingTop: 'var(--space-sm)' }}>
                 <button
                   className="btn btn-success btn-sm flex items-center gap-xs"
                   style={{ flex: 1 }}
