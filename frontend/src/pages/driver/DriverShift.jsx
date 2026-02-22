@@ -177,32 +177,10 @@ export default function DriverShift() {
     ? t(`common.shift_verification_status.${shift.verificationStatus.toLowerCase()}`, shift.verificationStatus)
     : t('common.status.pending');
   const hasVehicle = !!shift?.vehicleId || !!shift?.vehicle;
-  const shiftStatusLabel = shift?.status === 'PendingVerification'
-    ? t('shift.pending')
-    : shift?.status === 'Active'
-      ? t('shift.active')
-      : shift?.status === 'Closed'
-        ? t('common.status.closed')
-        : t('shift.no_active');
 
   return (
     <div>
       <h2 className="page-title" style={{ marginBottom: 'var(--space-lg)' }}>{t('shift.management')}</h2>
-
-      {shift && (
-        <div className="card mb-md" style={{ padding: '0.75rem var(--space-md)' }}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-sm">
-              <span className="text-xs text-muted uppercase" style={{ letterSpacing: '0.08em' }}>{t('shift.management')}</span>
-              <span className={`badge ${shift.status === 'Active' ? 'badge-success' : shift.status === 'PendingVerification' ? 'badge-warning' : 'badge-neutral'}`}>{shiftStatusLabel}</span>
-            </div>
-            <div className="flex items-center gap-sm">
-              <span className="badge badge-neutral">{verificationLabel}</span>
-              {hasVehicle && <span className="badge badge-info">{shift.vehicle?.plateNumber || ''}</span>}
-            </div>
-          </div>
-        </div>
-      )}
 
       {!shift ? (
         <div className="card" style={{ textAlign: 'center', padding: 'var(--space-2xl)' }}>

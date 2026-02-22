@@ -107,18 +107,6 @@ export default function DriverDamage() {
   return (
     <div>
       <h2 className="page-title" style={{ marginBottom: 'var(--space-lg)' }}>{t('damage.report_title')}</h2>
-      <div className="card mb-md" style={{ padding: '0.75rem var(--space-md)' }}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-sm">
-            <span className="text-xs text-muted uppercase" style={{ letterSpacing: '0.08em' }}>{t('damage.photos')}</span>
-            <span className="badge badge-info">{photos.length}</span>
-          </div>
-          <div className="flex items-center gap-sm">
-            {activeTrip && <span className="badge badge-warning">{t('common.trip_status.in_progress')}</span>}
-            {activeShift ? <span className="badge badge-success">{t('shift.active')}</span> : <span className="badge badge-neutral">{t('shift.no_active')}</span>}
-          </div>
-        </div>
-      </div>
       <input type="file" ref={fileRef} accept="image/*" capture="environment" onChange={addPhoto} style={{ display: 'none' }} />
 
       <form onSubmit={handleSubmit}>

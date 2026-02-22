@@ -70,30 +70,9 @@ export default function DriverTrips() {
 
   if (loading) return <div className="loading-page"><div className="spinner"></div></div>;
 
-  const tripCounts = trips.reduce((acc, trip) => {
-    const key = String(trip.status || '').toLowerCase();
-    acc[key] = (acc[key] || 0) + 1;
-    return acc;
-  }, {});
-  const activeTrip = trips.find(trip => trip.status === 'IN_PROGRESS');
-
   return (
     <div>
       <h2 className="page-title" style={{ marginBottom: 'var(--space-lg)' }}>{t('trip.my_trips')}</h2>
-
-      <div className="card mb-md" style={{ padding: '0.75rem var(--space-md)' }}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-sm">
-            <span className="text-xs text-muted uppercase" style={{ letterSpacing: '0.08em' }}>{t('trip.my_trips')}</span>
-            <span className="badge badge-info">{trips.length}</span>
-          </div>
-          <div className="flex items-center gap-sm">
-            {activeTrip && <span className="badge badge-warning">{t('common.trip_status.in_progress')}</span>}
-            {!activeTrip && <span className="badge badge-neutral">{t('common.status.pending')}</span>}
-            {tripCounts.assigned ? <span className="badge badge-info">{t('common.trip_status.assigned')}: {tripCounts.assigned}</span> : null}
-          </div>
-        </div>
-      </div>
 
       {!activeShift && (
         <div className="alert alert-warning mb-md">

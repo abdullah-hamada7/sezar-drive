@@ -67,7 +67,6 @@ export default function DriverHome() {
   const isShiftActive = activeShift?.status === 'Active';
   const isShiftPending = activeShift?.status === 'PendingVerification';
   const isLight = theme === 'light';
-  const identityLabel = user?.identityVerified ? t('common.status.verified') : t('common.status.pending');
 
   const pageStyle = isLight
     ? {
@@ -132,21 +131,6 @@ export default function DriverHome() {
         isOpen={showDetails}
         onClose={() => setShowDetails(false)}
       />
-
-      <div className="card mb-md" style={isLight ? { background: '#ffffff', border: '1px solid #e2e8f0' } : undefined}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-sm">
-            <span className="text-xs text-muted uppercase" style={{ letterSpacing: '0.08em' }}>{t('driver_home.status')}</span>
-            <span className={`badge ${isShiftActive ? 'badge-success' : isShiftPending ? 'badge-warning' : 'badge-neutral'}`}>
-              {isShiftActive ? t('shift.active') : isShiftPending ? t('shift.pending') : t('shift.no_active')}
-            </span>
-          </div>
-          <div className="flex items-center gap-sm">
-            <span className={`badge ${user?.identityVerified ? 'badge-success' : 'badge-warning'}`}>{identityLabel}</span>
-            {activeShift?.vehicle?.plateNumber && <span className="badge badge-info">{activeShift.vehicle.plateNumber}</span>}
-          </div>
-        </div>
-      </div>
 
       {/* Shift Status */}
       {isShiftActive && (
