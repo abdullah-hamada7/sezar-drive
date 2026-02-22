@@ -12,9 +12,6 @@ if (!ADMIN_PASSWORD) {
   process.exit(1);
 }
 
-// Helpers
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
 async function runTests() {
   console.log('🚀 Starting Integration Tests...');
   const agent = request(API_URL);

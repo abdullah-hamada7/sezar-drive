@@ -31,21 +31,6 @@ describeIntegration('API Integration Tests (E2E)', () => {
   // Set a longer timeout for the whole suite
   jest.setTimeout(30000);
 
-  const testDriver = {
-    email: `test.driver.${Date.now()}@fleet.com`,
-    password: 'Password123!',
-    name: 'Integration Driver',
-    phone: `+9665${Date.now().toString().slice(-8)}`,
-    licenseNumber: `DL-${Date.now()}`
-  };
-
-  const testVehicle = {
-    plateNumber: `INT-${Date.now().toString().slice(-4)}`,
-    model: 'Test Corolla',
-    year: 2024,
-    qrCode: `QR-${Date.now()}`
-  };
-
   beforeAll(async () => {
     await prisma.$connect();
     const res = await request(app)

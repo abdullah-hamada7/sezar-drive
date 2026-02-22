@@ -12,6 +12,11 @@ export default function QRScanner({ onScan, onCancel }) {
   const [scannedValue, setScannedValue] = useState(null);
   const scannerRef = useRef(null);
   const scannedRef = useRef(false); // prevent duplicate scans
+  const onScanRef = useRef(onScan);
+
+  useEffect(() => {
+    onScanRef.current = onScan;
+  }, [onScan]);
 
   useEffect(() => {
     if (scanMode !== 'camera') return;
@@ -42,7 +47,7 @@ export default function QRScanner({ onScan, onCancel }) {
             setScannedValue(decodedText);
             // Stop scanner then notify parent
             html5QrCode.stop().catch(() => { });
-            onScan(decodedText);
+            onScanRef.current(decodedText);
           },
           () => {
             // Ignore scan failures (no QR in frame) — this is normal
@@ -70,7 +75,7 @@ export default function QRScanner({ onScan, onCancel }) {
         scannerRef.current = null;
       }
     };
-  }, [scanMode]);
+  }, [scanMode, t]);
 
   const handleManualSubmit = (e) => {
     e.preventDefault();

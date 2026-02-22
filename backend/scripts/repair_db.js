@@ -25,7 +25,7 @@ async function repair() {
                 stdio: 'inherit'
             });
             console.log('Successfully marked migration as resolved.');
-        } catch (e) {
+        } catch {
             console.log('Note: Resolve skipped (likely already resolved or not needed).');
         }
 

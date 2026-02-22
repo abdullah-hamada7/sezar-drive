@@ -9,7 +9,7 @@ export function ToastProvider({ children }) {
   function addToast(message, type = 'info', duration = 5000) {
     const now = Date.now();
     const last = lastToastRef.current;
-    if (last.message === message && last.type === type && now - last.time < 800) {
+    if (last.message === message && last.type === type && now - last.time < 2000) {
       return;
     }
     lastToastRef.current = { message, type, time: now };

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useContext } from 'react';
+import { useState, useEffect, useRef, useCallback, useContext, useMemo } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { ThemeContext } from '../../contexts/theme';
@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import './AdminLayout.css';
 import { statsService } from '../../services/stats.service';
+import { buildTrackingWsUrl } from '../../utils/trackingWs';
 
 export default function AdminLayout() {
   const { language, toggleLanguage, t } = useLanguage();
@@ -26,17 +27,13 @@ export default function AdminLayout() {
   const location = useLocation();
   const wsRef = useRef(null);
 
-  // Clear badges based on current route
-  useEffect(() => {
-    if (location.pathname === '/admin/expenses') {
-      // eslint-disable-next-line
-      setPendingCounts(p => p.expenses !== 0 ? { ...p, expenses: 0 } : p);
-    }
-    if (location.pathname === '/admin/damage') {
-      // eslint-disable-next-line
-      setPendingCounts(p => p.damage !== 0 ? { ...p, damage: 0 } : p);
-    }
-  }, [location.pathname]);
+  const displayedCounts = useMemo(() => {
+    return {
+      ...pendingCounts,
+      expenses: location.pathname === '/admin/expenses' ? 0 : pendingCounts.expenses,
+      damage: location.pathname === '/admin/damage' ? 0 : pendingCounts.damage,
+    };
+  }, [pendingCounts, location.pathname]);
 
   const addNotification = useCallback((notif) => {
     setNotifications(prev => [notif, ...prev].slice(0, 5));
@@ -53,7 +50,7 @@ export default function AdminLayout() {
     setTimeout(() => {
       setNotifications(prev => prev.filter(n => n.id !== notif.id));
     }, 8000);
-  }, []);
+  }, [location.pathname]);
 
   const translatedNavItems = [
     { to: '/admin', icon: LayoutDashboard, label: t('nav.dashboard'), end: true },
@@ -85,8 +82,7 @@ export default function AdminLayout() {
       const token = localStorage.getItem('accessToken');
       if (!token) return;
 
-      const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-      const ws = new WebSocket(`${protocol}://${window.location.host}/ws/tracking?token=${token}`);
+      const ws = new WebSocket(buildTrackingWsUrl(token));
       wsRef.current = ws;
 
       ws.onmessage = (event) => {
@@ -176,10 +172,6 @@ export default function AdminLayout() {
               className={({ isActive }) => `nav-item ${isActive ? 'nav-active' : ''}`}
               title={item.label}
               onClick={() => {
-                // Optionally clear count when visiting page
-                if (item.countKey) {
-                  setPendingCounts(prev => ({ ...prev, [item.countKey]: 0 }));
-                }
                 // Auto-close on mobile
                 if (window.innerWidth <= 1024) {
                   setSidebarOpen(false);
@@ -188,8 +180,8 @@ export default function AdminLayout() {
             >
               <div className="nav-icon-wrapper">
                 <item.icon size={20} />
-                {item.countKey && pendingCounts[item.countKey] > 0 && (
-                  <span className="nav-badge">{pendingCounts[item.countKey]}</span>
+                {item.countKey && displayedCounts[item.countKey] > 0 && (
+                  <span className="nav-badge">{displayedCounts[item.countKey]}</span>
                 )}
               </div>
               {sidebarOpen && <span>{item.label}</span>}

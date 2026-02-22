@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { statsService as api } from '../../services/stats.service';
+import { authService } from '../../services/auth.service';
 import {
   Users, Car, Route, ClipboardCheck, Receipt,
   Clock, Info, TrendingUp, AlertTriangle, Shield
@@ -40,7 +41,7 @@ export default function DashboardPage() {
   // Rescue Requests loader
   const loadRescueRequests = useCallback(async () => {
     try {
-      const res = await api.getPendingRescueRequests();
+      const res = await authService.getPendingRescueRequests();
       setRescueRequests(res.data || []);
     } catch (err) {
       console.error('Rescue requests load error:', err);
@@ -49,10 +50,10 @@ export default function DashboardPage() {
 
   const handleGenerateRescueCode = async (requestId) => {
     try {
-      const res = await api.generateRescueCode(requestId);
+      const res = await authService.generateRescueCode(requestId);
       addToast(`${t('auth.rescue_code')}: ${res.data.code}`, 'success', 15000);
       loadRescueRequests();
-    } catch (err) {
+    } catch {
       addToast(t('common.error'), 'error');
     }
   };

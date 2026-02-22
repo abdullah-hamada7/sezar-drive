@@ -32,9 +32,12 @@ export default function TrackingPage() {
   const wsRef = useRef(null);
   const wsHadConnectionRef = useRef(false);
 
+  const reconnectTimerRef = useRef(null);
+
   const connectWebSocket = useCallback(() => {
     const token = localStorage.getItem('accessToken');
     if (!token) return;
+    if (wsRef.current && (wsRef.current.readyState === WebSocket.OPEN || wsRef.current.readyState === WebSocket.CONNECTING)) return;
 
     const ws = new WebSocket(buildTrackingWsUrl(token));
     wsRef.current = ws;
@@ -48,7 +51,10 @@ export default function TrackingPage() {
       if (wsHadConnectionRef.current) {
         addToast('Live tracking disconnected. Reconnecting...', 'warning');
       }
-      setTimeout(connectWebSocket, 5000);
+      if (reconnectTimerRef.current) {
+        clearTimeout(reconnectTimerRef.current);
+      }
+      reconnectTimerRef.current = setTimeout(connectWebSocket, 5000);
     };
     ws.onerror = () => {
       setWsStatus('error');
@@ -89,13 +95,7 @@ export default function TrackingPage() {
     };
   }, [addToast]);
 
-  useEffect(() => {
-    loadInitialPositions();
-    connectWebSocket();
-    return () => wsRef.current?.close();
-  }, [connectWebSocket, loadInitialPositions]);
-
-  async function loadInitialPositions() {
+  const loadInitialPositions = useCallback(async () => {
     try {
       const { trackingService: api } = await import('../../services/tracking.service');
       const res = await api.getActiveDrivers();
@@ -111,14 +111,30 @@ export default function TrackingPage() {
       addToast(err.message || 'Failed to load active drivers.', 'error');
     }
     finally { setLoading(false); }
-  }
+  }, [addToast]);
+
+  useEffect(() => {
+    loadInitialPositions();
+    connectWebSocket();
+    return () => {
+      if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
+      wsRef.current?.close();
+    };
+  }, [connectWebSocket, loadInitialPositions]);
 
   function formatTime(d) {
     if (!d) return '—';
     return new Date(d).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' });
   }
 
-  const defaultCenter = [24.7136, 46.6753]; // Riyadh
+  const envCenter = import.meta.env.VITE_DEFAULT_MAP_CENTER;
+  const parsedCenter = envCenter
+    ? envCenter.split(',').map((value) => Number.parseFloat(value.trim()))
+    : null;
+  const defaultCenter =
+    parsedCenter && parsedCenter.length === 2 && parsedCenter.every((n) => Number.isFinite(n))
+      ? parsedCenter
+      : [0, 0];
   const activeCenter = drivers.length > 0 ? [drivers[0].lat, drivers[0].lng] : defaultCenter;
 
   return (

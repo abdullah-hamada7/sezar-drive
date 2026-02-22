@@ -1,3 +1,4 @@
+/* global process */
 import { test, expect } from '@playwright/test';
 
 test.describe('Fleet Management E2E', () => {

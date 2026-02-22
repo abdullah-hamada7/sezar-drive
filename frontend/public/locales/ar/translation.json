@@ -87,7 +87,9 @@
     "status_assigned": "تم التعيين",
     "status_completed": "مكتملة",
     "status_cancelled": "ملغاة",
-    "no_active_shift_warning": "يجب أن تبدأ وتفعل مناوبتك قبل الرحلات."
+    "no_active_shift_warning": "يجب أن تبدأ وتفعل مناوبتك قبل الرحلات.",
+    "new_assignment_notif": "تم تعيين رحلة جديدة لك!",
+    "cancellation_notif": "تم إلغاء رحلة."
   },
   "shift": {
     "management": "إدارة المناوبات",
@@ -194,8 +196,7 @@
     "status_refreshed": "تم تحديث الحالة",
     "photo_updated": "تم تحديث الصورة الشخصية",
     "recent_activity": "النشاط الأخير",
-    "shift_performance": "أداء المناوبات",
-    "weekly_earnings": "الأرباح الأسبوعية"
+    "shift_performance": "أداء المناوبات"
   },
   "common": {
     "save": "حفظ",
@@ -208,6 +209,7 @@
     "loading": "جاري التحميل...",
     "error": "حدث خطأ ما",
     "success": "تم بنجاح",
+    "revenue": "الإيرادات",
     "hi": "مرحباً",
     "brand": "سيزار درايف",
     "confirm": "تأكيد",
@@ -227,6 +229,10 @@
     "phone": "الهاتف",
     "now": "الآن",
     "no_data": "لا يوجد بيانات متاحة",
+    "errors": {
+      "validation_failed": "فشل التحقق. يرجى مراجعة الحقول أدناه.",
+      "check_fields": "يرجى تصحيح الأخطاء في النموذج قبل الإرسال."
+    },
     "role": {
       "admin": "مسؤول",
       "driver": "سائق",
@@ -255,6 +261,7 @@
     }
   },
   "errors": {
+    "fetch_failed": "فشل جلب البيانات. يرجى المحاولة مرة أخرى.",
     "NO_ACTIVE_SHIFT": "السائق {{name}} ليس لديه مناوبة نشطة. يجب أن يبدأ ويفعل مناوبته أولاً.",
     "ACTIVE_TRIP_EXISTS": "السائق {{name}} لديه بالفعل رحلة نشطة أو معينة.",
     "NO_VEHICLE_ASSIGNED": "لا توجد مركبة معينة لمناوبتك الحالية.",
@@ -286,6 +293,9 @@
     "CORS_BLOCKED": "تم حظر الطلب. يرجى الاتصال بالدعم.",
     "validation_failed": "فشل التحقق. يرجى مراجعة الحقول أدناه.",
     "check_fields": "يرجى تصحيح الأخطاء في النموذج قبل الإرسال."
+  },
+  "status": {
+    "active": "نشطة"
   },
   "damage": {
     "report_title": "الإبلاغ عن ضرر بالمركبة",

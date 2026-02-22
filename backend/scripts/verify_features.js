@@ -51,7 +51,7 @@ function request(method, path, body = null, token = null) {
             console.error(`[ERROR] Request failed with status ${res.statusCode}. Body:`, data);
             reject({ status: res.statusCode, error: parsed });
           }
-        } catch (e) {
+        } catch {
           console.error(`[CRITICAL] JSON Parse Error on status ${res.statusCode}. Raw Data:`, data);
           reject({ status: res.statusCode, error: data });
         }
@@ -86,7 +86,7 @@ async function verifyFeatures() {
     let driverLogin;
     try {
       driverLogin = await request('POST', '/auth/login', { email: DRIVER_EMAIL, password: DRIVER_PASSWORD });
-    } catch (e) {
+    } catch {
       log('Initial login failed, trying with new password...', 'INFO');
       driverLogin = await request('POST', '/auth/login', { email: DRIVER_EMAIL, password: NEW_DRIVER_PASSWORD });
     }

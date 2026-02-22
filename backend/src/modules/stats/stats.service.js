@@ -312,6 +312,7 @@ module.exports = {
   getRevenueStats,
   getActivityStats,
   getDriverWeeklyStats,
+  getDriverDailyStats,
   getSummaryStats,
   getDriverShiftStats,
   getDriverActivity

@@ -6,6 +6,7 @@ const config = require('../config');
  * Converts all errors into the standardized error response format.
  */
 function errorHandler(err, req, res, next) {
+  void next;
   // Log error in development only — avoid leaking stack/details in production
   if (config.nodeEnv === 'development') {
     console.error('Error:', err);

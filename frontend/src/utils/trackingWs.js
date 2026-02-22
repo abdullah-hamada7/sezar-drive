@@ -10,7 +10,7 @@ export function buildTrackingWsUrl(token) {
       const url = new URL(apiBase);
       host = url.host;
       protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
-    } catch (e) {
+    } catch {
       console.error('[WebSocket] Invalid VITE_API_URL:', apiBase);
     }
   }

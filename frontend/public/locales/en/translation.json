@@ -87,7 +87,9 @@
     "status_assigned": "Assigned",
     "status_completed": "Completed",
     "status_cancelled": "Cancelled",
-    "no_active_shift_warning": "You must start and activate a shift before trips."
+    "no_active_shift_warning": "You must start and activate a shift before trips.",
+    "new_assignment_notif": "You have been assigned a new trip!",
+    "cancellation_notif": "A trip has been cancelled."
   },
   "shift": {
     "management": "Shift Management",
@@ -194,8 +196,7 @@
     "status_refreshed": "Status refreshed",
     "photo_updated": "Profile photo updated",
     "recent_activity": "Recent Activity",
-    "shift_performance": "Shift Performance",
-    "weekly_earnings": "Weekly Earnings"
+    "shift_performance": "Shift Performance"
   },
   "common": {
     "save": "Save",
@@ -208,6 +209,7 @@
     "loading": "Loading...",
     "error": "An error occurred",
     "success": "Success",
+    "revenue": "Revenue",
     "hi": "Hi",
     "brand": "Sezar Drive",
     "confirm": "Confirm",
@@ -227,6 +229,10 @@
     "phone": "Phone",
     "now": "Just now",
     "no_data": "No data available",
+    "errors": {
+      "validation_failed": "Validation failed. Please check the fields below.",
+      "check_fields": "Please fix the errors in the form before submitting."
+    },
     "role": {
       "admin": "Admin",
       "driver": "Driver",
@@ -255,6 +261,7 @@
     }
   },
   "errors": {
+    "fetch_failed": "Failed to fetch data. Please try again.",
     "NO_ACTIVE_SHIFT": "Driver {{name}} does not have an active shift. They must start and activate their shift first.",
     "ACTIVE_TRIP_EXISTS": "Driver {{name}} already has an active or assigned trip.",
     "NO_VEHICLE_ASSIGNED": "No vehicle is currently assigned to your shift.",
@@ -286,6 +293,9 @@
     "CORS_BLOCKED": "Request blocked. Please contact support.",
     "validation_failed": "Validation failed. Please check the fields below.",
     "check_fields": "Please fix the errors in the form before submitting."
+  },
+  "status": {
+    "active": "Active"
   },
   "damage": {
     "report_title": "Report Vehicle Damage",

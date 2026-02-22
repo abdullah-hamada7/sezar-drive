@@ -96,7 +96,7 @@ app.get('/api/v1/ready', async (req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
     res.json({ status: 'ready', timestamp: new Date().toISOString() });
-  } catch (e) {
+  } catch {
     res.status(503).json({ status: 'not_ready', timestamp: new Date().toISOString() });
   }
 });

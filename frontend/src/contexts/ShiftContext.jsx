@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useState, useEffect, useCallback, useContext } from 'react';
 import { shiftService as api } from '../services/shift.service';
 import { useAuth } from '../hooks/useAuth';
@@ -22,7 +23,7 @@ export function ShiftProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated, isDriver]);
+  }, [isAuthenticated, isDriver, user?.mustChangePassword]);
 
   useEffect(() => {
     if (!isAuthenticated || !isDriver || user?.mustChangePassword) return;
@@ -44,7 +45,7 @@ export function ShiftProvider({ children }) {
       window.removeEventListener('ws:shift_closed', handleShiftClosed);
       window.removeEventListener('ws:trip_assigned', handleShiftUpdate);
     };
-  }, [refreshShift, isAuthenticated, isDriver]);
+  }, [refreshShift, isAuthenticated, isDriver, user?.mustChangePassword]);
 
   return (
     <ShiftContext.Provider value={{ activeShift, loading, refreshShift, setActiveShift }}>

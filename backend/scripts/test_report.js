@@ -20,7 +20,7 @@ async function main() {
   await prisma.trip.deleteMany({ where: { status: 'Completed', price: 1000 } });
   await prisma.expense.deleteMany({ where: { status: 'approved', amount: 200 } });
   
-  const trip = await prisma.trip.create({
+  await prisma.trip.create({
     data: {
       driverId: driver.id,
       vehicleId: v?.id,
@@ -32,7 +32,7 @@ async function main() {
     }
   });
   
-  const expense = await prisma.expense.create({
+  await prisma.expense.create({
     data: {
       driverId: driver.id,
       amount: 200,

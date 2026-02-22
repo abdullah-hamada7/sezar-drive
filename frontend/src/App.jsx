@@ -176,10 +176,10 @@ function GlobalToastListener() {
     window.addEventListener('app:error', handler);
 
     // Real-time Trip Notifications for Drivers
-    const handleTripAssigned = (e) => {
+    const handleTripAssigned = () => {
       addToast(t('trip.new_assignment_notif') || 'You have been assigned a new trip!', 'info');
     };
-    const handleTripCancelled = (e) => {
+    const handleTripCancelled = () => {
       addToast(t('trip.cancellation_notif') || 'A trip has been cancelled.', 'warning');
     };
 

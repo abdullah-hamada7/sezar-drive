@@ -13,6 +13,7 @@ describe('Prisma Debug Test', () => {
     try {
       const prisma = new PrismaClient();
       console.log('PrismaClient initialized successfully in Jest.');
+      prisma.$disconnect();
     } catch (e) {
       console.log('Caught error in Jest:', e.message);
       if (e.stack) {

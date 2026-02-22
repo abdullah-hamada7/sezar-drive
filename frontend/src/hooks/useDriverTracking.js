@@ -8,11 +8,16 @@ export function useDriverTracking() {
   const wsRef = useRef(null);
   const watchIdRef = useRef(null);
   const lastUpdateRef = useRef(0);
+  const roleRef = useRef(user?.role || null);
 
-  const connectWebSocket = useCallback(() => {
+  useEffect(() => {
+    roleRef.current = user?.role || null;
+  }, [user?.role]);
+
+  const connectWebSocket = useCallback(function connectWs() {
     const token = localStorage.getItem('accessToken');
     if (!token) return;
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) return;
+    if (wsRef.current && (wsRef.current.readyState === WebSocket.OPEN || wsRef.current.readyState === WebSocket.CONNECTING)) return;
 
     const ws = new WebSocket(buildTrackingWsUrl(token));
 
@@ -36,8 +41,9 @@ export function useDriverTracking() {
 
     ws.onclose = () => {
       console.log('Driver tracking disconnected');
-      if (user?.role === 'driver') {
-        setTimeout(connectWebSocket, 5000);
+      wsRef.current = null;
+      if (roleRef.current === 'driver') {
+        setTimeout(connectWs, 5000);
       }
     };
 
@@ -96,7 +102,7 @@ export function useDriverTracking() {
       navigator.geolocation.clearWatch(watchIdRef.current);
       watchIdRef.current = null;
     }
-  }, [user?.role]);
+  }, []);
 
   useEffect(() => {
     if (user?.role !== 'driver') return;
