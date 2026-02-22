@@ -107,7 +107,11 @@ export default function DeviceVerificationPage() {
       stopCamera();
 
       setTimeout(() => {
-        navigate(userData.role === 'admin' ? '/admin' : '/driver');
+        if (userData.mustChangePassword) {
+          navigate('/change-password');
+        } else {
+          navigate(userData.role === 'admin' ? '/admin' : '/driver');
+        }
       }, 2000);
     } catch (err) {
       // DEV BYPASS for testing
