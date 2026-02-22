@@ -258,6 +258,25 @@
       "manual_review": "مراجعة يدوية",
       "in_progress": "نشطة",
       "all": "الكل"
+    },
+    "inspection_type": {
+      "full": "فحص كامل",
+      "checklist": "قائمة تحقق"
+    },
+    "trip_status": {
+      "assigned": "تم التعيين",
+      "accepted": "مقبولة",
+      "in_progress": "قيد التنفيذ",
+      "completed": "مكتملة",
+      "cancelled": "ملغاة",
+      "offline_pending_sync": "بانتظار المزامنة دون اتصال"
+    },
+    "shift_verification_status": {
+      "pending": "قيد المراجعة",
+      "verified": "متـحـقق",
+      "rejected": "مرفوض",
+      "failed_match": "فشل التطابق",
+      "manual_review": "مراجعة يدوية"
     }
   },
   "errors": {
@@ -548,9 +567,13 @@
       "metadata": "الميانات الوصفية"
     },
     "entity": {
+      "auth": "المصادقة",
       "damage_report": "تقرير ضرر",
+      "expense_category": "فئة المصروف",
+      "identity": "الهوية",
       "inspection": "فحص",
       "identity_verification": "التحقق من الهوية",
+      "report": "تقرير",
       "user": "مستخدم",
       "driver": "سائق",
       "vehicle": "مركبة",
@@ -571,12 +594,27 @@
     },
     "action": {
       "activated": "تفعيل",
+      "admin_closed": "إغلاق من المسؤول",
+      "assigned": "تعيين",
+      "closed": "إغلاق",
       "created": "إنشاء",
+      "deactivated": "إلغاء التفعيل",
       "updated": "تحديث",
       "deleted": "حذف",
+      "device_verified": "تم التحقق من الجهاز",
+      "generated": "توليد",
+      "login": "تسجيل الدخول",
+      "logout": "تسجيل الخروج",
+      "password_changed": "تغيير كلمة المرور",
+      "password_reset": "إعادة تعيين كلمة المرور",
+      "preferences_updated": "تحديث التفضيلات",
+      "reactivated": "إعادة تفعيل",
+      "released": "إنهاء التعيين",
+      "reported": "إبلاغ",
       "started": "بدء",
       "completed": "اكتمال",
       "cancelled": "إلغاء",
+      "uploaded": "رفع",
       "logged_in": "تسجيل دخول",
       "identity_uploaded": "رفع الهوية",
       "identity_reviewed": "مراجعة الهوية"

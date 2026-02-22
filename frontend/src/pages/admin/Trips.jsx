@@ -208,7 +208,7 @@ export default function TripsPage() {
                   <select className="form-input" value={form.driverId} onChange={e => setForm({ ...form, driverId: e.target.value })} required>
                     <option value="">{t('trips.modal.select_driver')}</option>
                     {drivers.map(d => (
-                      <option key={d.id} value={d.id}>{d.name} ({d.identityVerified ? t('drivers.table.verified') : t('drivers.table.pending')})</option>
+                      <option key={d.id} value={d.id}>{d.name} ({d.identityVerified ? t('common.shift_verification_status.verified') : t('common.shift_verification_status.pending')})</option>
                     ))}
                   </select>
                 </div>

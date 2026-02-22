@@ -139,6 +139,9 @@ export default function DriverShift() {
   }
 
   const isVerified = shift?.verificationStatus === 'VERIFIED';
+  const verificationLabel = shift?.verificationStatus
+    ? t(`common.shift_verification_status.${shift.verificationStatus.toLowerCase()}`, shift.verificationStatus)
+    : t('common.status.pending');
   const hasVehicle = !!shift?.vehicleId || !!shift?.vehicle;
 
   return (
@@ -186,7 +189,7 @@ export default function DriverShift() {
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 600 }}>{t('shift.face_verification')}</div>
-                  <div className="text-xs text-muted">{isVerified ? t('shift.identity_confirmed') : t('shift.action_required')}</div>
+                  <div className="text-xs text-muted">{isVerified ? t('shift.identity_confirmed') : verificationLabel}</div>
                 </div>
                 {!isVerified && <Play size={16} className="text-muted mirror-rtl" />}
               </div>
@@ -244,10 +247,10 @@ export default function DriverShift() {
               <div style={{ fontWeight: 600, fontSize: 'var(--font-size-lg)' }}>
                 {t('shift.active')}
               </div>
-              <div className="text-sm text-muted">{t('trip.status')}: {t('status.active')}</div>
+              <div className="text-sm text-muted">{t('trip.status')}: {t('common.trip_status.in_progress')}</div>
             </div>
             <span className="badge badge-success" style={{ marginLeft: 'auto' }}>
-              {t('status.active')}
+              {t('common.trip_status.in_progress')}
             </span>
           </div>
 

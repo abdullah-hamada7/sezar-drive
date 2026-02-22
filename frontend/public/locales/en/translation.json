@@ -258,6 +258,25 @@
       "manual_review": "Manual Review",
       "in_progress": "Active",
       "all": "All"
+    },
+    "inspection_type": {
+      "full": "Full",
+      "checklist": "Checklist"
+    },
+    "trip_status": {
+      "assigned": "Assigned",
+      "accepted": "Accepted",
+      "in_progress": "In Progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "offline_pending_sync": "Offline Pending Sync"
+    },
+    "shift_verification_status": {
+      "pending": "Pending",
+      "verified": "Verified",
+      "rejected": "Rejected",
+      "failed_match": "Failed Match",
+      "manual_review": "Manual Review"
     }
   },
   "errors": {
@@ -547,9 +566,13 @@
       "metadata": "Metadata"
     },
     "entity": {
+      "auth": "Auth",
       "damage_report": "Damage Report",
+      "expense_category": "Expense Category",
+      "identity": "Identity",
       "inspection": "Inspection",
       "identity_verification": "Identity Verification",
+      "report": "Report",
       "user": "User",
       "driver": "Driver",
       "vehicle": "Vehicle",
@@ -570,13 +593,28 @@
     },
     "action": {
       "activated": "Activated",
+      "admin_closed": "Admin Closed",
+      "assigned": "Assigned",
+      "closed": "Closed",
       "created": "Created",
+      "deactivated": "Deactivated",
       "updated": "Updated",
       "deleted": "Deleted",
+      "device_verified": "Device Verified",
+      "generated": "Generated",
+      "logged_in": "Logged In",
+      "logout": "Logged Out",
+      "login": "Logged In",
+      "password_changed": "Password Changed",
+      "password_reset": "Password Reset",
+      "preferences_updated": "Preferences Updated",
+      "reactivated": "Reactivated",
+      "released": "Released",
+      "reported": "Reported",
       "started": "Started",
       "completed": "Completed",
       "cancelled": "Cancelled",
-      "logged_in": "Logged In",
+      "uploaded": "Uploaded",
       "identity_uploaded": "Identity Uploaded",
       "identity_reviewed": "Identity Reviewed"
     }

@@ -219,8 +219,8 @@ export default function DriversPage() {
                   </td>
                   <td>
                     {d.identityVerified
-                      ? <span className="badge badge-success"><UserCheck size={12} /> {t('drivers.table.verified')}</span>
-                      : <span className="badge badge-warning"><UserX size={12} /> {t('drivers.table.pending')}</span>
+                      ? <span className="badge badge-success"><UserCheck size={12} /> {t('common.shift_verification_status.verified')}</span>
+                      : <span className="badge badge-warning"><UserX size={12} /> {t('common.shift_verification_status.pending')}</span>
                     }
                   </td>
                   <td>
@@ -405,7 +405,7 @@ export default function DriversPage() {
         isOpen={confirmData.isOpen}
         onClose={() => setConfirmData({ isOpen: false, type: '', data: null })}
         onConfirm={onConfirmAction}
-        title={confirmData.type === 'delete' ? t('common.delete') : t('drivers.table.verified')}
+        title={confirmData.type === 'delete' ? t('common.delete') : t('common.shift_verification_status.verified')}
         message={confirmData.type === 'delete'
           ? t('drivers.messages.delete_confirm')
           : t('drivers.messages.approve_confirm', { name: confirmData.data?.name })}
