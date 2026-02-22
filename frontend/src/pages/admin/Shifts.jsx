@@ -232,41 +232,32 @@ export default function ShiftsPage() {
                         </div>
                       </div>
 
-                       {insp.checklistData && (
-                         <div className="mb-lg">
-                           <h4 className="text-xs uppercase text-muted font-bold mb-sm tracking-wider">{t('shifts.modal.checklist')}</h4>
-                           <div className="grid grid-4 gap-sm">
-                             {checkEntries.map(([key, val]) => (
-                               <div key={key} className="flex items-center justify-between p-xs px-sm rounded border bg-bg-secondary">
-                                 <span className="text-xs">{t(`inspection.checklist.${key}`) || key}</span>
-                                 {val ? <Check size={14} className="text-success" /> : <AlertCircle size={14} className="text-danger" />}
-                               </div>
-                             ))}
-                           </div>
-                           <div className="grid grid-2 gap-md mt-md">
-                             <div className="p-sm rounded border bg-bg-tertiary">
-                               <div className="text-xs uppercase text-muted font-bold mb-xs tracking-wider">{t('inspection.marked') || 'Marked'}</div>
-                               <div className="flex flex-wrap gap-xs">
-                                 {marked.length === 0 ? (
-                                   <span className="text-xs text-muted">—</span>
-                                 ) : marked.map(k => (
-                                   <span key={k} className="badge badge-success" style={{ fontSize: '0.65rem' }}>{t(`inspection.checklist.${k}`) || k}</span>
-                                 ))}
-                               </div>
-                             </div>
-                             <div className="p-sm rounded border bg-bg-tertiary">
-                               <div className="text-xs uppercase text-muted font-bold mb-xs tracking-wider">{t('inspection.not_marked') || 'Not marked'}</div>
-                               <div className="flex flex-wrap gap-xs">
-                                 {unmarked.length === 0 ? (
-                                   <span className="text-xs text-muted">—</span>
-                                 ) : unmarked.map(k => (
-                                   <span key={k} className="badge badge-warning" style={{ fontSize: '0.65rem' }}>{t(`inspection.checklist.${k}`) || k}</span>
-                                 ))}
-                               </div>
-                             </div>
-                           </div>
-                         </div>
-                       )}
+                      {insp.checklistData && (
+                        <div className="mb-lg">
+                          <div className="grid grid-2 gap-md">
+                            <div className="p-sm rounded border bg-bg-tertiary">
+                              <div className="text-xs uppercase text-muted font-bold mb-xs tracking-wider">{t('inspection.marked') || 'Marked'}</div>
+                              <div className="flex flex-wrap gap-xs">
+                                {marked.length === 0 ? (
+                                  <span className="text-xs text-muted">—</span>
+                                ) : marked.map(k => (
+                                  <span key={k} className="badge badge-success" style={{ fontSize: '0.65rem' }}>{t(`inspection.checklist.${k}`) || k}</span>
+                                ))}
+                              </div>
+                            </div>
+                            <div className="p-sm rounded border bg-bg-tertiary">
+                              <div className="text-xs uppercase text-muted font-bold mb-xs tracking-wider">{t('inspection.not_marked') || 'Not marked'}</div>
+                              <div className="flex flex-wrap gap-xs">
+                                {unmarked.length === 0 ? (
+                                  <span className="text-xs text-muted">—</span>
+                                ) : unmarked.map(k => (
+                                  <span key={k} className="badge badge-danger" style={{ fontSize: '0.65rem' }}>{t(`inspection.checklist.${k}`) || k}</span>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
                       {(insp.notes || (insp.checklistData && insp.checklistData.notes)) && (
                         <div className="mb-lg">
