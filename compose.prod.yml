@@ -65,15 +65,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+    env_file: .env
     environment:
-      # These are now loaded from AWS Secrets Manager & SSM Parameter Store
       PORT: 3000
       NODE_ENV: production
-      CORS_ORIGIN: ${CORS_ORIGIN}
-      FRONTEND_URL: ${FRONTEND_URL}
-      PROJECT_NAME: ${PROJECT_NAME}
-      S3_REGION: ${S3_REGION:-us-east-1}
-      AWS_DEFAULT_REGION: ${aws_region:-us-east-1}
+      # These overrides are for container-to-container networking
       RUN_MIGRATIONS_ON_STARTUP: "true"
     networks:
       - db-net
