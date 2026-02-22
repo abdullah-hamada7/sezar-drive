@@ -10,7 +10,10 @@
 
     # ─── Tracking WebSockets ───
     handle /ws/* {
-        reverse_proxy backend:3000
+        reverse_proxy backend:3000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+        }
     }
 
     # ─── Frontend (Catch-all) ───
