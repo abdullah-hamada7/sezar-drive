@@ -8,6 +8,9 @@ import { ClipboardCheck, User } from 'lucide-react';
 import { ToastContext } from '../../contexts/toastContext';
 
 import DriverDetailsModal from '../../components/driver/DriverDetailsModal';
+import ShiftPerformanceChart from '../../components/driver/ShiftPerformanceChart';
+import WeeklyEarningsChart from '../../components/driver/WeeklyEarningsChart';
+import RecentActivityList from '../../components/driver/RecentActivityList';
 
 export default function DriverHome() {
   const { t } = useTranslation();
@@ -113,6 +116,16 @@ export default function DriverHome() {
           </div>
         </div>
       )}
+
+      {/* Grid for Charts & Activity */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+        <ShiftPerformanceChart />
+        <WeeklyEarningsChart />
+      </div>
+
+      <div className="mt-md">
+        <RecentActivityList />
+      </div>
     </div>
   );
 }

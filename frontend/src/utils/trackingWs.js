@@ -9,8 +9,13 @@ export function buildTrackingWsUrl(token) {
   const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const wsUrl = `${wsProtocol}//${window.location.host}/ws/tracking?token=${encodeURIComponent(token)}`;
 
-  if (import.meta.env.DEV) {
-    console.log('[WS] Connection URL:', wsUrl);
+  if (import.meta.env.DEV || window.location.hostname === 'localhost') {
+    console.log('[WebSocket] Connecting to:', wsUrl);
+    console.log('[WebSocket] Context:', {
+      protocol: window.location.protocol,
+      host: window.location.host,
+      apiBase
+    });
   }
 
   return wsUrl;

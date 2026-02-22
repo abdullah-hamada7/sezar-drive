@@ -12,7 +12,7 @@ export default function ShiftPerformanceChart() {
     async function loadStats() {
       try {
         const res = await statsService.getDriverShiftStats();
-        setData(res);
+        setData(res.data || []);
       } catch (err) {
         console.error('Failed to load shift performance:', err);
       } finally {

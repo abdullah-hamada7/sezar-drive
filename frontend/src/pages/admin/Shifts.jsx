@@ -203,20 +203,25 @@ export default function ShiftsPage() {
                         <div className="mb-lg">
                           <h4 className="text-xs uppercase text-muted font-bold mb-sm tracking-wider">{t('shifts.modal.checklist')}</h4>
                           <div className="grid grid-4 gap-sm">
-                            {Object.entries(insp.checklistData).map(([key, val]) => (
-                              <div key={key} className="flex items-center justify-between p-xs px-sm rounded border bg-bg-secondary">
-                                <span className="text-xs">{t(`inspection.checklist.${key}`) || key}</span>
-                                {val ? <Check size={14} className="text-success" /> : <AlertCircle size={14} className="text-danger" />}
-                              </div>
+                            {Object.entries(insp.checklistData.checks || insp.checklistData).map(([key, val]) => (
+                              // Filter out 'notes' if it was mixed in for legacy reasons, though we prefer nesting
+                              key !== 'notes' && (
+                                <div key={key} className="flex items-center justify-between p-xs px-sm rounded border bg-bg-secondary">
+                                  <span className="text-xs">{t(`inspection.checklist.${key}`) || key}</span>
+                                  {val ? <Check size={14} className="text-success" /> : <AlertCircle size={14} className="text-danger" />}
+                                </div>
+                              )
                             ))}
                           </div>
                         </div>
                       )}
 
-                      {insp.notes && (
+                      {(insp.notes || (insp.checklistData && insp.checklistData.notes)) && (
                         <div className="mb-lg">
                           <h4 className="text-xs uppercase text-muted font-bold mb-sm tracking-wider">{t('inspection.notes_label')}</h4>
-                          <p className="text-sm p-sm bg-bg-tertiary rounded border">{insp.notes}</p>
+                          <p className="text-sm p-sm bg-bg-tertiary rounded border">
+                            {insp.notes || insp.checklistData.notes}
+                          </p>
                         </div>
                       )}
 

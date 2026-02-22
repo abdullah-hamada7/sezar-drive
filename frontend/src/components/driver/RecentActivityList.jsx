@@ -11,7 +11,7 @@ export default function RecentActivityList() {
     async function loadActivity() {
       try {
         const res = await statsService.getDriverActivity();
-        setData(res);
+        setData(res.data || []);
       } catch (err) {
         console.error('Failed to load activity:', err);
       } finally {

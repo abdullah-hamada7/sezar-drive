@@ -78,6 +78,18 @@ class TripValidator {
       throw new ConflictError('INSPECTION_REQUIRED', 'Inspection not completed');
     }
 
+    // Verify scheduled time (don't start too early)
+    if (trip.scheduledTime) {
+      const now = new Date();
+      const scheduled = new Date(trip.scheduledTime);
+      const diffMs = scheduled - now;
+      const oneHourMs = 60 * 60 * 1000;
+
+      if (diffMs > oneHourMs) {
+        throw new ConflictError('TRIP_TOO_EARLY', `Trip is scheduled for ${scheduled.toLocaleString()}. You can only start 1 hour before.`);
+      }
+    }
+
     return { trip, shift, driver, assignment, inspection };
   }
 }
