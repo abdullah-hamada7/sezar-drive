@@ -151,19 +151,6 @@ export default function TrackingPage() {
         </div>
       </div>
 
-      {!loading && (
-        <div className="card mb-md" style={{ padding: '0.75rem var(--space-md)' }}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-sm">
-              <span className="text-xs text-muted uppercase" style={{ letterSpacing: '0.08em' }}>{t('tracking.card.title')}</span>
-              <span className="badge badge-info">{drivers.length}</span>
-            </div>
-            <span className={`badge ${wsStatus === 'connected' ? 'badge-success' : 'badge-danger'}`}>
-              {wsStatus === 'connected' ? t('tracking.status.live') : t('tracking.status.disconnected')}
-            </span>
-          </div>
-        </div>
-      )}
 
       <div className="grid" style={{ gridTemplateColumns: '1fr 300px', gap: '1rem' }}>
         <div className="card" style={{ padding: 0, height: '600px', overflow: 'hidden', position: 'relative' }}>

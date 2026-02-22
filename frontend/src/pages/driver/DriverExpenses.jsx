@@ -75,6 +75,8 @@ export default function DriverExpenses() {
 
   if (loading) return <div className="loading-page"><div className="spinner"></div></div>;
 
+  const pendingCount = expenses.filter(e => e.status === 'pending').length;
+
   return (
     <div>
       <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-lg)' }}>
@@ -82,6 +84,19 @@ export default function DriverExpenses() {
         <button className="btn btn-primary btn-sm flex items-center gap-xs" onClick={() => setShowForm(true)}>
           <Plus size={16} /> {t('expenses.new')}
         </button>
+      </div>
+
+      <div className="card mb-md" style={{ padding: '0.75rem var(--space-md)' }}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-sm">
+            <span className="text-xs text-muted uppercase" style={{ letterSpacing: '0.08em' }}>{t('expenses.title')}</span>
+            <span className="badge badge-info">{expenses.length}</span>
+          </div>
+          <div className="flex items-center gap-sm">
+            {pendingCount > 0 && <span className="badge badge-warning">{t('expenses.status.pending')}: {pendingCount}</span>}
+            {activeShift ? <span className="badge badge-success">{t('shift.active')}</span> : <span className="badge badge-neutral">{t('shift.no_active')}</span>}
+          </div>
+        </div>
       </div>
 
       {expenses.length === 0 ? (
