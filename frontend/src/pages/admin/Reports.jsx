@@ -6,7 +6,7 @@ import { useContext } from 'react';
 import { ToastContext } from '../../contexts/toastContext';
 
 export default function ReportsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { addToast } = useContext(ToastContext);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -30,6 +30,7 @@ export default function ReportsPage() {
 
   async function downloadFile(type) {
     try {
+      const lang = i18n.language || 'en';
       if (!startDate || !endDate) {
         addToast(t('reports.messages.select_dates') || 'Please select start and end dates', 'error');
         return;
@@ -38,6 +39,7 @@ export default function ReportsPage() {
       const params = new URLSearchParams();
       params.set('startDate', startDate);
       params.set('endDate', endDate);
+      params.set('lang', lang);
 
       const endpoint = type === 'pdf' ? `/reports/revenue/pdf?${params}` : `/reports/revenue/excel?${params}`;
       const response = await fetch(`/api/v1${endpoint}`, {

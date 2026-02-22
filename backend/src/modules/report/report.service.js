@@ -108,37 +108,106 @@ async function generateRevenueData({ startDate, endDate, driverId }) {
   };
 }
 
+const REPORT_I18N = {
+  en: {
+    title: 'Fleet Management — Revenue Report',
+    period: 'Period',
+    summary: 'Summary',
+    totalRevenue: 'Total Revenue',
+    totalExpenses: 'Total Expenses',
+    netRevenue: 'Net Revenue',
+    totalTrips: 'Total Trips',
+    driverBreakdown: 'Driver Breakdown',
+    revenue: 'Revenue',
+    expenses: 'Expenses',
+    net: 'Net',
+    trips: 'Trips',
+    metric: 'Metric',
+    value: 'Value',
+    periodStart: 'Period Start',
+    periodEnd: 'Period End',
+    driversSheet: 'Drivers',
+    tripsSheet: 'Trips',
+    driver: 'Driver',
+    vehicle: 'Vehicle',
+    pickup: 'Pickup',
+    dropoff: 'Dropoff',
+    price: 'Price',
+    status: 'Status',
+    date: 'Date',
+    fileName: 'revenue_report'
+  },
+  ar: {
+    title: 'إدارة الأسطول — تقرير الإيرادات',
+    period: 'الفترة',
+    summary: 'الملخص',
+    totalRevenue: 'إجمالي الإيرادات',
+    totalExpenses: 'إجمالي المصروفات',
+    netRevenue: 'صافي الإيرادات',
+    totalTrips: 'إجمالي الرحلات',
+    driverBreakdown: 'تفاصيل السائقين',
+    revenue: 'الإيرادات',
+    expenses: 'المصروفات',
+    net: 'الصافي',
+    trips: 'الرحلات',
+    metric: 'البند',
+    value: 'القيمة',
+    periodStart: 'بداية الفترة',
+    periodEnd: 'نهاية الفترة',
+    driversSheet: 'السائقون',
+    tripsSheet: 'الرحلات',
+    driver: 'السائق',
+    vehicle: 'المركبة',
+    pickup: 'نقطة الانطلاق',
+    dropoff: 'نقطة الوصول',
+    price: 'السعر',
+    status: 'الحالة',
+    date: 'التاريخ',
+    fileName: 'revenue_report'
+  }
+};
+
+function resolveLang(lang) {
+  const normalized = String(lang || '').toLowerCase();
+  return REPORT_I18N[normalized] ? normalized : 'en';
+}
+
+function getReportStrings(lang) {
+  return REPORT_I18N[resolveLang(lang)];
+}
+
 /**
  * Generate PDF report.
  */
-async function generatePDF(reportData, res) {
+async function generatePDF(reportData, res, { lang } = {}) {
+  const strings = getReportStrings(lang);
   const doc = new PDFDocument({ margin: 50 });
   res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader('Content-Disposition', 'attachment; filename=revenue_report.pdf');
+  res.setHeader('Content-Disposition', `attachment; filename=${strings.fileName}.pdf`);
   doc.pipe(res);
 
   // Header
-  doc.fontSize(20).font('Helvetica-Bold').text('Fleet Management — Revenue Report', { align: 'center' });
+  doc.fontSize(20).font('Helvetica-Bold').text(strings.title, { align: 'center' });
   doc.moveDown();
-  doc.fontSize(12).font('Helvetica').text(`Period: ${reportData.startDate.slice(0, 10)} to ${reportData.endDate.slice(0, 10)}`, { align: 'center' });
+  doc.fontSize(12).font('Helvetica').text(`${strings.period}: ${reportData.startDate.slice(0, 10)} - ${reportData.endDate.slice(0, 10)}`, { align: 'center' });
   doc.moveDown();
 
   // Summary table
-  doc.fontSize(14).font('Helvetica-Bold').text('Summary', { underline: true });
+  doc.fontSize(14).font('Helvetica-Bold').text(strings.summary, { underline: true });
   doc.moveDown(0.5);
   doc.fontSize(11).font('Helvetica');
-  doc.text(`Total Revenue: ${reportData.totalRevenue.toFixed(2)} EGP`);
-  doc.text(`Total Expenses: ${reportData.totalExpenses.toFixed(2)} EGP`);
-  doc.text(`Net Revenue: ${reportData.netRevenue.toFixed(2)} EGP`);
-  doc.text(`Total Trips: ${reportData.tripCount}`);
+  doc.text(`${strings.totalRevenue}: ${reportData.totalRevenue.toFixed(2)} EGP`);
+  doc.text(`${strings.totalExpenses}: ${reportData.totalExpenses.toFixed(2)} EGP`);
+  doc.text(`${strings.netRevenue}: ${reportData.netRevenue.toFixed(2)} EGP`);
+  doc.text(`${strings.totalTrips}: ${reportData.tripCount}`);
   doc.moveDown();
 
   // Driver breakdown
-  doc.fontSize(14).font('Helvetica-Bold').text('Driver Breakdown', { underline: true });
+  doc.fontSize(14).font('Helvetica-Bold').text(strings.driverBreakdown, { underline: true });
   doc.moveDown(0.5);
   doc.fontSize(11).font('Helvetica');
   for (const driver of reportData.driverSummaries) {
-    doc.text(`${driver.driverName}: Revenue ${driver.totalRevenue.toFixed(2)} EGP | Expenses ${driver.totalExpenses.toFixed(2)} EGP | Net ${driver.netRevenue.toFixed(2)} EGP | Trips: ${driver.tripCount}`);
+    doc.text(`${driver.driverName}: ${strings.revenue} ${driver.totalRevenue.toFixed(2)} EGP | ${strings.expenses} ${driver.totalExpenses.toFixed(2)} EGP | ${strings.net} ${driver.netRevenue.toFixed(2)} EGP | ${strings.trips}: ${driver.tripCount}`);
   }
 
   doc.end();
@@ -147,31 +216,32 @@ async function generatePDF(reportData, res) {
 /**
  * Generate Excel report.
  */
-async function generateExcel(reportData, res) {
+async function generateExcel(reportData, res, { lang } = {}) {
+  const strings = getReportStrings(lang);
   const workbook = new ExcelJS.Workbook();
   workbook.creator = 'Fleet Management System';
 
   // Summary sheet
-  const summarySheet = workbook.addWorksheet('Summary');
+  const summarySheet = workbook.addWorksheet(strings.summary);
   summarySheet.columns = [
-    { header: 'Metric', key: 'metric', width: 30 },
-    { header: 'Value', key: 'value', width: 25 },
+    { header: strings.metric, key: 'metric', width: 30 },
+    { header: strings.value, key: 'value', width: 25 },
   ];
-  summarySheet.addRow({ metric: 'Period Start', value: reportData.startDate.slice(0, 10) });
-  summarySheet.addRow({ metric: 'Period End', value: reportData.endDate.slice(0, 10) });
-  summarySheet.addRow({ metric: 'Total Revenue (EGP)', value: reportData.totalRevenue });
-  summarySheet.addRow({ metric: 'Total Expenses (EGP)', value: reportData.totalExpenses });
-  summarySheet.addRow({ metric: 'Net Revenue (EGP)', value: reportData.netRevenue });
-  summarySheet.addRow({ metric: 'Total Trips', value: reportData.tripCount });
+  summarySheet.addRow({ metric: strings.periodStart, value: reportData.startDate.slice(0, 10) });
+  summarySheet.addRow({ metric: strings.periodEnd, value: reportData.endDate.slice(0, 10) });
+  summarySheet.addRow({ metric: `${strings.totalRevenue} (EGP)`, value: reportData.totalRevenue });
+  summarySheet.addRow({ metric: `${strings.totalExpenses} (EGP)`, value: reportData.totalExpenses });
+  summarySheet.addRow({ metric: `${strings.netRevenue} (EGP)`, value: reportData.netRevenue });
+  summarySheet.addRow({ metric: strings.totalTrips, value: reportData.tripCount });
 
   // Drivers sheet
-  const driverSheet = workbook.addWorksheet('Drivers');
+  const driverSheet = workbook.addWorksheet(strings.driversSheet);
   driverSheet.columns = [
-    { header: 'Driver', key: 'name', width: 25 },
-    { header: 'Revenue (EGP)', key: 'revenue', width: 20 },
-    { header: 'Expenses (EGP)', key: 'expenses', width: 20 },
-    { header: 'Net (EGP)', key: 'net', width: 20 },
-    { header: 'Trips', key: 'trips', width: 15 },
+    { header: strings.driver, key: 'name', width: 25 },
+    { header: `${strings.revenue} (EGP)`, key: 'revenue', width: 20 },
+    { header: `${strings.expenses} (EGP)`, key: 'expenses', width: 20 },
+    { header: `${strings.net} (EGP)`, key: 'net', width: 20 },
+    { header: strings.trips, key: 'trips', width: 15 },
   ];
   for (const d of reportData.driverSummaries) {
     driverSheet.addRow({
@@ -181,15 +251,15 @@ async function generateExcel(reportData, res) {
   }
 
   // Trips sheet
-  const tripsSheet = workbook.addWorksheet('Trips');
+  const tripsSheet = workbook.addWorksheet(strings.tripsSheet);
   tripsSheet.columns = [
-    { header: 'Date', key: 'date', width: 25 },
-    { header: 'Driver', key: 'driver', width: 25 },
-    { header: 'Vehicle', key: 'vehicle', width: 20 },
-    { header: 'Pickup', key: 'pickup', width: 35 },
-    { header: 'Dropoff', key: 'dropoff', width: 35 },
-    { header: 'Price', key: 'price', width: 15 },
-    { header: 'Status', key: 'status', width: 15 },
+    { header: strings.date, key: 'date', width: 25 },
+    { header: strings.driver, key: 'driver', width: 25 },
+    { header: strings.vehicle, key: 'vehicle', width: 20 },
+    { header: strings.pickup, key: 'pickup', width: 35 },
+    { header: strings.dropoff, key: 'dropoff', width: 35 },
+    { header: strings.price, key: 'price', width: 15 },
+    { header: strings.status, key: 'status', width: 15 },
   ];
   for (const t of reportData.trips) {
     tripsSheet.addRow({
@@ -204,7 +274,7 @@ async function generateExcel(reportData, res) {
   }
 
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  res.setHeader('Content-Disposition', 'attachment; filename=revenue_report.xlsx');
+  res.setHeader('Content-Disposition', `attachment; filename=${strings.fileName}.xlsx`);
   await workbook.xlsx.write(res);
 }
 

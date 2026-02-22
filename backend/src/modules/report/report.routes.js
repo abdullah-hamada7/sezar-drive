@@ -36,7 +36,7 @@ router.get(
         newState: { format: 'pdf', startDate: req.query.startDate, endDate: req.query.endDate },
         ipAddress: req.clientIp,
       });
-      await reportService.generatePDF(data, res);
+      await reportService.generatePDF(data, res, { lang: req.query.lang });
     } catch (err) {
       console.error('[REPORT_ERROR] PDF Generation failed:', err);
       next(err);
@@ -60,7 +60,7 @@ router.get(
         newState: { format: 'excel', startDate: req.query.startDate, endDate: req.query.endDate },
         ipAddress: req.clientIp,
       });
-      await reportService.generateExcel(data, res);
+      await reportService.generateExcel(data, res, { lang: req.query.lang });
     } catch (err) {
       console.error('[REPORT_ERROR] Excel Generation failed:', err);
       next(err);
