@@ -76,6 +76,32 @@ export default function TripsPage() {
     } catch (err) { console.error(err); }
   }
 
+  function toLocalInputValue(date) {
+    const pad = value => String(value).padStart(2, '0');
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
+  function toOffsetISOString(date) {
+    const pad = value => String(value).padStart(2, '0');
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+    const seconds = pad(date.getSeconds());
+    const offsetMinutes = -date.getTimezoneOffset();
+    const sign = offsetMinutes >= 0 ? '+' : '-';
+    const offsetAbs = Math.abs(offsetMinutes);
+    const offsetHours = pad(Math.floor(offsetAbs / 60));
+    const offsetMins = pad(offsetAbs % 60);
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${sign}${offsetHours}:${offsetMins}`;
+  }
+
   async function handleCreate(e) {
     e.preventDefault();
     setError('');
@@ -93,7 +119,7 @@ export default function TripsPage() {
       if (scheduledTime) {
         const scheduledDate = new Date(scheduledTime);
         if (!Number.isNaN(scheduledDate.getTime())) {
-          scheduledTime = scheduledDate.toISOString();
+          scheduledTime = toOffsetISOString(scheduledDate);
         }
       }
       await api.assignTrip({ ...form, price: parsedPrice, scheduledTime });
@@ -265,7 +291,7 @@ export default function TripsPage() {
                       className="form-input"
                       value={form.scheduledTime}
                       onChange={e => { setForm({ ...form, scheduledTime: e.target.value }); setError(''); }}
-                      min={new Date().toISOString().slice(0, 16)}
+                      min={toLocalInputValue(new Date())}
                     />
                   </div>
                 </div>
