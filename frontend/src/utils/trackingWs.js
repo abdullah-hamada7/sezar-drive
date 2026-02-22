@@ -1,21 +1,24 @@
 export function buildTrackingWsUrl(token) {
-  const apiBase = import.meta.env.VITE_API_URL || '/api/v1';
+  const apiBase = import.meta.env.VITE_API_URL || '';
+  const isAbsolute = apiBase.startsWith('http');
 
-  // Create a URL object to reliably extract information
-  const baseUrl = apiBase.startsWith('http')
-    ? new URL(apiBase)
-    : new URL(apiBase, window.location.origin);
+  let host = window.location.host;
+  let protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 
-  const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const wsUrl = `${wsProtocol}//${window.location.host}/ws/tracking?token=${encodeURIComponent(token)}`;
+  if (isAbsolute) {
+    try {
+      const url = new URL(apiBase);
+      host = url.host;
+      protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+    } catch (e) {
+      console.error('[WebSocket] Invalid VITE_API_URL:', apiBase);
+    }
+  }
 
-  if (import.meta.env.DEV || window.location.hostname === 'localhost') {
-    console.log('[WebSocket] Connecting to:', wsUrl);
-    console.log('[WebSocket] Context:', {
-      protocol: window.location.protocol,
-      host: window.location.host,
-      apiBase
-    });
+  const wsUrl = `${protocol}//${host}/ws/tracking?token=${encodeURIComponent(token)}`;
+
+  if (import.meta.env.DEV || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    console.log('[WebSocket] Connecting:', { wsUrl, apiBase, isAbsolute, derivedHost: host });
   }
 
   return wsUrl;

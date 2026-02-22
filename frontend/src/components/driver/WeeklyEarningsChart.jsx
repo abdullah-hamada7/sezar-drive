@@ -12,7 +12,9 @@ export default function WeeklyEarningsChart() {
     async function loadStats() {
       try {
         const res = await statsService.getDriverWeeklyStats();
-        setData(res.data || []);
+        // Handle both { success: true, data: [...] } and direct [...]
+        const result = res.data || res;
+        setData(Array.isArray(result) ? result : []);
       } catch (err) {
         console.error('Failed to load weekly earnings:', err);
       } finally {

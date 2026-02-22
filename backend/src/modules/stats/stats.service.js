@@ -256,7 +256,7 @@ async function getDriverActivity(driverId, limit = 10) {
       id: `trip-${t.id}`,
       type: 'trip',
       title: `Trip to ${t.dropoffLocation}`,
-      amount: t.price,
+      amount: Number(t.price),
       status: t.status,
       timestamp: t.createdAt
     })),
@@ -264,7 +264,7 @@ async function getDriverActivity(driverId, limit = 10) {
       id: `exp-${e.id}`,
       type: 'expense',
       title: e.category?.name || 'Expense',
-      amount: -e.amount,
+      amount: -Number(e.amount),
       status: e.status,
       timestamp: e.createdAt
     }))
