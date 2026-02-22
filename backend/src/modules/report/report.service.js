@@ -1,6 +1,7 @@
 const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
 const path = require('path');
+const fs = require('fs');
 const prisma = require('../../config/database');
 const { ValidationError } = require('../../errors');
 
@@ -182,11 +183,16 @@ function getPdfFonts(lang) {
   if (normalized !== 'ar') {
     return { regular: 'Helvetica', bold: 'Helvetica-Bold' };
   }
+  const regularPath = path.join(__dirname, '../../assets/fonts/Cairo-Regular.ttf');
+  const boldPath = path.join(__dirname, '../../assets/fonts/Cairo-Bold.ttf');
+  if (!fs.existsSync(regularPath) || !fs.existsSync(boldPath)) {
+    return { regular: 'Helvetica', bold: 'Helvetica-Bold' };
+  }
   return {
     regular: 'Cairo',
     bold: 'Cairo-Bold',
-    regularPath: path.join(__dirname, '../../assets/fonts/Cairo-Regular.ttf'),
-    boldPath: path.join(__dirname, '../../assets/fonts/Cairo-Bold.ttf')
+    regularPath,
+    boldPath
   };
 }
 

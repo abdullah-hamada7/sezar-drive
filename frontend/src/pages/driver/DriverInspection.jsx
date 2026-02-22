@@ -189,8 +189,22 @@ export default function DriverInspection() {
   }
 
   return (
-    <div>
+    <div className="inspection-page">
       <h2 className="page-title" style={{ marginBottom: 'var(--space-lg)' }}>{t('inspection.title')}</h2>
+      <div className="card mb-md" style={{ padding: '0.75rem var(--space-md)' }}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-sm">
+            <span className="text-xs text-muted uppercase" style={{ letterSpacing: '0.08em' }}>{t('inspection.title')}</span>
+            <span className={`badge ${inspectionType === 'pre' ? 'badge-info' : 'badge-warning'}`}>
+              {inspectionType === 'pre' ? t('inspection.before_shift') : t('inspection.after_shift')}
+            </span>
+          </div>
+          <div className="flex items-center gap-sm">
+            <span className="badge badge-neutral">{stepLabels[step] || step}</span>
+            {shift?.vehicle?.plateNumber && <span className="badge badge-info">{shift.vehicle.plateNumber}</span>}
+          </div>
+        </div>
+      </div>
       <input type="file" ref={fileRef} accept="image/*" capture="environment" onChange={handlePhotoUpload} style={{ display: 'none' }} />
 
       <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
@@ -373,6 +387,18 @@ export default function DriverInspection() {
           </button>
         </div>
       )}
+      <style>{`
+        [data-theme="dark"] .inspection-page .text-muted {
+          color: var(--color-text-secondary);
+        }
+        .inspection-page .card {
+          border: 1px solid var(--color-border);
+          background: var(--color-bg-secondary);
+        }
+        .inspection-page .card-title {
+          color: var(--color-text);
+        }
+      `}</style>
     </div>
   );
 }
