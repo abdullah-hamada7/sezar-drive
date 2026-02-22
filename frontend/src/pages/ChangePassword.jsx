@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { authService as api } from '../services/auth.service';
 import { http } from '../services/http.service';
 import { Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
+import './Login.css';
 
 export default function ChangePasswordPage() {
   const { t } = useTranslation();
