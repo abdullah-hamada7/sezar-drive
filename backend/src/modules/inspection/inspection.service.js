@@ -12,6 +12,7 @@ async function createInspection(data, driverId, ipAddress) {
   const shift = await prisma.shift.findUnique({ where: { id: shiftId } });
   if (!shift || shift.driverId !== driverId) throw new NotFoundError('Shift');
 
+  const isChecklist = type === 'checklist';
   const inspection = await prisma.inspection.create({
     data: {
       shiftId,
@@ -19,8 +20,8 @@ async function createInspection(data, driverId, ipAddress) {
       driverId,
       type,
       mileage,
-      status: type === 'checklist' ? 'completed' : 'pending',
-      completedAt: type === 'checklist' ? new Date() : null,
+      status: isChecklist ? 'completed' : 'pending',
+      completedAt: isChecklist ? new Date() : null,
     },
   });
 
@@ -66,7 +67,7 @@ async function completeInspection(inspectionId, driverId, checklistData, ipAddre
     throw new ConflictError('ALREADY_COMPLETED', 'Inspection already completed');
   }
 
-  if (inspection.type === 'full') {
+  if (['full', 'pre', 'post'].includes(inspection.type)) {
     const directions = inspection.photos.map((p) => p.direction);
     const required = ['front', 'back', 'left', 'right'];
     const missing = required.filter((d) => !directions.includes(d));

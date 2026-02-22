@@ -22,7 +22,7 @@ router.post(
   [
     body('shiftId').isUUID(),
     body('vehicleId').isUUID(),
-    body('type').isIn(['full', 'checklist']),
+    body('type').isIn(['full', 'checklist', 'pre', 'post']),
     body('mileage').optional().isInt({ min: 0 }),
   ],
   async (req, res, next) => {
