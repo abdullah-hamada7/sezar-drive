@@ -3,8 +3,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const compression = require('compression');
-
 const rateLimit = require('express-rate-limit');
+
 const config = require('./config');
 const prisma = require('./config/database');
 const { attachIp } = require('./middleware/audit');
@@ -31,6 +31,8 @@ const expenseRoutes = require('./modules/expense/expense.routes');
 const damageRoutes = require('./modules/damage/damage.routes');
 const trackingRoutes = require('./modules/tracking/tracking.routes');
 const reportRoutes = require('./modules/report/report.routes');
+const statsRoutes = require('./modules/stats/stats.routes');
+const verificationRoutes = require('./modules/verification/verification.routes');
 const auditRoutes = require('./modules/audit/audit.routes');
 
 const app = express();
@@ -56,7 +58,7 @@ app.use(
   })
 );
 
-// CORS: supports web frontend, packaged Electron (origin="null"), and mobile/native clients (no origin header).
+// CORS configuration
 const configuredOrigins = (process.env.CORS_ORIGIN || '')
   .split(',')
   .map((s) => s.trim())
@@ -65,30 +67,17 @@ const allowNullOrigin = process.env.CORS_ALLOW_NULL_ORIGIN !== 'false';
 
 const corsOptions = {
   origin(origin, callback) {
-    // Native/mobile clients and server-to-server requests often omit Origin.
     if (!origin) return callback(null, true);
-
-    // In development allow all browser origins for faster local iteration.
-    if (!config.isProduction && configuredOrigins.length === 0) {
-      return callback(null, true);
-    }
-
-    if (configuredOrigins.includes('*') || configuredOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-
-    // Packaged Electron loads from file:// and sends Origin: null
-    if (origin === 'null' && (allowNullOrigin || configuredOrigins.includes('null'))) {
-      return callback(null, true);
-    }
-
+    if (!config.isProduction && configuredOrigins.length === 0) return callback(null, true);
+    if (configuredOrigins.includes('*') || configuredOrigins.includes(origin)) return callback(null, true);
+    if (origin === 'null' && (allowNullOrigin || configuredOrigins.includes('null'))) return callback(null, true);
     return callback(new Error(`CORS blocked for origin: ${origin}`));
   },
   credentials: true,
 };
+
 app.use(cors(corsOptions));
 app.use(compression());
-
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -103,7 +92,6 @@ app.get('/api/v1/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Readiness: verifies basic DB connectivity.
 app.get('/api/v1/ready', async (req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
@@ -123,8 +111,8 @@ app.use('/api/v1/expenses', expenseRoutes);
 app.use('/api/v1/damage-reports', damageRoutes);
 app.use('/api/v1/tracking', trackingRoutes);
 app.use('/api/v1/reports', reportRoutes);
-app.use('/api/v1/stats', require('./modules/stats/stats.routes'));
-app.use('/api/v1/verify', require('./modules/verification/verification.routes'));
+app.use('/api/v1/stats', statsRoutes);
+app.use('/api/v1/verify', verificationRoutes);
 app.use('/api/v1/audit-logs', auditRoutes);
 
 app.use((req, res) => {

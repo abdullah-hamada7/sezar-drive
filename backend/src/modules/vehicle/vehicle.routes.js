@@ -149,13 +149,13 @@ router.post(
 // ─── POST /api/v1/vehicles/scan-qr ──────────────
 router.post(
   '/scan-qr',
-  authenticate, authorize('driver'),
+  authenticate, enforcePasswordChanged, authorize('driver'),
   [body('qrCode').notEmpty().trim()],
   async (req, res, next) => {
     try {
       handleValidation(req);
       const vehicle = await vehicleService.validateQrCode(req.body.qrCode);
-      
+
       let shift = await prisma.shift.findFirst({
         where: { driverId: req.user.id, status: { in: ['PendingVerification', 'Active'] } },
         orderBy: { createdAt: 'desc' }
@@ -170,7 +170,7 @@ router.post(
       const assignment = await vehicleService.assignVehicle(
         vehicle.id, req.user.id, shift.id, req.user.id, req.clientIp
       );
-      
+
       // Also update shift with vehicleId
       await prisma.shift.update({
         where: { id: shift.id },
@@ -190,13 +190,11 @@ router.post(
   async (req, res, next) => {
     try {
       handleValidation(req);
-      // In a real app, you'd find the active assignment for this vehicle
-      const prisma = require('../../config/database');
       const assignment = await prisma.vehicleAssignment.findFirst({
         where: { vehicleId: req.params.id, active: true }
       });
       if (!assignment) throw new ValidationError('No active assignment found');
-      
+
       await vehicleService.releaseVehicle(assignment.id, req.user.id, req.clientIp);
       res.json({ message: 'Vehicle released' });
     } catch (err) { next(err); }

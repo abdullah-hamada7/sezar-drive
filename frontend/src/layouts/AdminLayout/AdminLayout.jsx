@@ -43,9 +43,9 @@ export default function AdminLayout() {
 
     // Update local pending counts based on notification type
     // Only increment if not currently on that page
-    if (notif.type === 'expense_pending' && window.location.pathname !== '/admin/expenses') {
+    if (notif.type === 'expense_pending' && location.pathname !== '/admin/expenses') {
       setPendingCounts(prev => ({ ...prev, expenses: prev.expenses + 1 }));
-    } else if (notif.type === 'damage_reported' && window.location.pathname !== '/admin/damage') {
+    } else if (notif.type === 'damage_reported' && location.pathname !== '/admin/damage') {
       setPendingCounts(prev => ({ ...prev, damage: prev.damage + 1 }));
     }
 
