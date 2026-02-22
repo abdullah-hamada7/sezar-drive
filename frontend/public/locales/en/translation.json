@@ -58,7 +58,7 @@
     "resend_request": "Resend Request",
     "generate_rescue_code": "Generate Rescue Code",
     "device_security_title": "Device Security",
-    "device_security_desc": "First time logging in from this device? Let's verify it's you.",
+    "device_security_desc": "We verify when a new device is detected or when extra security is required.",
     "verification_success_title": "Verified Successfully",
     "redirecting": "Redirecting you now...",
     "start_camera": "Start Camera",
@@ -128,6 +128,13 @@
   },
   "inspection": {
     "title": "Vehicle Inspection",
+    "before_shift": "Before shift",
+    "after_shift": "After shift",
+    "during_shift": "During shift",
+    "pre_shift_desc": "Complete this inspection before activating your shift.",
+    "post_shift_desc": "Complete this inspection after your shift work is done.",
+    "pre_already_done": "Pre-shift inspection already submitted for this shift.",
+    "post_already_done": "Post-shift inspection already submitted for this shift.",
     "checklist_desc": "Please perform a pre-trip inspection and check all required items.",
     "checklist": {
       "tires": "Tires Condition",
@@ -229,6 +236,7 @@
     "phone": "Phone",
     "now": "Just now",
     "no_data": "No data available",
+    "last_updated": "Latest updates",
     "errors": {
       "validation_failed": "Validation failed. Please check the fields below.",
       "check_fields": "Please fix the errors in the form before submitting."
@@ -261,7 +269,9 @@
     },
     "inspection_type": {
       "full": "Full",
-      "checklist": "Checklist"
+      "checklist": "Checklist",
+      "pre": "Pre-shift",
+      "post": "Post-shift"
     },
     "trip_status": {
       "assigned": "Assigned",
@@ -283,6 +293,8 @@
     "fetch_failed": "Failed to fetch data. Please try again.",
     "NO_ACTIVE_SHIFT": "Driver {{name}} does not have an active shift. They must start and activate their shift first.",
     "ACTIVE_TRIP_EXISTS": "Driver {{name}} already has an active or assigned trip.",
+    "DRIVER_ALREADY_HAS_ACTIVE_OR_ASSIGNED_TRIP": "Driver {{name}} already has an active or assigned trip.",
+    "SHIFT_HAS_ACTIVE_TRIP": "You cannot end your shift while you have an assigned or active trip.",
     "NO_VEHICLE_ASSIGNED": "No vehicle is currently assigned to your shift.",
     "INSPECTION_REQUIRED": "Vehicle inspection not completed.",
     "IDENTITY_NOT_VERIFIED": "Driver identity not verified.",

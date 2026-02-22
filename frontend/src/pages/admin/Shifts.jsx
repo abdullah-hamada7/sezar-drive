@@ -13,6 +13,8 @@ const STATUS_BADGES = {
   Closed: 'badge-neutral',
 };
 
+const CHECKLIST_KEYS = ['tires', 'lights', 'brakes', 'mirrors', 'fluids', 'seatbelts', 'horn', 'wipers'];
+
 const INSP_STATUS_BADGES = {
   pending: 'badge-warning',
   completed: 'badge-success',
@@ -190,12 +192,15 @@ export default function ShiftsPage() {
                    {selectedShiftInspections.map(insp => {
                      const timing = getInspectionTiming(insp);
                      const checks = insp.checklistData?.checks || insp.checklistData || {};
-                     const checkEntries = Object.entries(checks).filter(([key]) => key !== 'notes');
+                     const checkEntriesRaw = Object.entries(checks).filter(([key]) => key !== 'notes');
+                     const checkEntries = checkEntriesRaw.length > 0
+                       ? checkEntriesRaw
+                       : CHECKLIST_KEYS.map(key => [key, false]);
                      const marked = checkEntries.filter(([, val]) => !!val).map(([key]) => key);
                      const unmarked = checkEntries.filter(([, val]) => !val).map(([key]) => key);
 
                      return (
-                     <div key={insp.id} className="detail-item-group border rounded-lg p-md bg-surface-dark">
+                     <div key={insp.id} className="detail-item-group border rounded-lg p-md bg-surface-dark" style={{ background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.35) 0%, rgba(15, 23, 42, 0.2) 100%)' }}>
                        <div className="flex justify-between items-center mb-md pb-sm border-bottom">
                          <h3 className="text-md font-bold text-gradient">
                            {t('shifts.modal.type_title', { type: t(`common.inspection_type.${insp.type.toLowerCase()}`) })}

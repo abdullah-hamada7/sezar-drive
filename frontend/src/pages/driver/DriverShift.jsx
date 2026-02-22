@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { authService } from '../../services/auth.service';
 import { shiftService } from '../../services/shift.service';
 import { vehicleService } from '../../services/vehicle.service';
+import { tripService } from '../../services/trip.service';
 import { useShift } from '../../contexts/ShiftContext';
 import FaceCapture from '../../components/FaceCapture';
 import QRScanner from '../../components/QRScanner';
@@ -106,6 +107,13 @@ export default function DriverShift() {
     setShowConfirm(false);
     setActionLoading(true);
     try {
+      const tripsRes = await tripService.getTrips('limit=50');
+      const trips = tripsRes.data?.trips || [];
+      const hasActiveTrip = trips.some(t => t.status === 'ASSIGNED' || t.status === 'IN_PROGRESS');
+      if (hasActiveTrip) {
+        addToast(t('errors.SHIFT_HAS_ACTIVE_TRIP') || 'You cannot end your shift while you have an assigned or active trip.', 'warning');
+        return;
+      }
       await shiftService.closeShift(shift.id);
       addToast(t('common.success'), 'success');
       await refreshShift();

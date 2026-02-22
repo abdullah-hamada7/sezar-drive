@@ -33,6 +33,7 @@ export default function TripsPage() {
     scheduledTime: '',
     passengers: []
   });
+  const [selectedDriverName, setSelectedDriverName] = useState('');
   const [error, setError] = useState('');
   const [refresh, setRefresh] = useState(0);
   const [promptData, setPromptData] = useState({ isOpen: false, tripId: null });
@@ -78,13 +79,23 @@ export default function TripsPage() {
   async function handleCreate(e) {
     e.preventDefault();
     setError('');
+    if (!form.driverId) {
+      setError(t('trips.modal.select_driver'));
+      return;
+    }
+    const parsedPrice = parseFloat(form.price);
+    if (Number.isNaN(parsedPrice)) {
+      setError(t('trips.modal.price_label', { unit: t('common.currency') }));
+      return;
+    }
     try {
-      await api.assignTrip({ ...form, price: parseFloat(form.price) });
+      await api.assignTrip({ ...form, price: parsedPrice });
       setShowCreateModal(false);
       setForm({ driverId: '', pickupLocation: '', dropoffLocation: '', price: '', scheduledTime: '', passengers: [] });
+      setSelectedDriverName('');
       setRefresh(r => r + 1);
     } catch (err) {
-      const driverName = drivers.find(d => d.id === form.driverId)?.name || '';
+      const driverName = selectedDriverName || drivers.find(d => String(d.id) === String(form.driverId))?.name || '';
       setError(err.code ? t(`errors.${err.code}`, { name: driverName }) : err.message);
     }
   }
@@ -205,7 +216,18 @@ export default function TripsPage() {
               <div className="form-section mb-md">
                 <div className="form-group mb-md">
                   <label className="form-label">{t('trips.modal.driver_label')}</label>
-                  <select className="form-input" value={form.driverId} onChange={e => setForm({ ...form, driverId: e.target.value })} required>
+                  <select
+                    className="form-input"
+                    value={form.driverId}
+                    onChange={e => {
+                      const value = e.target.value;
+                      const selected = drivers.find(d => String(d.id) === String(value));
+                      setForm({ ...form, driverId: value });
+                      setSelectedDriverName(selected?.name || '');
+                      setError('');
+                    }}
+                    required
+                  >
                     <option value="">{t('trips.modal.select_driver')}</option>
                     {drivers.map(d => (
                       <option key={d.id} value={d.id}>{d.name} ({d.identityVerified ? t('common.shift_verification_status.verified') : t('common.shift_verification_status.pending')})</option>
@@ -216,18 +238,18 @@ export default function TripsPage() {
                 <div className="grid grid-2 gap-md mb-md">
                   <div className="form-group">
                     <label className="form-label">{t('trips.modal.pickup_label')}</label>
-                    <input className="form-input" value={form.pickupLocation} onChange={e => setForm({ ...form, pickupLocation: e.target.value })} required placeholder={t('trips.modal.pickup_placeholder')} />
+                    <input className="form-input" value={form.pickupLocation} onChange={e => { setForm({ ...form, pickupLocation: e.target.value }); setError(''); }} required placeholder={t('trips.modal.pickup_placeholder')} />
                   </div>
                   <div className="form-group">
                     <label className="form-label">{t('trips.modal.dropoff_label')}</label>
-                    <input className="form-input" value={form.dropoffLocation} onChange={e => setForm({ ...form, dropoffLocation: e.target.value })} required placeholder={t('trips.modal.dropoff_placeholder')} />
+                    <input className="form-input" value={form.dropoffLocation} onChange={e => { setForm({ ...form, dropoffLocation: e.target.value }); setError(''); }} required placeholder={t('trips.modal.dropoff_placeholder')} />
                   </div>
                 </div>
 
                 <div className="grid grid-2 gap-md">
                   <div className="form-group">
                     <label className="form-label">{t('trips.modal.price_label', { unit: t('common.currency') })}</label>
-                    <input type="number" step="0.01" className="form-input" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} required placeholder="0.00" />
+                    <input type="number" step="0.01" className="form-input" value={form.price} onChange={e => { setForm({ ...form, price: e.target.value }); setError(''); }} required placeholder="0.00" />
                   </div>
                   <div className="form-group">
                     <label className="form-label">{t('trips.modal.time_label')}</label>
@@ -235,7 +257,7 @@ export default function TripsPage() {
                       type="datetime-local"
                       className="form-input"
                       value={form.scheduledTime}
-                      onChange={e => setForm({ ...form, scheduledTime: e.target.value })}
+                      onChange={e => { setForm({ ...form, scheduledTime: e.target.value }); setError(''); }}
                       min={new Date().toISOString().slice(0, 16)}
                     />
                   </div>

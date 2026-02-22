@@ -1,4 +1,4 @@
-import { useState, useRef, useContext } from 'react';
+import { useState, useRef, useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { inspectionService as api } from '../../services/inspection.service';
 import { Camera, CheckCircle, Upload, ChevronRight, AlertCircle } from 'lucide-react';
@@ -17,18 +17,66 @@ export default function DriverInspection() {
   const [notes, setNotes] = useState('');
   const [photos, setPhotos] = useState({});
   const [inspectionId, setInspectionId] = useState(null);
+  const [existingInspections, setExistingInspections] = useState([]);
+  const [loadingExisting, setLoadingExisting] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const fileRef = useRef(null);
   const [currentDirection, setCurrentDirection] = useState(null);
 
+  useEffect(() => {
+    async function loadExisting() {
+      if (!shift?.id) return;
+      setLoadingExisting(true);
+      try {
+        const res = await api.getInspections(`shiftId=${shift.id}`);
+        setExistingInspections(res.data || []);
+      } catch (err) {
+        console.error('Failed to load inspections:', err);
+      } finally {
+        setLoadingExisting(false);
+      }
+    }
+    loadExisting();
+  }, [shift?.id]);
+
   function toggleCheck(key) {
     setChecks(prev => ({ ...prev, [key]: !prev[key] }));
   }
 
+  function getTimingForInspection(insp) {
+    if (!shift?.startedAt || !insp?.createdAt) return null;
+    const created = new Date(insp.createdAt);
+    const started = new Date(shift.startedAt);
+    const closed = shift.closedAt ? new Date(shift.closedAt) : null;
+    if (!isNaN(started.getTime()) && created <= started) return 'before';
+    if (closed && !isNaN(closed.getTime()) && created >= closed) return 'after';
+    if (closed && created > started && created < closed) return 'during';
+    return null;
+  }
+
+  const inspectionType = shift?.status === 'PendingVerification' ? 'pre' : 'post';
+  const hasPreInspection = existingInspections.some(insp => {
+    const type = String(insp.type || '').toLowerCase();
+    if (['pre', 'before', 'pre_shift'].includes(type)) return true;
+    if (type === 'full') return getTimingForInspection(insp) === 'before';
+    return false;
+  });
+  const hasPostInspection = existingInspections.some(insp => {
+    const type = String(insp.type || '').toLowerCase();
+    if (['post', 'after', 'post_shift'].includes(type)) return true;
+    if (type === 'full') return getTimingForInspection(insp) === 'after' || getTimingForInspection(insp) === 'during';
+    return false;
+  });
+  const isInspectionLocked = inspectionType === 'pre' ? hasPreInspection : hasPostInspection;
+
   async function submitChecklist() {
     if (!shift) {
       addToast(t('inspection.no_shift_title'), 'error');
+      return;
+    }
+    if (isInspectionLocked) {
+      addToast(inspectionType === 'pre' ? t('inspection.pre_already_done') : t('inspection.post_already_done'), 'warning');
       return;
     }
     const vehicleId = shift.vehicleId
@@ -41,7 +89,7 @@ export default function DriverInspection() {
     }
     setLoading(true);
     try {
-      const type = 'full';
+      const type = inspectionType;
       const res = await api.createInspection({
         shiftId: shift.id,
         vehicleId,
@@ -125,6 +173,28 @@ export default function DriverInspection() {
       <h2 className="page-title" style={{ marginBottom: 'var(--space-lg)' }}>{t('inspection.title')}</h2>
       <input type="file" ref={fileRef} accept="image/*" capture="environment" onChange={handlePhotoUpload} style={{ display: 'none' }} />
 
+      <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
+        <div className="flex items-center justify-between">
+          <div>
+            <div style={{ fontWeight: 700 }}>
+              {inspectionType === 'pre' ? t('inspection.before_shift') : t('inspection.after_shift')}
+            </div>
+            <div className="text-sm text-muted">
+              {inspectionType === 'pre' ? t('inspection.pre_shift_desc') : t('inspection.post_shift_desc')}
+            </div>
+          </div>
+          <span className={`badge ${inspectionType === 'pre' ? 'badge-info' : 'badge-warning'}`}>
+            {inspectionType === 'pre' ? t('inspection.before_shift') : t('inspection.after_shift')}
+          </span>
+        </div>
+        {loadingExisting && <div className="text-xs text-muted mt-sm">{t('common.loading')}</div>}
+        {isInspectionLocked && (
+          <div className="alert alert-info mt-md">
+            <AlertCircle size={16} /> {inspectionType === 'pre' ? t('inspection.pre_already_done') : t('inspection.post_already_done')}
+          </div>
+        )}
+      </div>
+
       <div style={{ display: 'flex', gap: '0.25rem', marginBottom: 'var(--space-lg)' }}>
         {['checklist', 'photos', 'review'].map((s, i) => (
           <div key={s} style={{
@@ -143,12 +213,13 @@ export default function DriverInspection() {
               <div
                 key={key}
                 className="card"
-                onClick={() => toggleCheck(key)}
+                onClick={() => !isInspectionLocked && toggleCheck(key)}
                 style={{
                   padding: 'var(--space-md)',
-                  cursor: 'pointer',
+                  cursor: isInspectionLocked ? 'not-allowed' : 'pointer',
                   borderColor: checks[key] ? 'var(--color-success)' : undefined,
                   background: checks[key] ? 'var(--color-success-bg)' : undefined,
+                  opacity: isInspectionLocked ? 0.6 : 1
                 }}
               >
                 <div className="flex items-center gap-sm">
@@ -169,10 +240,10 @@ export default function DriverInspection() {
 
           <div className="form-group">
             <label className="form-label">{t('inspection.notes_label')}</label>
-            <textarea className="form-textarea" value={notes} onChange={e => setNotes(e.target.value)} placeholder={t('inspection.notes_placeholder')} />
+            <textarea className="form-textarea" value={notes} onChange={e => setNotes(e.target.value)} placeholder={t('inspection.notes_placeholder')} disabled={isInspectionLocked} />
           </div>
 
-          <button className="btn btn-primary" onClick={submitChecklist} disabled={loading} style={{ width: '100%' }}>
+          <button className="btn btn-primary" onClick={submitChecklist} disabled={loading || isInspectionLocked} style={{ width: '100%' }}>
             {loading ? <span className="spinner"></span> : <ChevronRight size={18} className="mirror-rtl" />}
             {t('inspection.continue_photos')}
           </button>
@@ -187,7 +258,7 @@ export default function DriverInspection() {
               <div
                 key={dir}
                 className="card"
-                onClick={() => triggerPhotoCapture(dir)}
+                onClick={() => !isInspectionLocked && triggerPhotoCapture(dir)}
                 style={{ textAlign: 'center', padding: 'var(--space-md)', cursor: 'pointer', borderColor: photos[dir] ? 'var(--color-success)' : undefined }}
               >
                 {photos[dir] ? (
@@ -204,7 +275,7 @@ export default function DriverInspection() {
           <button
             className="btn btn-primary"
             onClick={() => setStep('review')}
-            disabled={Object.keys(photos).length < 4}
+            disabled={Object.keys(photos).length < 4 || isInspectionLocked}
             style={{ width: '100%' }}
           >
             <ChevronRight size={18} className="mirror-rtl" /> {t('inspection.review_complete')}
@@ -253,7 +324,7 @@ export default function DriverInspection() {
             </div>
           )}
 
-          <button className="btn btn-success" onClick={completeInspection} disabled={loading} style={{ width: '100%' }}>
+          <button className="btn btn-success" onClick={completeInspection} disabled={loading || isInspectionLocked} style={{ width: '100%' }}>
             {loading ? <span className="spinner"></span> : <CheckCircle size={18} />}
             {t('inspection.submit')}
           </button>
