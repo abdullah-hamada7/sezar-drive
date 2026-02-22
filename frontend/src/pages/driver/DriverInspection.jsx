@@ -13,7 +13,9 @@ export default function DriverInspection() {
   const { addToast } = useContext(ToastContext);
   const { activeShift: shift } = useShift();
   const [step, setStep] = useState('checklist'); // checklist | photos | review | done
-  const [checks, setChecks] = useState({});
+  const [checks, setChecks] = useState(() =>
+    CHECKLIST_KEYS.reduce((acc, key) => ({ ...acc, [key]: false }), {})
+  );
   const [notes, setNotes] = useState('');
   const [photos, setPhotos] = useState({});
   const [inspectionId, setInspectionId] = useState(null);
