@@ -4,6 +4,8 @@ import { statsService } from '../../services/stats.service';
 
 export default function RecentActivityList() {
   const { t } = useTranslation();
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
