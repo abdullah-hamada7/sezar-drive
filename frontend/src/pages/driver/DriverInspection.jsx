@@ -58,15 +58,26 @@ export default function DriverInspection() {
   }
 
   const inspectionType = shift?.status === 'PendingVerification' ? 'pre' : 'post';
+  function isCompletedInspection(insp) {
+    const photoCount = Array.isArray(insp.photos) ? insp.photos.length : 0;
+    return insp.status === 'completed' && photoCount >= 4;
+  }
+
   const hasPreInspection = existingInspections.some(insp => {
     const type = String(insp.type || '').toLowerCase();
+    if (!isCompletedInspection(insp)) return false;
     if (['pre', 'before', 'pre_shift'].includes(type)) return true;
     if (type === 'full') return getTimingForInspection(insp) === 'before';
     return false;
   });
   const hasPostInspection = existingInspections.some(insp => {
     const type = String(insp.type || '').toLowerCase();
-    if (['post', 'after', 'post_shift'].includes(type)) return true;
+    if (!shift?.startedAt || !isCompletedInspection(insp)) return false;
+    if (['post', 'after', 'post_shift'].includes(type)) {
+      const created = insp?.createdAt ? new Date(insp.createdAt) : null;
+      const started = new Date(shift.startedAt);
+      return created && created > started;
+    }
     if (type === 'full') return getTimingForInspection(insp) === 'after' || getTimingForInspection(insp) === 'during';
     return false;
   });

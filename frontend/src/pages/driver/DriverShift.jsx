@@ -119,6 +119,19 @@ export default function DriverShift() {
     setShowConfirm(false);
     setActionLoading(true);
     try {
+      const inspectionsRes = await inspectionService.getInspections(`shiftId=${shift.id}`);
+      const inspections = inspectionsRes.data || [];
+      const startedAt = shift?.startedAt ? new Date(shift.startedAt) : null;
+      const hasEndInspection = inspections.some((insp) => {
+        const createdAt = insp?.createdAt ? new Date(insp.createdAt) : null;
+        const isAfterStart = startedAt && createdAt && createdAt > startedAt;
+        const photoCount = Array.isArray(insp.photos) ? insp.photos.length : 0;
+        return insp.status === 'completed' && isAfterStart && photoCount >= 4;
+      });
+      if (startedAt && !hasEndInspection) {
+        addToast(t('errors.INSPECTION_REQUIRED') || t('shift.inspection_required') || 'End-of-shift inspection required', 'warning');
+        return;
+      }
       const tripsRes = await tripService.getTrips('limit=50');
       const trips = tripsRes.data?.trips || [];
       const hasActiveTrip = trips.some(t => t.status === 'ASSIGNED' || t.status === 'IN_PROGRESS');
@@ -129,8 +142,9 @@ export default function DriverShift() {
       await shiftService.closeShift(shift.id);
       addToast(t('common.success'), 'success');
       await refreshShift();
-    } catch {
-      // Handled by HttpService
+    } catch (err) {
+      const code = err?.code;
+      addToast(code ? t(`errors.${code}`) : (err?.message || t('common.error')), 'error');
     } finally { setActionLoading(false); }
   }
 
