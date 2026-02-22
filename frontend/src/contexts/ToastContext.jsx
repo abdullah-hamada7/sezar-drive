@@ -4,15 +4,15 @@ import { ToastContext } from './toastContext';
 
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
-  const lastToastRef = useRef({ message: '', type: '', time: 0 });
+  const lastToastRef = useRef({ message: '', time: 0 });
 
   function addToast(message, type = 'info', duration = 5000) {
     const now = Date.now();
     const last = lastToastRef.current;
-    if (last.message === message && last.type === type && now - last.time < 2000) {
+    if (last.message === message && now - last.time < 3000) {
       return;
     }
-    lastToastRef.current = { message, type, time: now };
+    lastToastRef.current = { message, time: now };
     const id = Date.now();
     setToasts(prev => [...prev, { id, message, type, duration }]);
   }

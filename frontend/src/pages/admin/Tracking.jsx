@@ -58,7 +58,6 @@ export default function TrackingPage() {
     };
     ws.onerror = () => {
       setWsStatus('error');
-      addToast('Live tracking connection error.', 'error');
     };
     ws.onmessage = (event) => {
       try {
