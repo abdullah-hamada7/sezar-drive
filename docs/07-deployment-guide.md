@@ -110,6 +110,8 @@ Since we are staying in the **AWS Free Tier**, we manage DNS externally.
     - `DOMAIN_NAME`: `sezardrive.com`
     - `EMAIL_FOR_SSL`: `your-email@example.com`
     - `FRONTEND_URL`: `https://sezardrive.com`
+    - `POSTGRES_PASSWORD`: (Generate a strong password)
+    - `JWT_SECRET`: (Generate a strong 64-char string)
     - `S3_BUCKET`: (From Terraform output)
     - `S3_REGION`: `us-east-1`
 3. **Start the Containers**:
