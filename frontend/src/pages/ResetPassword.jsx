@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { authService as api } from '../services/auth.service';
 import LanguageSwitcher from '../components/LanguageSwitcher';
-import { Car, Lock, Key, AlertCircle, CheckCircle } from 'lucide-react';
+import { Car, Lock, Key, AlertCircle, CheckCircle, Eye, EyeOff } from 'lucide-react';
 import './Login.css';
 
 export default function ResetPasswordPage() {
@@ -14,6 +14,8 @@ export default function ResetPasswordPage() {
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [validating, setValidating] = useState(true);
   const [isValid, setIsValid] = useState(false);
@@ -130,7 +132,7 @@ export default function ResetPasswordPage() {
                 <label className="form-label">{t('auth.new_password')}</label>
                 <div className="password-field">
                   <input
-                    type="password"
+                    type={showNewPassword ? 'text' : 'password'}
                     className="form-input"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
@@ -138,7 +140,14 @@ export default function ResetPasswordPage() {
                     minLength={8}
                     autoFocus
                   />
-                  <Lock size={16} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }} />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() => setShowNewPassword(prev => !prev)}
+                    aria-label={showNewPassword ? t('auth.hide_password') : t('auth.show_password')}
+                  >
+                    {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
                 </div>
               </div>
 
@@ -146,14 +155,21 @@ export default function ResetPasswordPage() {
                 <label className="form-label">{t('auth.confirm_password')}</label>
                 <div className="password-field">
                   <input
-                    type="password"
+                    type={showConfirmPassword ? 'text' : 'password'}
                     className="form-input"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
                     minLength={8}
                   />
-                  <Key size={16} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }} />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() => setShowConfirmPassword(prev => !prev)}
+                    aria-label={showConfirmPassword ? t('auth.hide_password') : t('auth.show_password')}
+                  >
+                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
                 </div>
               </div>
 
