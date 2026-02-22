@@ -158,8 +158,8 @@ Since we are staying in the **AWS Free Tier**, we manage DNS externally.
 ## Maintenance & Verification
 
 - **Check Logs**: `docker compose -f compose.prod.yml logs -f backend`
+- **Security**: If your home IP changes and you lose SSH access, update `ssh_cidr_blocks` in `terraform.tfvars` and run `terraform apply` again.
 - **Daily Backups**: Automated script runs at 03:00 UTC and uploads to S3.
-- **Security**: Ensure your local IP is updated in `variables.tf` if your home internet changes.
 
 ---
 

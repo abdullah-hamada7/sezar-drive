@@ -17,7 +17,7 @@ async function startServer() {
     const { execSync } = require('child_process');
     const appCwd = process.env.APP_CWD || process.cwd();
 
-    // 2. Optionally run database migrations (recommended: run in CI/CD, not at runtime)
+    // 2. Optionally run database migrations
     if (isTruthyEnv('RUN_MIGRATIONS_ON_STARTUP')) {
       try {
         console.log('Running database migrations...');
@@ -25,7 +25,15 @@ async function startServer() {
         console.log('✅ Migrations applied successfully');
       } catch (err) {
         console.error('❌ Migration failed:', err.message);
-        // If you opt into runtime migrations, consider failing hard instead.
+        console.error('\n' + '='.repeat(50));
+        console.error('DATABASE MIGRATION ERROR DETECTED');
+        console.error('This often happens due to a previously failed migration (P3009).');
+        console.error('To fix this permanently, run the following on the server:');
+        console.error('npm run db:repair');
+        console.error('='.repeat(50) + '\n');
+
+        // In production, we might want to prevent startup if migrations are blocked
+        // But for now, we just log clearly.
       }
     }
 
@@ -101,7 +109,7 @@ function setupGracefulShutdown(server, prisma) {
       console.log('Server closed.');
       Promise.resolve()
         .then(() => prisma?.$disconnect?.())
-        .catch(() => {})
+        .catch(() => { })
         .finally(() => process.exit(0));
     });
   };

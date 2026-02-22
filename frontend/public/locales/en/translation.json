@@ -278,6 +278,12 @@
     "VEHICLE_LOCKED": "Vehicle is locked (damaged or maintenance).",
     "VEHICLE_ASSIGNED": "Cannot delete a vehicle with an active assignment.",
     "UNKNOWN_ERROR": "An unknown error occurred.",
+    "INTERNAL_ERROR": "An internal server error occurred. Please try again later.",
+    "CONFLICT": "A record with this value already exists.",
+    "NOT_FOUND": "The requested resource was not found.",
+    "TOO_MANY_REQUESTS": "Too many attempts. Please try again later.",
+    "PAYLOAD_TOO_LARGE": "The uploaded file is too large.",
+    "CORS_BLOCKED": "Request blocked. Please contact support.",
     "validation_failed": "Validation failed. Please check the fields below.",
     "check_fields": "Please fix the errors in the form before submitting."
   },

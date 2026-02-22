@@ -25,7 +25,14 @@ export default function LoginPage() {
 
   const getErrorMessage = (err) => {
     const code = err.errorCode || err.code;
-    if (code) return t(`errors.${code}`);
+    if (code) {
+      const translationKey = `errors.${code}`;
+      const translated = t(translationKey);
+      // If i18next returns the key itself, it means the translation is missing
+      if (translated !== translationKey) {
+        return translated;
+      }
+    }
     return err.message || t('common.error');
   };
 
