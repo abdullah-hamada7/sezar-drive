@@ -37,7 +37,6 @@ export default function TripsPage() {
   const [error, setError] = useState('');
   const [refresh, setRefresh] = useState(0);
   const [promptData, setPromptData] = useState({ isOpen: false, tripId: null });
-  const filterLabel = statusFilter ? t(`common.status.${statusFilter.toLowerCase()}`) : t('trips.filter_all');
 
   useEffect(() => {
     async function load() {
@@ -173,18 +172,6 @@ export default function TripsPage() {
           </button>
         ))}
       </div>
-
-      {!loading && (
-        <div className="card mb-md" style={{ padding: '0.75rem var(--space-md)' }}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-sm">
-              <span className="text-xs text-muted uppercase" style={{ letterSpacing: '0.08em' }}>{t('trips.table.status')}</span>
-              <span className="badge badge-neutral">{filterLabel}</span>
-            </div>
-            <span className="badge badge-info">{trips.length}</span>
-          </div>
-        </div>
-      )}
 
       {loading ? (
         <div className="loading-page"><div className="spinner"></div></div>

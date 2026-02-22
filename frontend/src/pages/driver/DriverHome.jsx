@@ -9,6 +9,7 @@ import { ToastContext } from '../../contexts/toastContext';
 import { ThemeContext } from '../../contexts/theme';
 
 import DriverDetailsModal from '../../components/driver/DriverDetailsModal';
+import ShiftPerformanceChart from '../../components/driver/ShiftPerformanceChart';
 import DailyEarningsChart from '../../components/driver/DailyEarningsChart';
 import RecentActivityList from '../../components/driver/RecentActivityList';
 
@@ -173,6 +174,7 @@ export default function DriverHome() {
 
       {/* Grid for Charts & Activity */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+        <ShiftPerformanceChart />
         <DailyEarningsChart />
       </div>
 

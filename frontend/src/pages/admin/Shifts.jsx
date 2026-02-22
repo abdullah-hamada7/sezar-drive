@@ -185,35 +185,6 @@ export default function ShiftsPage() {
               <button className="btn-icon" onClick={() => setShowInspections(false)}><X size={18} /></button>
             </div>
             <div className="modal-body" style={{ maxHeight: '75vh', overflowY: 'auto' }}>
-              {selectedShift && (
-                <div className="card mb-lg inspection-summary">
-                  <div className="flex items-start justify-between gap-md">
-                    <div>
-                      <div className="text-xs text-muted uppercase" style={{ letterSpacing: '0.08em' }}>{t('shifts.table.driver')}</div>
-                      <div className="text-lg font-bold">{selectedShift.driver?.name || '—'}</div>
-                      <div className="text-sm text-muted">{selectedShift.vehicle?.plateNumber || '—'}</div>
-                    </div>
-                    <div className="flex items-center gap-sm">
-                      <span className={`badge ${STATUS_BADGES[selectedShift.status] || 'badge-neutral'}`}>{t(`common.status.${selectedShift.status.toLowerCase()}`)}</span>
-                      <span className="badge badge-neutral">{selectedShiftInspections.length} {t('shifts.actions.inspections')}</span>
-                    </div>
-                  </div>
-                  <div className="grid grid-3 gap-md mt-md">
-                    <div>
-                      <div className="text-xs text-muted">{t('shifts.table.started')}</div>
-                      <div className="text-sm">{formatDate(selectedShift.startedAt)}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-muted">{t('shifts.table.closed')}</div>
-                      <div className="text-sm">{formatDate(selectedShift.closedAt)}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-muted">{t('shifts.table.reason')}</div>
-                      <div className="text-sm">{selectedShift.closeReason || '—'}</div>
-                    </div>
-                  </div>
-                </div>
-              )}
               {selectedShiftInspections.length === 0 ? (
                 <p className="text-muted text-center p-xl">{t('shifts.modal.empty')}</p>
               ) : (
@@ -229,35 +200,34 @@ export default function ShiftsPage() {
                       const unmarked = checkEntries.filter(([, val]) => !val).map(([key]) => key);
 
                       return (
-                      <div key={insp.id} className="inspection-card">
-                        <div className="inspection-header">
-                          <div>
-                            <h3 className="text-md font-bold">
+                      <div key={insp.id} className="detail-item-group border rounded-lg p-md bg-surface-dark" style={{ background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.25) 0%, rgba(15, 23, 42, 0.12) 100%)' }}>
+                        <div className="flex flex-col gap-sm mb-md pb-sm border-bottom">
+                          <div className="flex justify-between items-center">
+                            <h3 className="text-md font-bold text-gradient">
                               {t('shifts.modal.type_title', { type: t(`common.inspection_type.${insp.type.toLowerCase()}`) })}
                             </h3>
-                            <div className="text-xs text-muted flex items-center gap-xs">
-                              <Calendar size={12} /> {formatDate(insp.createdAt)}
+                            <div className="flex items-center gap-sm">
+                              {timing && (
+                                <span className="badge badge-info" style={{ textTransform: 'capitalize' }}>
+                                  {timing === 'before' ? t('inspection.before_shift') || 'Before shift' : timing === 'after' ? t('inspection.after_shift') || 'After shift' : t('inspection.during_shift') || 'During shift'}
+                                </span>
+                              )}
+                              <span className={`badge ${INSP_STATUS_BADGES[insp.status]}`}>
+                                {t(`common.status.${insp.status.toLowerCase()}`)}
+                              </span>
                             </div>
                           </div>
-                          <div className="inspection-badges">
-                            {timing && (
-                              <span className="badge badge-info" style={{ textTransform: 'capitalize' }}>
-                                {timing === 'before' ? t('inspection.before_shift') || 'Before shift' : timing === 'after' ? t('inspection.after_shift') || 'After shift' : t('inspection.during_shift') || 'During shift'}
-                              </span>
-                            )}
-                            <span className={`badge ${INSP_STATUS_BADGES[insp.status]}`}>
-                              {t(`common.status.${insp.status.toLowerCase()}`)}
-                            </span>
+                          <div className="text-xs text-muted flex items-center gap-xs">
+                            <Calendar size={12} /> {formatDate(insp.createdAt)}
                           </div>
                         </div>
 
                       {insp.checklistData && (
-                        <div className="inspection-section">
-                          <div className="inspection-grid">
-                            <div className="inspection-block">
-                              <div className="inspection-block-title">{t('inspection.marked') || 'Marked'}</div>
-                              <div className="inspection-count">{marked.length}</div>
-                              <div className="inspection-chips">
+                        <div className="mb-lg">
+                          <div className="grid grid-2 gap-md">
+                            <div className="p-sm rounded border bg-bg-tertiary">
+                              <div className="text-xs uppercase text-muted font-bold mb-xs tracking-wider">{t('inspection.marked') || 'Marked'}</div>
+                              <div className="flex flex-wrap gap-xs">
                                 {marked.length === 0 ? (
                                   <span className="text-xs text-muted">—</span>
                                 ) : marked.map(k => (
@@ -265,10 +235,9 @@ export default function ShiftsPage() {
                                 ))}
                               </div>
                             </div>
-                            <div className="inspection-block">
-                              <div className="inspection-block-title">{t('inspection.not_marked') || 'Not marked'}</div>
-                              <div className="inspection-count">{unmarked.length}</div>
-                              <div className="inspection-chips">
+                            <div className="p-sm rounded border bg-bg-tertiary">
+                              <div className="text-xs uppercase text-muted font-bold mb-xs tracking-wider">{t('inspection.not_marked') || 'Not marked'}</div>
+                              <div className="flex flex-wrap gap-xs">
                                 {unmarked.length === 0 ? (
                                   <span className="text-xs text-muted">—</span>
                                 ) : unmarked.map(k => (
@@ -281,8 +250,8 @@ export default function ShiftsPage() {
                       )}
 
                       {(insp.notes || (insp.checklistData && insp.checklistData.notes)) && (
-                        <div className="inspection-section">
-                          <div className="inspection-block-title">{t('inspection.notes_label')}</div>
+                        <div className="mb-lg">
+                          <h4 className="text-xs uppercase text-muted font-bold mb-sm tracking-wider">{t('inspection.notes_label')}</h4>
                           <p className="text-sm p-sm bg-bg-tertiary rounded border">
                             {insp.notes || insp.checklistData.notes}
                           </p>
@@ -290,9 +259,9 @@ export default function ShiftsPage() {
                       )}
 
                       {insp.photos && insp.photos.length > 0 && (
-                        <div className="inspection-section">
-                          <div className="inspection-block-title">{t('shifts.modal.photos')}</div>
-                          <div className="inspection-photos">
+                        <div>
+                          <h4 className="text-xs uppercase text-muted font-bold mb-sm tracking-wider">{t('shifts.modal.photos')}</h4>
+                          <div className="grid grid-4 gap-md">
                             {insp.photos.map(p => (
                               <div key={p.id} className="text-center group">
                                 <a href={p.photoUrl} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-md border border-border group-hover:border-primary transition-all">
@@ -329,17 +298,6 @@ export default function ShiftsPage() {
 
       <style>{`
         .bg-surface-dark { background: rgba(0, 0, 0, 0.1); }
-        .inspection-summary { background: var(--color-bg-secondary); border: 1px solid var(--color-border); }
-        .inspection-card { border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-md); background: var(--color-bg-secondary); }
-        .inspection-header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-md); padding-bottom: var(--space-sm); border-bottom: 1px solid var(--color-border); margin-bottom: var(--space-md); }
-        .inspection-badges { display: flex; align-items: center; gap: var(--space-sm); flex-wrap: wrap; }
-        .inspection-section { margin-bottom: var(--space-lg); }
-        .inspection-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-md); }
-        .inspection-block { background: var(--color-bg-tertiary); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-md); }
-        .inspection-block-title { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.65rem; color: var(--color-text-muted); font-weight: 700; margin-bottom: var(--space-xs); }
-        .inspection-count { font-size: 1.25rem; font-weight: 700; color: var(--color-text); margin-bottom: var(--space-xs); }
-        .inspection-chips { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
-        .inspection-photos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-md); }
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); }
         .p-xs { padding: 0.25rem; }
         .px-sm { padding-left: 0.75rem; padding-right: 0.75rem; }
@@ -347,8 +305,6 @@ export default function ShiftsPage() {
         .border-top { border-top: 1px solid var(--color-border); }
         @media (max-width: 640px) {
           .grid-3 { grid-template-columns: 1fr; }
-          .inspection-grid { grid-template-columns: 1fr; }
-          .inspection-photos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
       `}</style>
     </div>

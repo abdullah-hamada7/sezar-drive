@@ -12,7 +12,6 @@ export default function ReportsPage() {
   const [endDate, setEndDate] = useState('');
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState(null);
-  const rangeLabel = startDate && endDate ? `${startDate} - ${endDate}` : '—';
 
   async function handleGenerate(e) {
     e.preventDefault();
@@ -89,28 +88,19 @@ export default function ReportsPage() {
             {loading ? <span className="spinner"></span> : <FileBarChart size={18} />}
             {t('reports.filter.generate')}
           </button>
+          <div style={{ display: 'flex', gap: '0.5rem', alignSelf: 'flex-end' }}>
+            <button type="button" className="btn btn-secondary btn-sm" onClick={() => downloadFile('pdf')}>
+              <Download size={14} /> PDF
+            </button>
+            <button type="button" className="btn btn-secondary btn-sm" onClick={() => downloadFile('excel')}>
+              <Download size={14} /> Excel
+            </button>
+          </div>
         </form>
       </div>
 
       {report && (
         <div>
-          <div className="card mb-md" style={{ padding: '0.75rem var(--space-md)' }}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-sm">
-                <span className="text-xs text-muted uppercase" style={{ letterSpacing: '0.08em' }}>{t('reports.filter.start')}</span>
-                <span className="badge badge-neutral">{rangeLabel}</span>
-              </div>
-              <div className="flex items-center gap-sm">
-                <button type="button" className="btn btn-secondary btn-sm" onClick={() => downloadFile('pdf')}>
-                  <Download size={14} /> PDF
-                </button>
-                <button type="button" className="btn btn-secondary btn-sm" onClick={() => downloadFile('excel')}>
-                  <Download size={14} /> Excel
-                </button>
-              </div>
-            </div>
-          </div>
-
           <div className="grid grid-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', marginBottom: 'var(--space-lg)' }}>
             <div className="stat-card">
               <div className="stat-icon" style={{ background: 'rgba(16, 185, 129, 0.12)', color: '#10b981' }}><FileBarChart size={24} /></div>

@@ -20,7 +20,6 @@ export default function ExpensesPage() {
   const [selected, setSelected] = useState(null);
   const [refresh, setRefresh] = useState(0);
   const [promptData, setPromptData] = useState({ isOpen: false, expenseId: null });
-  const statusLabel = statusFilter ? t(`admin_expenses.filter.${statusFilter}`) : t('admin_expenses.filter.all');
 
   useEffect(() => {
     async function load() {
@@ -77,18 +76,6 @@ export default function ExpensesPage() {
           ))}
         </div>
       </div>
-
-      {!loading && (
-        <div className="card mb-md" style={{ padding: '0.75rem var(--space-md)' }}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-sm">
-              <span className="text-xs text-muted uppercase" style={{ letterSpacing: '0.08em' }}>{t('admin_expenses.table.status')}</span>
-              <span className="badge badge-neutral">{statusLabel}</span>
-            </div>
-            <span className="badge badge-info">{expenses.length}</span>
-          </div>
-        </div>
-      )}
 
       {loading ? (
         <div className="loading-page"><div className="spinner"></div></div>

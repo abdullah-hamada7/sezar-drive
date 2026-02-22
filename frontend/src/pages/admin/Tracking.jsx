@@ -151,7 +151,6 @@ export default function TrackingPage() {
         </div>
       </div>
 
-
       <div className="grid" style={{ gridTemplateColumns: '1fr 300px', gap: '1rem' }}>
         <div className="card" style={{ padding: 0, height: '600px', overflow: 'hidden', position: 'relative' }}>
           <MapContainer center={activeCenter} zoom={12} style={{ height: '100%', width: '100%', zIndex: 1 }}>
