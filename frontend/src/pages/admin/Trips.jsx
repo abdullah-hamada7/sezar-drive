@@ -89,7 +89,14 @@ export default function TripsPage() {
       return;
     }
     try {
-      await api.assignTrip({ ...form, price: parsedPrice });
+      let scheduledTime = form.scheduledTime;
+      if (scheduledTime) {
+        const scheduledDate = new Date(scheduledTime);
+        if (!Number.isNaN(scheduledDate.getTime())) {
+          scheduledTime = scheduledDate.toISOString();
+        }
+      }
+      await api.assignTrip({ ...form, price: parsedPrice, scheduledTime });
       setShowCreateModal(false);
       setForm({ driverId: '', pickupLocation: '', dropoffLocation: '', price: '', scheduledTime: '', passengers: [] });
       setSelectedDriverName('');
