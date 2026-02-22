@@ -1,7 +1,5 @@
 const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
-const path = require('path');
-const fs = require('fs');
 const prisma = require('../../config/database');
 const { ValidationError } = require('../../errors');
 
@@ -138,62 +136,19 @@ const REPORT_I18N = {
     status: 'Status',
     date: 'Date',
     fileName: 'revenue_report'
-  },
-  ar: {
-    title: 'إدارة الأسطول — تقرير الإيرادات',
-    period: 'الفترة',
-    summary: 'الملخص',
-    totalRevenue: 'إجمالي الإيرادات',
-    totalExpenses: 'إجمالي المصروفات',
-    netRevenue: 'صافي الإيرادات',
-    totalTrips: 'إجمالي الرحلات',
-    driverBreakdown: 'تفاصيل السائقين',
-    revenue: 'الإيرادات',
-    expenses: 'المصروفات',
-    net: 'الصافي',
-    trips: 'الرحلات',
-    metric: 'البند',
-    value: 'القيمة',
-    periodStart: 'بداية الفترة',
-    periodEnd: 'نهاية الفترة',
-    driversSheet: 'السائقون',
-    tripsSheet: 'الرحلات',
-    driver: 'السائق',
-    vehicle: 'المركبة',
-    pickup: 'نقطة الانطلاق',
-    dropoff: 'نقطة الوصول',
-    price: 'السعر',
-    status: 'الحالة',
-    date: 'التاريخ',
-    fileName: 'revenue_report'
   }
 };
 
-function resolveLang(lang) {
-  const normalized = String(lang || '').toLowerCase();
-  return REPORT_I18N[normalized] ? normalized : 'en';
+function resolveLang() {
+  return 'en';
 }
 
 function getReportStrings(lang) {
   return REPORT_I18N[resolveLang(lang)];
 }
 
-function getPdfFonts(lang) {
-  const normalized = resolveLang(lang);
-  if (normalized !== 'ar') {
-    return { regular: 'Helvetica', bold: 'Helvetica-Bold' };
-  }
-  const regularPath = path.join(__dirname, '../../assets/fonts/Cairo-Regular.ttf');
-  const boldPath = path.join(__dirname, '../../assets/fonts/Cairo-Bold.ttf');
-  if (!fs.existsSync(regularPath) || !fs.existsSync(boldPath)) {
-    return { regular: 'Helvetica', bold: 'Helvetica-Bold' };
-  }
-  return {
-    regular: 'Cairo',
-    bold: 'Cairo-Bold',
-    regularPath,
-    boldPath
-  };
+function getPdfFonts() {
+  return { regular: 'Helvetica', bold: 'Helvetica-Bold' };
 }
 
 /**
@@ -201,9 +156,8 @@ function getPdfFonts(lang) {
  */
 async function generatePDF(reportData, res, { lang } = {}) {
   const strings = getReportStrings(lang);
-  const fonts = getPdfFonts(lang);
-  const isArabic = resolveLang(lang) === 'ar';
-  const textAlign = isArabic ? 'right' : 'left';
+  const fonts = getPdfFonts();
+  const textAlign = 'left';
   const doc = new PDFDocument({ margin: 50 });
   res.setHeader('Content-Type', 'application/pdf');
   res.setHeader('Content-Disposition', `attachment; filename=${strings.fileName}.pdf`);
