@@ -103,7 +103,7 @@ async function getDriverWeeklyStats(driverId) {
       SUM(price) as total 
     FROM trips 
     WHERE status = 'COMPLETED' 
-      AND driver_id = ${driverId}
+      AND driver_id = ${driverId}::uuid
       AND actual_end_time >= ${monday}
     GROUP BY EXTRACT(ISODOW FROM actual_end_time), date_trunc('day', actual_end_time)
     ORDER BY date_trunc('day', actual_end_time) ASC
@@ -119,6 +119,37 @@ async function getDriverWeeklyStats(driverId) {
     };
   });
 
+
+  return result;
+}
+
+/**
+ * Get daily revenue (hourly) for a specific driver.
+ */
+async function getDriverDailyStats(driverId) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const rawRevenue = await prisma.$queryRaw`
+    SELECT 
+      EXTRACT(HOUR FROM actual_end_time) as hour_num, 
+      SUM(price) as total 
+    FROM trips 
+    WHERE status = 'COMPLETED' 
+      AND driver_id = ${driverId}::uuid
+      AND actual_end_time >= ${today}
+    GROUP BY EXTRACT(HOUR FROM actual_end_time)
+    ORDER BY hour_num ASC
+  `;
+
+  // Create array for 24 hours
+  const result = Array.from({ length: 24 }, (_, i) => {
+    const match = rawRevenue.find(r => Number(r.hour_num) === i);
+    return {
+      hour: `${i}:00`,
+      amount: match ? Number(match.total) : 0
+    };
+  });
 
   return result;
 }
@@ -224,8 +255,12 @@ async function getDriverShiftStats(driverId) {
     }
   }
 
-  const activePercent = Math.min(100, Math.round((activeMinutes / shiftDurationMinutes) * 100));
-  const idlePercent = 100 - activePercent;
+  // Safety guard against 0 or negative duration
+  const activePercent = shiftDurationMinutes > 0
+    ? Math.min(100, Math.round((activeMinutes / shiftDurationMinutes) * 100))
+    : (activeMinutes > 0 ? 100 : 0);
+
+  const idlePercent = Math.max(0, 100 - activePercent);
 
   return [
     { name: 'Active', value: activePercent, color: '#00E676' },

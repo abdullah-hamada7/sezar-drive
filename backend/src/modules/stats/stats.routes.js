@@ -33,6 +33,16 @@ router.get('/my-revenue', authenticate, authorize('driver'), async (req, res, ne
   }
 });
 
+// GET /api/v1/stats/my-daily-revenue
+router.get('/my-daily-revenue', authenticate, authorize('driver'), async (req, res, next) => {
+  try {
+    const data = await statsService.getDriverDailyStats(req.user.id);
+    res.json(data);
+  } catch (err) {
+    next(err);
+  }
+});
+
 
 // GET /api/v1/stats/summary
 router.get('/summary', authenticate, authorize('admin'), async (req, res, next) => {

@@ -174,9 +174,23 @@ function GlobalToastListener() {
 
     window.addEventListener('app:toast', handler);
     window.addEventListener('app:error', handler);
+
+    // Real-time Trip Notifications for Drivers
+    const handleTripAssigned = (e) => {
+      addToast(t('trip.new_assignment_notif') || 'You have been assigned a new trip!', 'info');
+    };
+    const handleTripCancelled = (e) => {
+      addToast(t('trip.cancellation_notif') || 'A trip has been cancelled.', 'warning');
+    };
+
+    window.addEventListener('ws:trip_assigned', handleTripAssigned);
+    window.addEventListener('ws:trip_cancelled', handleTripCancelled);
+
     return () => {
       window.removeEventListener('app:toast', handler);
       window.removeEventListener('app:error', handler);
+      window.removeEventListener('ws:trip_assigned', handleTripAssigned);
+      window.removeEventListener('ws:trip_cancelled', handleTripCancelled);
     };
   }, [addToast, t]);
 

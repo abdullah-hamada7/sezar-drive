@@ -9,7 +9,7 @@ import { ToastContext } from '../../contexts/toastContext';
 
 import DriverDetailsModal from '../../components/driver/DriverDetailsModal';
 import ShiftPerformanceChart from '../../components/driver/ShiftPerformanceChart';
-import WeeklyEarningsChart from '../../components/driver/WeeklyEarningsChart';
+import DailyEarningsChart from '../../components/driver/DailyEarningsChart';
 import RecentActivityList from '../../components/driver/RecentActivityList';
 
 export default function DriverHome() {
@@ -47,9 +47,15 @@ export default function DriverHome() {
     };
 
     window.addEventListener('ws:identity_update', handleIdentityUpdate);
+    window.addEventListener('ws:trip_assigned', refreshStatus);
+    window.addEventListener('ws:trip_cancelled', refreshStatus);
+    window.addEventListener('ws:trip_completed', refreshStatus);
 
     return () => {
       window.removeEventListener('ws:identity_update', handleIdentityUpdate);
+      window.removeEventListener('ws:trip_assigned', refreshStatus);
+      window.removeEventListener('ws:trip_cancelled', refreshStatus);
+      window.removeEventListener('ws:trip_completed', refreshStatus);
     };
   }, [t, addToast, refreshStatus]);
 
@@ -120,7 +126,7 @@ export default function DriverHome() {
       {/* Grid for Charts & Activity */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
         <ShiftPerformanceChart />
-        <WeeklyEarningsChart />
+        <DailyEarningsChart />
       </div>
 
       <div className="mt-md">
