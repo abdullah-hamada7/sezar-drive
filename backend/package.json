@@ -9,6 +9,7 @@
     "prisma:migrate": "npx prisma migrate dev",
     "prisma:migrate:prod": "npx prisma migrate deploy",
     "prisma:studio": "npx prisma studio",
+    "db:setup": "npm run prisma:migrate:prod && npm run seed",
     "db:repair": "node scripts/repair_db.js",
     "seed": "node prisma/seed.js",
     "test": "jest --passWithNoTests",

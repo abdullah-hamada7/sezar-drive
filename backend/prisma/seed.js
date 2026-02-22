@@ -23,6 +23,7 @@ async function main() {
   const adminPhone = (process.env.SEED_ADMIN_PHONE || '0000000000').trim();
   const providedPassword = process.env.SEED_ADMIN_PASSWORD;
   const overwriteAdminPassword = isTruthyEnv('SEED_OVERWRITE_ADMIN_PASSWORD');
+  const overwriteConfig = isTruthyEnv('SEED_OVERWRITE_CONFIG');
 
   // Dangerous operation: full reset REMOVED per user request.
   // const resetDb = isTruthyEnv('SEED_RESET_DB');
@@ -91,6 +92,43 @@ async function main() {
       skipDuplicates: true,
     });
     console.log('  ✅ Expense categories ensured.');
+
+    // 4. Seed platform config keys (idempotent)
+    const inspectionPolicy = {
+      first_shift_of_day: 'full',
+      subsequent_trips: 'checklist',
+      damage_reported: 'full',
+      vehicle_reassigned: 'full',
+    };
+
+    const defaultConfig = [
+      { key: 'shift_auto_timeout_hours', value: 14 },
+      { key: 'tracking_interval_seconds', value: 30 },
+      { key: 'max_report_days', value: 90 },
+      { key: 'inspection_policy', value: inspectionPolicy },
+    ];
+
+    for (const item of defaultConfig) {
+      const existing = await prisma.adminConfig.findUnique({ where: { key: item.key } });
+      if (!existing) {
+        await prisma.adminConfig.create({
+          data: {
+            key: item.key,
+            value: item.value,
+            updatedBy: admin?.id || null,
+          },
+        });
+      } else if (overwriteConfig) {
+        await prisma.adminConfig.update({
+          where: { key: item.key },
+          data: {
+            value: item.value,
+            updatedBy: admin?.id || existing.updatedBy || null,
+          },
+        });
+      }
+    }
+    console.log(`  ✅ Admin config ensured${overwriteConfig ? ' (overwritten)' : ''}.`);
 
     console.log('\n🎉 Seed completed successfully!');
     if (!isProduction) {

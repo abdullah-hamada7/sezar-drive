@@ -13,6 +13,15 @@ export const authService = {
   uploadIdentityPhoto(formData) {
     return http.request('/verify/identity', { method: 'POST', body: formData });
   },
+  uploadIdentity(formData) {
+    return http.request('/auth/identity', { method: 'POST', body: formData, headers: { 'Content-Type': 'multipart/form-data' } });
+  },
+  getPendingShiftVerifications(params) {
+    return http.get(`/verify/pending?${params}`);
+  },
+  reviewShiftVerification(shiftId, decision, reason) {
+    return http.post('/verify/review', { shiftId, decision, reason });
+  },
   verifyIdentity(formData) {
     return http.request('/verify/identity', { method: 'POST', body: formData });
   },

@@ -2,7 +2,7 @@ const prisma = require('../../config/database');
 const jwt = require('jsonwebtoken');
 const config = require('../../config');
 const { notifyAdmins } = require('../tracking/tracking.ws');
-const { ValidationError, NotFoundError } = require('../../errors');
+const { ValidationError, NotFoundError, ConflictError } = require('../../errors');
 
 /**
  * Driver requests a rescue code because they forgot their password.

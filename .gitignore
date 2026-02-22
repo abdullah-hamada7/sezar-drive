@@ -20,9 +20,6 @@ out/
 build/
 .turbo/
 .vercel/
-.gemini/
-! .gemini/antigravity/brain/
-.agent/
 
 # Infrastructure (Terraform)
 .terraform/
@@ -31,6 +28,4 @@ build/
 *.tfplan
 plan
 terraform.tfvars
-
-# Deployment Artifacts
-trip.zip
+.agents/

@@ -43,7 +43,7 @@ export default function DriverShift() {
       await refreshShift();
       // Force face verification for every shift start
       setActiveStep('face');
-    } catch (err) {
+    } catch {
       // Handled by HttpService
     } finally {
       setActionLoading(false);
@@ -70,7 +70,7 @@ export default function DriverShift() {
       } else {
         addToast(t('shift.failed_alert'), 'error');
       }
-    } catch (err) {
+    } catch {
       // Handled by HttpService
     } finally {
       setActionLoading(false);
@@ -84,7 +84,7 @@ export default function DriverShift() {
       addToast(t('common.success'), 'success');
       setActiveStep(null);
       await refreshShift();
-    } catch (err) {
+    } catch {
       // Handled by HttpService
     } finally {
       setActionLoading(false);
@@ -97,7 +97,7 @@ export default function DriverShift() {
       await shiftService.activateShift(shift.id);
       addToast(t('common.success'), 'success');
       await refreshShift();
-    } catch (err) {
+    } catch {
       // Handled by HttpService
     } finally { setActionLoading(false); }
   }
@@ -109,7 +109,7 @@ export default function DriverShift() {
       await shiftService.closeShift(shift.id);
       addToast(t('common.success'), 'success');
       await refreshShift();
-    } catch (err) {
+    } catch {
       // Handled by HttpService
     } finally { setActionLoading(false); }
   }

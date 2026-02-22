@@ -1,0 +1,35 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Premium Dark Background with Gradient -->
+  <rect width="512" height="512" rx="120" fill="url(#bg_gradient)"/>
+  
+  <!-- Subtle Glassmorphism Effect -->
+  <rect x="0" y="0" width="512" height="512" rx="120" fill="white" fill-opacity="0.03"/>
+  <rect x="1" y="1" width="510" height="510" rx="119" stroke="white" stroke-opacity="0.1" stroke-width="2"/>
+
+  <!-- Stylized 'S' Road Path -->
+  <path d="M140 160C140 120 180 100 220 100H292C332 100 372 120 372 160V190C372 230 332 250 292 250H220C180 250 140 270 140 310V352C140 392 180 412 220 412H292C332 412 372 392 372 352" 
+        stroke="url(#path_gradient)" stroke-width="48" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Speed Lines / Road Marks -->
+  <path d="M220 175H292" stroke="white" stroke-width="4" stroke-opacity="0.3" stroke-dasharray="10 10"/>
+  <path d="M220 337H292" stroke="white" stroke-width="4" stroke-opacity="0.3" stroke-dasharray="10 10"/>
+
+  <!-- Glowing Core Accent (Modern D - Drive) -->
+  <circle cx="256" cy="256" r="40" fill="url(#accent_glow)"/>
+  <path d="M245 235L275 256L245 277V235Z" fill="white"/>
+
+  <defs>
+    <linearGradient id="bg_gradient" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#020617"/>
+      <stop offset="1" stop-color="#1E293B"/>
+    </linearGradient>
+    <linearGradient id="path_gradient" x1="140" y1="100" x2="372" y2="412" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8"/>
+      <stop offset="1" stop-color="#818CF8"/>
+    </linearGradient>
+    <radialGradient id="accent_glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(256 256) rotate(90) scale(40)">
+      <stop stop-color="#22D3EE"/>
+      <stop offset="1" stop-color="#22D3EE" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg>

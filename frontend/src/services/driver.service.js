@@ -13,10 +13,9 @@ export const driverService = {
   updateDriver(id, data) {
     return http.request(`/drivers/${id}`, { method: 'PUT', body: data });
   },
-  deleteDriver(id) {
-    return http.request(`/drivers/${id}`, { method: 'DELETE' });
-  },
-  updateProfileAvatar(formData) {
-    return http.request('/drivers/profile', { method: 'PUT', body: formData });
-  }
+  deleteDriver: (id) => http.delete(`/drivers/${id}`),
+  updateAvatar: (id, formData) => http.post(`/drivers/${id}/avatar`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+  reviewIdentity: (id, data) => http.put(`/auth/identity/${id}/review`, data)
 };

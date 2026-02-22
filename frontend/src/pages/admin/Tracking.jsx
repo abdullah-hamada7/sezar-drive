@@ -87,13 +87,13 @@ export default function TrackingPage() {
         }
       } catch (err) { console.error(err); }
     };
-  }, []);
+  }, [addToast]);
 
   useEffect(() => {
     loadInitialPositions();
     connectWebSocket();
     return () => wsRef.current?.close();
-  }, [connectWebSocket]);
+  }, [connectWebSocket, loadInitialPositions]);
 
   async function loadInitialPositions() {
     try {
