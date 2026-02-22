@@ -27,7 +27,7 @@ class HttpService {
     const headers = { ...options.headers };
 
     const notifyToast = (message, type = 'error', code = null) => {
-      if (options.suppressToast) return;
+      if (options.suppressToast || options.toast !== true) return;
       if (typeof window === 'undefined') return;
       window.dispatchEvent(new CustomEvent('app:toast', { detail: { message, type, code } }));
     };

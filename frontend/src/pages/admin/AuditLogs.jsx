@@ -195,23 +195,26 @@ export default function AuditPage() {
               <h2 className="modal-title">{t('audit.modal.title')}</h2>
               <button className="btn-icon" onClick={() => setSelected(null)}><X size={18} /></button>
             </div>
-            <div className="grid grid-2 mb-lg">
-              <div>
+            <div className="grid grid-2 mb-lg" style={{ gap: '1rem' }}>
+              <div className="card" style={{ padding: '0.75rem 1rem' }}>
                 <label className="form-label">{t('audit.modal.action')}</label>
-                <div className="text-sm" style={{ fontWeight: 600 }}>
+                <div className="text-sm" style={{ fontWeight: 700 }}>
                   {t(`audit.action.${selected.actionType?.split('.').pop()?.toLowerCase()}`, selected.actionType)}
                 </div>
               </div>
 
-              <div>
+              <div className="card" style={{ padding: '0.75rem 1rem' }}>
                 <label className="form-label">{t('audit.modal.entity')}</label>
-                <div className="text-sm">{t(`audit.entity.${selected.entityType?.toLowerCase()}`, selected.entityType)} ({selected.entityId})</div>
+                <div className="text-sm">
+                  {t(`audit.entity.${selected.entityType?.toLowerCase()}`, selected.entityType)}
+                  <span className="text-xs text-muted" style={{ marginLeft: '0.5rem' }}>({selected.entityId})</span>
+                </div>
               </div>
-              <div>
+              <div className="card" style={{ padding: '0.75rem 1rem' }}>
                 <label className="form-label">{t('audit.modal.timestamp')}</label>
                 <div className="text-sm">{formatDate(selected.createdAt)}</div>
               </div>
-              <div>
+              <div className="card" style={{ padding: '0.75rem 1rem' }}>
                 <label className="form-label">{t('audit.modal.ip')}</label>
                 <div className="text-sm">{selected.ipAddress || '—'}</div>
               </div>
@@ -221,7 +224,7 @@ export default function AuditPage() {
               <div>
                 <label className="form-label" style={{ color: 'var(--color-danger)' }}>{t('audit.modal.prev_state')}</label>
                 <div dir={i18n.language === 'ar' ? 'rtl' : 'ltr'} style={{
-                  background: 'var(--color-bg)',
+                  background: 'linear-gradient(180deg, rgba(239, 68, 68, 0.08) 0%, var(--color-bg) 70%)',
                   padding: '1rem',
                   borderRadius: 'var(--radius-md)',
                   fontSize: '0.85rem',
@@ -229,13 +232,15 @@ export default function AuditPage() {
                   border: '1px solid var(--color-border)',
                   color: 'var(--color-text)'
                 }}>
-                  <pre style={{ margin: 0 }}>{JSON.stringify(translateState(selected.previousState || {}), null, 2)}</pre>
+                  <pre style={{ margin: 0, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace' }}>
+                    {JSON.stringify(translateState(selected.previousState || {}), null, 2)}
+                  </pre>
                 </div>
               </div>
               <div>
                 <label className="form-label" style={{ color: 'var(--color-success)' }}>{t('audit.modal.new_state')}</label>
                 <div dir={i18n.language === 'ar' ? 'rtl' : 'ltr'} style={{
-                  background: 'var(--color-bg)',
+                  background: 'linear-gradient(180deg, rgba(16, 185, 129, 0.08) 0%, var(--color-bg) 70%)',
                   padding: '1rem',
                   borderRadius: 'var(--radius-md)',
                   fontSize: '0.85rem',
@@ -243,7 +248,9 @@ export default function AuditPage() {
                   border: '1px solid var(--color-border)',
                   color: 'var(--color-text)'
                 }}>
-                  <pre style={{ margin: 0 }}>{JSON.stringify(translateState(selected.newState || {}), null, 2)}</pre>
+                  <pre style={{ margin: 0, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace' }}>
+                    {JSON.stringify(translateState(selected.newState || {}), null, 2)}
+                  </pre>
                 </div>
               </div>
             </div>
@@ -256,7 +263,8 @@ export default function AuditPage() {
                   padding: '1rem',
                   borderRadius: 'var(--radius-md)',
                   fontSize: '0.75rem',
-                  border: '1px solid var(--color-border)'
+                  border: '1px solid var(--color-border)',
+                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace'
                 }}>
                   {JSON.stringify(selected.metadata, null, 2)}
                 </pre>

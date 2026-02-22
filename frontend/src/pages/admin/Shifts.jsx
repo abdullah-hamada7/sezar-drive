@@ -76,9 +76,12 @@ export default function ShiftsPage() {
 
   const [showInspections, setShowInspections] = useState(false);
   const [selectedShiftInspections, setSelectedShiftInspections] = useState([]);
+  const [selectedShift, setSelectedShift] = useState(null);
 
   async function handleViewInspections(shiftId) {
     try {
+      const shift = shifts.find(s => s.id === shiftId) || null;
+      setSelectedShift(shift);
       const res = await inspApi.getInspections(`shiftId=${shiftId}`);
       setSelectedShiftInspections(res.data || []);
       setShowInspections(true);
@@ -86,6 +89,17 @@ export default function ShiftsPage() {
       console.error(err);
       addToast(t('common.error'), 'error');
     }
+  }
+
+  function getInspectionTiming(insp) {
+    if (!selectedShift?.startedAt || !insp?.createdAt) return null;
+    const created = new Date(insp.createdAt);
+    const started = new Date(selectedShift.startedAt);
+    const closed = selectedShift.closedAt ? new Date(selectedShift.closedAt) : null;
+    if (!isNaN(started.getTime()) && created <= started) return 'before';
+    if (closed && !isNaN(closed.getTime()) && created >= closed) return 'after';
+    if (closed && created > started && created < closed) return 'during';
+    return null;
   }
 
   return (
@@ -173,16 +187,30 @@ export default function ShiftsPage() {
                 <p className="text-muted text-center p-xl">{t('shifts.modal.empty')}</p>
               ) : (
                 <div className="flex flex-col gap-xl">
-                  {selectedShiftInspections.map(insp => (
-                    <div key={insp.id} className="detail-item-group border rounded-lg p-md bg-surface-dark">
-                      <div className="flex justify-between items-center mb-md pb-sm border-bottom">
-                        <h3 className="text-md font-bold text-gradient">
-                          {t('shifts.modal.type_title', { type: t(`common.inspection_type.${insp.type.toLowerCase()}`) })}
-                        </h3>
-                        <span className={`badge ${INSP_STATUS_BADGES[insp.status]}`}>
-                          {t(`common.status.${insp.status.toLowerCase()}`)}
-                        </span>
-                      </div>
+                   {selectedShiftInspections.map(insp => {
+                     const timing = getInspectionTiming(insp);
+                     const checks = insp.checklistData?.checks || insp.checklistData || {};
+                     const checkEntries = Object.entries(checks).filter(([key]) => key !== 'notes');
+                     const marked = checkEntries.filter(([, val]) => !!val).map(([key]) => key);
+                     const unmarked = checkEntries.filter(([, val]) => !val).map(([key]) => key);
+
+                     return (
+                     <div key={insp.id} className="detail-item-group border rounded-lg p-md bg-surface-dark">
+                       <div className="flex justify-between items-center mb-md pb-sm border-bottom">
+                         <h3 className="text-md font-bold text-gradient">
+                           {t('shifts.modal.type_title', { type: t(`common.inspection_type.${insp.type.toLowerCase()}`) })}
+                         </h3>
+                         <div className="flex items-center gap-sm">
+                           {timing && (
+                             <span className="badge badge-info" style={{ textTransform: 'capitalize' }}>
+                               {timing === 'before' ? t('inspection.before_shift') || 'Before shift' : timing === 'after' ? t('inspection.after_shift') || 'After shift' : t('inspection.during_shift') || 'During shift'}
+                             </span>
+                           )}
+                           <span className={`badge ${INSP_STATUS_BADGES[insp.status]}`}>
+                             {t(`common.status.${insp.status.toLowerCase()}`)}
+                           </span>
+                         </div>
+                       </div>
 
                       <div className="grid grid-3 gap-md mb-lg p-sm rounded bg-bg-tertiary">
                         <div className="flex flex-col">
@@ -199,22 +227,41 @@ export default function ShiftsPage() {
                         </div>
                       </div>
 
-                      {insp.checklistData && (
-                        <div className="mb-lg">
-                          <h4 className="text-xs uppercase text-muted font-bold mb-sm tracking-wider">{t('shifts.modal.checklist')}</h4>
-                          <div className="grid grid-4 gap-sm">
-                            {Object.entries(insp.checklistData.checks || insp.checklistData).map(([key, val]) => (
-                              // Filter out 'notes' if it was mixed in for legacy reasons, though we prefer nesting
-                              key !== 'notes' && (
-                                <div key={key} className="flex items-center justify-between p-xs px-sm rounded border bg-bg-secondary">
-                                  <span className="text-xs">{t(`inspection.checklist.${key}`) || key}</span>
-                                  {val ? <Check size={14} className="text-success" /> : <AlertCircle size={14} className="text-danger" />}
-                                </div>
-                              )
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                       {insp.checklistData && (
+                         <div className="mb-lg">
+                           <h4 className="text-xs uppercase text-muted font-bold mb-sm tracking-wider">{t('shifts.modal.checklist')}</h4>
+                           <div className="grid grid-4 gap-sm">
+                             {checkEntries.map(([key, val]) => (
+                               <div key={key} className="flex items-center justify-between p-xs px-sm rounded border bg-bg-secondary">
+                                 <span className="text-xs">{t(`inspection.checklist.${key}`) || key}</span>
+                                 {val ? <Check size={14} className="text-success" /> : <AlertCircle size={14} className="text-danger" />}
+                               </div>
+                             ))}
+                           </div>
+                           <div className="grid grid-2 gap-md mt-md">
+                             <div className="p-sm rounded border bg-bg-tertiary">
+                               <div className="text-xs uppercase text-muted font-bold mb-xs tracking-wider">{t('inspection.marked') || 'Marked'}</div>
+                               <div className="flex flex-wrap gap-xs">
+                                 {marked.length === 0 ? (
+                                   <span className="text-xs text-muted">—</span>
+                                 ) : marked.map(k => (
+                                   <span key={k} className="badge badge-success" style={{ fontSize: '0.65rem' }}>{t(`inspection.checklist.${k}`) || k}</span>
+                                 ))}
+                               </div>
+                             </div>
+                             <div className="p-sm rounded border bg-bg-tertiary">
+                               <div className="text-xs uppercase text-muted font-bold mb-xs tracking-wider">{t('inspection.not_marked') || 'Not marked'}</div>
+                               <div className="flex flex-wrap gap-xs">
+                                 {unmarked.length === 0 ? (
+                                   <span className="text-xs text-muted">—</span>
+                                 ) : unmarked.map(k => (
+                                   <span key={k} className="badge badge-warning" style={{ fontSize: '0.65rem' }}>{t(`inspection.checklist.${k}`) || k}</span>
+                                 ))}
+                               </div>
+                             </div>
+                           </div>
+                         </div>
+                       )}
 
                       {(insp.notes || (insp.checklistData && insp.checklistData.notes)) && (
                         <div className="mb-lg">
@@ -244,11 +291,12 @@ export default function ShiftsPage() {
                           </div>
                         </div>
                       )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                     </div>
+                   );
+                  })}
+                 </div>
+               )}
+             </div>
           </div>
         </div>
       )}
