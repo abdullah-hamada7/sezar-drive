@@ -58,6 +58,17 @@ export default function DamageReportsPage() {
         </div>
       </div>
 
+      {!loading && (
+        <div className="card mb-md" style={{ padding: '0.75rem var(--space-md)' }}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-sm">
+              <span className="text-xs text-muted uppercase" style={{ letterSpacing: '0.08em' }}>{t('admin_damage.title')}</span>
+            </div>
+            <span className="badge badge-info">{reports.length}</span>
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <div className="loading-page"><div className="spinner"></div></div>
       ) : (

@@ -151,8 +151,6 @@ export default function TrackingPage() {
         </div>
       </div>
 
-<<<<<<< HEAD
-=======
       {!loading && (
         <div className="card mb-md" style={{ padding: '0.75rem var(--space-md)' }}>
           <div className="flex items-center justify-between">
@@ -166,8 +164,6 @@ export default function TrackingPage() {
           </div>
         </div>
       )}
-
->>>>>>> parent of 87dd9a0 (v2-drivers)
       <div className="grid" style={{ gridTemplateColumns: '1fr 300px', gap: '1rem' }}>
         <div className="card" style={{ padding: 0, height: '600px', overflow: 'hidden', position: 'relative' }}>
           <MapContainer center={activeCenter} zoom={12} style={{ height: '100%', width: '100%', zIndex: 1 }}>
