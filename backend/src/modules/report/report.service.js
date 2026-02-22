@@ -1,5 +1,6 @@
 const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
+const path = require('path');
 const prisma = require('../../config/database');
 const { ValidationError } = require('../../errors');
 
@@ -176,38 +177,61 @@ function getReportStrings(lang) {
   return REPORT_I18N[resolveLang(lang)];
 }
 
+function getPdfFonts(lang) {
+  const normalized = resolveLang(lang);
+  if (normalized !== 'ar') {
+    return { regular: 'Helvetica', bold: 'Helvetica-Bold' };
+  }
+  return {
+    regular: 'Cairo',
+    bold: 'Cairo-Bold',
+    regularPath: path.join(__dirname, '../../assets/fonts/Cairo-Regular.ttf'),
+    boldPath: path.join(__dirname, '../../assets/fonts/Cairo-Bold.ttf')
+  };
+}
+
 /**
  * Generate PDF report.
  */
 async function generatePDF(reportData, res, { lang } = {}) {
   const strings = getReportStrings(lang);
+  const fonts = getPdfFonts(lang);
+  const isArabic = resolveLang(lang) === 'ar';
+  const textAlign = isArabic ? 'right' : 'left';
   const doc = new PDFDocument({ margin: 50 });
   res.setHeader('Content-Type', 'application/pdf');
   res.setHeader('Content-Disposition', `attachment; filename=${strings.fileName}.pdf`);
   doc.pipe(res);
 
+  if (fonts.regularPath) {
+    doc.registerFont(fonts.regular, fonts.regularPath);
+  }
+  if (fonts.boldPath) {
+    doc.registerFont(fonts.bold, fonts.boldPath);
+  }
+
   // Header
-  doc.fontSize(20).font('Helvetica-Bold').text(strings.title, { align: 'center' });
+  doc.fontSize(20).font(fonts.bold).text(strings.title, { align: 'center' });
   doc.moveDown();
-  doc.fontSize(12).font('Helvetica').text(`${strings.period}: ${reportData.startDate.slice(0, 10)} - ${reportData.endDate.slice(0, 10)}`, { align: 'center' });
+  doc.fontSize(12).font(fonts.regular).text(`${strings.period}: ${reportData.startDate.slice(0, 10)} - ${reportData.endDate.slice(0, 10)}`, { align: 'center' });
   doc.moveDown();
 
   // Summary table
-  doc.fontSize(14).font('Helvetica-Bold').text(strings.summary, { underline: true });
+  doc.fontSize(14).font(fonts.bold).text(strings.summary, { underline: true, align: textAlign });
   doc.moveDown(0.5);
-  doc.fontSize(11).font('Helvetica');
-  doc.text(`${strings.totalRevenue}: ${reportData.totalRevenue.toFixed(2)} EGP`);
-  doc.text(`${strings.totalExpenses}: ${reportData.totalExpenses.toFixed(2)} EGP`);
-  doc.text(`${strings.netRevenue}: ${reportData.netRevenue.toFixed(2)} EGP`);
-  doc.text(`${strings.totalTrips}: ${reportData.tripCount}`);
+  doc.fontSize(11).font(fonts.regular);
+  doc.text(`${strings.totalRevenue}: ${reportData.totalRevenue.toFixed(2)} EGP`, { align: textAlign });
+  doc.text(`${strings.totalExpenses}: ${reportData.totalExpenses.toFixed(2)} EGP`, { align: textAlign });
+  doc.text(`${strings.netRevenue}: ${reportData.netRevenue.toFixed(2)} EGP`, { align: textAlign });
+  doc.text(`${strings.totalTrips}: ${reportData.tripCount}`, { align: textAlign });
   doc.moveDown();
 
   // Driver breakdown
-  doc.fontSize(14).font('Helvetica-Bold').text(strings.driverBreakdown, { underline: true });
+  doc.fontSize(14).font(fonts.bold).text(strings.driverBreakdown, { underline: true, align: textAlign });
   doc.moveDown(0.5);
-  doc.fontSize(11).font('Helvetica');
+  doc.fontSize(11).font(fonts.regular);
   for (const driver of reportData.driverSummaries) {
-    doc.text(`${driver.driverName}: ${strings.revenue} ${driver.totalRevenue.toFixed(2)} EGP | ${strings.expenses} ${driver.totalExpenses.toFixed(2)} EGP | ${strings.net} ${driver.netRevenue.toFixed(2)} EGP | ${strings.trips}: ${driver.tripCount}`);
+    doc.text(`${driver.driverName}: ${strings.revenue} ${driver.totalRevenue.toFixed(2)} EGP | ${strings.expenses} ${driver.totalExpenses.toFixed(2)} EGP | ${strings.net} ${driver.netRevenue.toFixed(2)} EGP | ${strings.trips}: ${driver.tripCount}`, { align: textAlign });
   }
 
   doc.end();
